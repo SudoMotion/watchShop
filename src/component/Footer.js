@@ -3,7 +3,7 @@ import React from 'react'
 
 export default function Footer() {
   return (
-    <div className='bg-black'>
+    <div className='bg-black px-2'>
         <div className='bg-[#1a1a1a] w-full py-5 md:py-16 flex items-center justify-center'>
             <Link href={'/'} className='border px-32 py-4 border-white text-white hover:bg-[#193c72]'>Contact</Link>
         </div>
@@ -30,11 +30,23 @@ export default function Footer() {
             </div>
         </div>
         <div className='max-w-6xl mx-auto'>
-            <div className='flex items-center justify-end gap-5'>
+            <div className='flex items-center justify-end gap-2'>
                 <a href="#">
-                    <img src="/social-media/sns-youtube.svg" alt="" className='h-10' />
+                    <img src="/social-media/sns-youtube.svg" alt="" className='h-8' />
+                </a>
+                <a href="#">
+                    <img src="/social-media/sns-facebook.svg" alt="" className='h-8' />
+                </a>
+                <a href="#">
+                    <img src="/social-media/sns-instagram.svg" alt="" className='h-8' />
+                </a>
+                <a href="#">
+                    <img src="/social-media/sns-twitter.svg" alt="" className='h-8' />
                 </a>
             </div>
+        </div>
+        <div className='max-w-6xl mx-auto text-center py-2 text-gray-600 text-[10px] md:text-xs'>
+            <p>© 2025 watchshopbd Corporation</p>
         </div>
     </div>
   )
