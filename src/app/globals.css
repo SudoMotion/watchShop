@@ -24,3 +24,37 @@ body {
   color: var(--foreground);
   font-family: Inter, Arial, Helvetica, sans-serif;
 }
+/* Base state */
+/* Swiper size safety */
+.swiper,
+.swiper-wrapper,
+.swiper-slide {
+  width: 100%;
+  height: 100%;
+}
+
+/* Zoom animation */
+.hero-bg {
+  transform: scale(1);
+  transition: transform 5s linear;
+}
+
+.swiper-slide-active .hero-bg {
+  transform: scale(1.25);
+}
+
+/* Pagination dots */
+.hero-bullet {
+  width: 6px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.4);
+  display: inline-block;
+  margin: 0 6px;
+  border-radius: 50%;
+  transition: all 0.4s ease;
+}
+
+.hero-bullet-active {
+  background: #ffffff;
+  transform: scale(1.4);
+}
