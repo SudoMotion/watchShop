@@ -1,5 +1,7 @@
+import BigButton from '@/component/BigButton';
 import HeroSlider from '@/component/HeroSlider'
 import ProductCard from '@/component/ProductCard'
+import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
 import React from 'react'
 
 export default function page() {
@@ -86,13 +88,16 @@ export default function page() {
         </div>
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2'>
-        <HeroSlider/>
+        <SecoundaryProductSlider/>
         <div className='text-center p-5'>
           <h1 className='text-2xl md:text-3xl pb-5'>Recommend</h1>
           <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
               {productList.map((item, index) => (
                 <ProductCard item={item} key={index} />
               ))}
+          </div>
+          <div className='flex items-center justify-center'>
+            <BigButton label="View All Watches" className='mt-10'/>
           </div>
         </div>
       </div>
