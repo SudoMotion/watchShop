@@ -1,12 +1,12 @@
-import { Inter } from "next/font/google";
+import { Jost } from "next/font/google";
 import "./globals.css";
 import Header from "@/component/Header";
 import Footer from "@/component/Footer";
 
-const inter = Inter({
+const jost = Jost({
   subsets: ["latin"],
   display: "swap",
-  variable: "--font-inter",
+  variable: "--font-jost",
 });
 
 export const metadata = {
@@ -17,10 +17,8 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
-      <body
-        className={`${inter.variable} font-sans antialiased`}
-      >
+    <html lang="en" className={jost.variable}>
+      <body className="font-sans antialiased">
         <div className="flex flex-col justify-between min-h-screen text-xs md:text-sm">
           <Header />
           <div className="flex-1 w-full">
