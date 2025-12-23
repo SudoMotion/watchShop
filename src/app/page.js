@@ -1,81 +1,37 @@
+import { productList } from '@/_lib/productList';
+import { topBrands } from '@/_lib/tobBrands';
 import BigButton from '@/component/BigButton';
-import HeroSlider from '@/component/HeroSlider'
-import ProductCard from '@/component/ProductCard'
+import HeroSlider from '@/component/HeroSlider';
+import ProductCard from '@/component/ProductCard';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
-import React from 'react'
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
 
 export default function page() {
-  const productList = [
-    {
-      id: 1,
-      image: '/images/mockProduct/1.png',
-      title: 'Rolex Submariner',
-      brand: 'Rolex',
-      price: '৳1,250,000',
-      originalPrice: '৳1,400,000',
-      discount: '11% OFF',
-      rating: 4.8,
-      isNew: true
-    },
-    {
-      id: 2,
-      image: '/images/mockProduct/2.png',
-      title: 'Omega Speedmaster Moonwatch',
-      brand: 'Omega',
-      price: '৳850,000',
-      originalPrice: '৳920,000',
-      discount: '8% OFF',
-      rating: 4.7,
-      isNew: false
-    },
-    {
-      id: 3,
-      image: '/images/mockProduct/3.png',
-      title: 'TAG Heuer Carrera',
-      brand: 'TAG Heuer',
-      price: '৳650,000',
-      originalPrice: '৳720,000',
-      discount: '10% OFF',
-      rating: 4.5,
-      isNew: true
-    },
-    {
-      id: 4,
-      image: '/images/mockProduct/4.png',
-      title: 'Tissot PRX Powermatic 80',
-      brand: 'Tissot',
-      price: '৳120,000',
-      originalPrice: '৳135,000',
-      discount: '11% OFF',
-      rating: 4.6,
-      isNew: false
-    },
-    {
-      id: 5,
-      image: '/images/mockProduct/5.png',
-      title: 'Casio G-Shock GA-2100',
-      brand: 'Casio',
-      price: '৳25,000',
-      originalPrice: '৳28,000',
-      discount: '11% OFF',
-      rating: 4.9,
-      isNew: true
-    },
-    {
-      id: 6,
-      image: '/images/mockProduct/6.png',
-      title: 'Seiko Presage Cocktail Time',
-      brand: 'Seiko',
-      price: '৳85,000',
-      originalPrice: '৳95,000',
-      discount: '11% OFF',
-      rating: 4.7,
-      isNew: false
-    }
-  ];
   return (
     <div>
       <HeroSlider/>
+      <div className='py-10 bg-gray-50'>
+        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+          <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
+          <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 justify-items-center'>
+            {topBrands.map((brand, index) => (
+              <div key={index} className='flex flex-col items-center p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 w-full'>
+                <div className='relative w-full h-16 md:h-20'>
+                  <Image
+                    src={brand.image}
+                    alt={brand.name}
+                    fill
+                    className='object-contain p-2'
+                    // sizes='(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 10vw'
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className='py-10 bg-black text-white'>
         <div className='max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between'>
           <p>Important</p>
@@ -90,7 +46,7 @@ export default function page() {
       <div className='grid grid-cols-1 md:grid-cols-2'>
         <SecoundaryProductSlider/>
         <div className='text-center p-5'>
-          <h1 className='text-2xl md:text-3xl pb-5'>Recommend</h1>
+          <h1 className='title'>Recommend</h1>
           <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
               {productList.map((item, index) => (
                 <ProductCard item={item} key={index} />
@@ -99,6 +55,12 @@ export default function page() {
           <div className='flex items-center justify-center'>
             <BigButton label="View All Watches" className='mt-10'/>
           </div>
+        </div>
+      </div>
+      <div className='max-w-7xl mx-auto'>
+        <h1 className='title'>Category</h1>
+        <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
+          <Link href={'#'}>hello</Link>
         </div>
       </div>
     </div>
