@@ -2,6 +2,7 @@ export const productList = [
     {
       id: 1,
       image: '/images/mockProduct/1.png',
+      image2: '/images/mockProduct/2.png',
       title: 'Rolex Submariner',
       brand: 'Rolex',
       price: '৳1,250,000',
@@ -13,6 +14,7 @@ export const productList = [
     {
       id: 2,
       image: '/images/mockProduct/2.png',
+      image2: '/images/mockProduct/3.png',
       title: 'Omega Speedmaster Moonwatch',
       brand: 'Omega',
       price: '৳850,000',
@@ -24,6 +26,7 @@ export const productList = [
     {
       id: 3,
       image: '/images/mockProduct/3.png',
+      image2: '/images/mockProduct/4.png',
       title: 'TAG Heuer Carrera',
       brand: 'TAG Heuer',
       price: '৳650,000',
@@ -35,6 +38,7 @@ export const productList = [
     {
       id: 4,
       image: '/images/mockProduct/4.png',
+      image2: '/images/mockProduct/5.png',
       title: 'Tissot PRX Powermatic 80',
       brand: 'Tissot',
       price: '৳120,000',
@@ -46,6 +50,7 @@ export const productList = [
     {
       id: 5,
       image: '/images/mockProduct/5.png',
+      image2: '/images/mockProduct/6.png',
       title: 'Casio G-Shock GA-2100',
       brand: 'Casio',
       price: '৳25,000',
@@ -57,6 +62,7 @@ export const productList = [
     {
       id: 6,
       image: '/images/mockProduct/6.png',
+      image2: '/images/mockProduct/1.png',
       title: 'Seiko Presage Cocktail Time',
       brand: 'Seiko',
       price: '৳85,000',
