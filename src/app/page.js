@@ -3,6 +3,7 @@ import { topBrands } from '@/_lib/tobBrands';
 import BigButton from '@/component/BigButton';
 import HeroSlider from '@/component/HeroSlider';
 import ProductCard from '@/component/ProductCard';
+import ProductSection from '@/component/ProductSection';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -57,12 +58,7 @@ export default function page() {
           </div>
         </div>
       </div>
-      <div className='max-w-7xl mx-auto'>
-        <h1 className='title'>Category</h1>
-        <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
-          <Link href={'#'}>hello</Link>
-        </div>
-      </div>
+      <ProductSection products={productList} title="New Arrival"/>
     </div>
   )
 }
