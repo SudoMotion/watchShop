@@ -10,11 +10,12 @@ import Link from 'next/link';
 import React from 'react';
 
 export default function page() {
+  const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
     <div>
       <HeroSlider/>
       <div className='py-10 bg-gray-50'>
-        <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
+        <div className='max-w-7xl mx-auto'>
           <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
           <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 justify-items-center'>
             {topBrands.map((brand, index) => (
@@ -31,6 +32,17 @@ export default function page() {
               </div>
             ))}
           </div>
+        </div>
+      </div>
+      <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-5 mb-10 md:h-[400px]'>
+        <div className='col-span-1 md:col-span-4 rounded-md md:rounded-lg overflow-hidden'>
+          <video preload autoPlay loop muted playsInline>
+            <source src="/intro.mp4" type="video/mp4" />            
+            Your browser does not support the video.
+          </video>
+        </div>
+        <div className='col-span-1 md:col-span-3 rounded-md md:rounded-lg overflow-hidden'>
+          <Image src="/images/beside-video.avif" alt="beside-video" width={500} height={500} className='w-full'/>
         </div>
       </div>
       <div className='py-10 bg-black text-white'>
@@ -59,6 +71,17 @@ export default function page() {
         </div>
       </div>
       <ProductSection products={productList} title="New Arrival"/>
+      <div className='max-w-7xl mx-auto my-10'>
+        <h1 className='title'>Trending Now</h1>
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
+          <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer1.webp" className='w-full h-96 object-cover' alt="offer1" width={500} height={500}/>
+          <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer2.webp" className='w-full h-96 object-cover' alt="offer2" width={500} height={500}/>
+        </div>
+      </div>
+      <ProductSection products={productList} title="MEN'S BEST SELLER"/>
+      <div className='max-w-7xl mx-auto my-10'>
+        <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full h-96 object-cover' alt="offer1" width={1500} height={1500}/>
+      </div>
     </div>
   )
 }
