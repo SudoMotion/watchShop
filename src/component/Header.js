@@ -12,7 +12,7 @@ export default function Header() {
                 <Link href="/">
                     <Image src="/logo.png" alt="Logo" width={120} height={120} />
                 </Link>
-                <div className={`flex flex-col md:flex-row gap-x-6 gap-y-3 whitespace-nowrap absolute top-[101%] bg-white backdrop-blur-md md:bg-transparent md:backdrop-blur-none w-full ${open ? 'left-0' : '-left-96'} transition-all duration-150 p-3 shadow-md md:shadow-none md:static bg-white`} style={{zIndex: 998}}>
+                <div className={`flex flex-col md:flex-row gap-x-6 gap-y-3 whitespace-nowrap absolute top-[101%] bg-white backdrop-blur-md md:bg-transparent md:backdrop-blur-none w-full ${open ? 'left-0' : '-left-[500px]'} transition-all duration-150 p-3 shadow-md md:shadow-none md:static bg-white`} style={{zIndex: 998}}>
                     <Link href="/">Collections</Link>
                     <Link href="/">Watch Finder</Link>
                     <Link href="/">Learn about SEIKO</Link>
