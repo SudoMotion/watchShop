@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
       <body className="font-sans antialiased">
         <div className="flex flex-col justify-between min-h-screen text-xs md:text-sm">
           <Header />
-          <div className="flex-1 w-full">
+          <div className="flex-1 w-full pt-[75px]">
             {children}
           </div>
           <Footer/>
