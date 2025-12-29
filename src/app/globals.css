@@ -62,3 +62,8 @@ body {
 .title {
   @apply text-3xl md:text-4xl pb-5;
 }
+@layer components {
+  .border {
+    @apply border-gray-200;
+  }
+}
