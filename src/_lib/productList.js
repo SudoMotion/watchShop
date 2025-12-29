@@ -10,7 +10,8 @@ export const productList = [
     originalPrice: '৳1,400,000',
     discount: '11% OFF',
     rating: 4.8,
-    isNew: true
+    isNew: true,
+    stock: 5
   },
   {
     id: 2,
@@ -23,7 +24,8 @@ export const productList = [
     originalPrice: '৳920,000',
     discount: '8% OFF',
     rating: 4.7,
-    isNew: false
+    isNew: false,
+    stock: 8
   },
   {
     id: 3,
@@ -36,7 +38,8 @@ export const productList = [
     originalPrice: '৳720,000',
     discount: '10% OFF',
     rating: 4.5,
-    isNew: true
+    isNew: true,
+    stock: 12
   },
   {
     id: 4,
@@ -49,7 +52,8 @@ export const productList = [
     originalPrice: '৳135,000',
     discount: '11% OFF',
     rating: 4.6,
-    isNew: false
+    isNew: false,
+    stock: 20
   },
   {
     id: 5,
@@ -62,7 +66,8 @@ export const productList = [
     originalPrice: '৳28,000',
     discount: '11% OFF',
     rating: 4.9,
-    isNew: true
+    isNew: true,
+    stock: 50
   },
   {
     id: 6,
@@ -75,6 +80,7 @@ export const productList = [
     originalPrice: '৳95,000',
     discount: '11% OFF',
     rating: 4.7,
-    isNew: false
+    isNew: false,
+    stock: 15
   }
 ];
