@@ -1,4 +1,6 @@
 "use client";
+import { productList } from "@/_lib/productList";
+import ProductCard2 from "@/component/ProductCard2";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
@@ -160,22 +162,8 @@ export default function ProductPage() {
         </h3>
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-          {[1, 2, 3, 4, 5].map((i) => (
-            <div key={i} className="border rounded-xl p-3 text-center">
-              <Image
-                src="/watch1.png"
-                width={160}
-                height={160}
-                alt="Watch"
-                className="mx-auto"
-              />
-              <p className="mt-2 text-sm font-medium">
-                Product Title
-              </p>
-              <p className="text-red-600 text-sm font-semibold">
-                ৳25,000
-              </p>
-            </div>
+          {productList.map((item) => (
+            <ProductCard2 item={item} />
           ))}
         </div>
       </div>
