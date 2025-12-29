@@ -184,22 +184,22 @@ export default function ProductPage() {
 
           {/* SPECS */}
           <div className="mt-8 border rounded-xl p-5">
-            <h2 className="font-semibold mb-3">Product Specifications</h2>
+            <h2 className="text-xl md:text-2xl font-semibold mb-3">To speak an Expert 24/7</h2>
+            <h2 className="font-semibold mb-3">WhatsApp us at +8801000000000</h2>
 
-            <div className="grid grid-cols-2 text-sm gap-y-2">
-              <p className="font-medium">Brand</p>
-              <p>Sample Brand</p>
-
-              <p className="font-medium">Movement</p>
-              <p>Automatic</p>
-
-              <p className="font-medium">Case Material</p>
-              <p>Stainless Steel</p>
-
-              <p className="font-medium">Water Resistance</p>
-              <p>200m</p>
-
-              {/* Add remaining rows the same way */}
+            <div className="grid grid-cols-2 md:grid-cols-2 text-sm gap-2">
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
+                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} />
+              </div>
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
+                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} />
+              </div>
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
+                <Image src="/images/busket.jpg" alt="Cycle" width={100} height={100} />
+              </div>
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
+                <Image src="/images/warrenty.png" alt="Cycle" width={100} height={100} />
+              </div>
             </div>
           </div>
         </div>
