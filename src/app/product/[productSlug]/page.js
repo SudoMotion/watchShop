@@ -7,6 +7,24 @@ import { useRef, useState } from "react";
 export default function ProductPage() {
   const [mainImg, setMainImg] = useState("/images/mockProduct/1.png");
   const scrollRef = useRef(null);
+  
+  // Product price (in Taka) - replace with actual product data
+  const productPrice = 42000; // ৳42,000.00
+  const isEmiAvailable = true; // Set based on product data
+  
+  // Calculate EMI amounts
+  const calculateEMI = (price, months, interestRate = 0) => {
+    if (interestRate === 0) {
+      return Math.round(price / months);
+    }
+    const monthlyRate = interestRate / 100 / 12;
+    const emi = (price * monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+                (Math.pow(1 + monthlyRate, months) - 1);
+    return Math.round(emi);
+  };
+  
+  const emi3Months = calculateEMI(productPrice, 3);
+  const emi6Months = calculateEMI(productPrice, 6);
 
 
   const scrollLeft = () => {
@@ -91,7 +109,7 @@ export default function ProductPage() {
             >
                 ▶
             </button>
-            </div>
+          </div>
         </div>
 
         {/* RIGHT: DETAILS */}
@@ -100,11 +118,52 @@ export default function ProductPage() {
             Product Title Goes Here
           </h1>
 
-          <p className="text-sm mt-1">Model: XXXXX</p>
-
           <div className="mt-3">
             <span className="line-through text-sm mr-3">৳56,000.00</span>
             <span className="text-red-600 font-bold text-lg">৳42,000.00</span>
+          </div>
+
+          <p className="text-sm mt-1">Model: XXXXX</p>
+          
+          {/* EMI Section */}
+          <div className="mt-4 border rounded-xl p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+            {isEmiAvailable ? (
+              <>
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                  <span className="font-semibold text-sm text-gray-800">EMI Available</span>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-3 mt-3">
+                  {/* 3 Months EMI */}
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="text-xs text-gray-600 mb-1">3 Months EMI</div>
+                    <div className="text-lg font-bold text-indigo-600">
+                      ৳{emi3Months.toLocaleString('en-US')}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">per month</div>
+                  </div>
+                  
+                  {/* 6 Months EMI */}
+                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                    <div className="text-xs text-gray-600 mb-1">6 Months EMI</div>
+                    <div className="text-lg font-bold text-indigo-600">
+                      ৳{emi6Months.toLocaleString('en-US')}
+                    </div>
+                    <div className="text-xs text-gray-500 mt-1">per month</div>
+                  </div>
+                </div>
+                
+                <p className="text-xs text-gray-600 mt-3 text-center">
+                  Interest rate: 0% | Terms & conditions apply
+                </p>
+              </>
+            ) : (
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
+                <span className="font-semibold text-sm text-gray-600">EMI Not Available</span>
+              </div>
+            )}
           </div>
 
           <p className="mt-2 text-sm font-medium text-red-500">
