@@ -69,12 +69,8 @@ export default function Header() {
       <div className="border-b border-gray-200 py-4 px-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Logo */}
-          <Link href="/" className="flex-shrink-0">
-            <div className="flex items-center gap-2">
-              <div className="text-2xl md:text-3xl font-bold">
-                <Image src={'/logo.png'} height={100} width={250} alt='watchshopbd'/>
-              </div>
-            </div>
+          <Link href="/">
+            <Image src={'/logo.png'} height={100} width={250} alt='watchshopbd' className='h-10 object-contain'/>
           </Link>
 
           {/* Search Bar - Hidden on mobile */}
