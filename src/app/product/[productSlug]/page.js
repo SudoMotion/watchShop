@@ -258,7 +258,7 @@ export default function ProductPage() {
 
       {/* DESCRIPTION */}
       <div className="max-w-7xl mx-auto px-4 mt-8">
-        <div className="flex items-center gap-6 sticky top-20 bg-white">
+        <div className="flex items-center gap-6 sticky top-[75px] bg-white shadow-md px-3">
             <button 
               onClick={() => scrollToSection("editor-note")}
               className={`py-2 font-semibold md:text-lg transition-colors ${
