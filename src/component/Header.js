@@ -31,14 +31,14 @@ export default function Header() {
   const wishlistCount = 0;
 
   const navigationItems = [
-    { label: "MEN'S WATCH", href: "/men-watch" },
-    { label: "LADIES WATCH", href: "/ladies-watch" },
-    { label: "COUPLE WATCH", href: "/couple-watch" },
-    { label: "WATCH ACCESSORIES", href: "/accessories" },
-    { label: "MEN'S FASHION", href: "/men-fashion" },
-    { label: "LADIES FASHION", href: "/ladies-fashion" },
-    { label: "LIMITED EDITION", href: "/limited-edition" },
-    { label: "BEST DEAL", href: "/best-deal", highlight: true },
+    { label: "MEN'S WATCH", href: "/category/men-watch" },
+    { label: "LADIES WATCH", href: "/category/ladies-watch" },
+    { label: "COUPLE WATCH", href: "/category/couple-watch" },
+    { label: "WATCH ACCESSORIES", href: "/category/accessories" },
+    { label: "MEN'S FASHION", href: "/category/men-fashion" },
+    { label: "LADIES FASHION", href: "/category/ladies-fashion" },
+    { label: "LIMITED EDITION", href: "/category/limited-edition" },
+    { label: "BEST DEAL", href: "/category/best-deal", highlight: true },
   ];
 
   const handleSearch = (e) => {
