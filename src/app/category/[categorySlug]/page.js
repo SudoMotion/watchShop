@@ -1,0 +1,46 @@
+import { productList } from '@/_lib/productList';
+import ProductCard2 from '@/component/ProductCard2';
+import ProductFilter from '@/component/ProductFilter';
+import React from 'react'
+
+export default async function CategoryPage({ params }) {
+  const { categorySlug } = await params;
+  const data = productList;
+  
+  // Format category name for display (convert slug to readable format)
+  const categoryName = categorySlug
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
+  
+  return (
+    <div>
+      <div className="py-24 flex items-center justify-center" style={{backgroundImage: "url('/images/brand-banner.webp')",}}>
+        <div className="text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
+          <span className="capitalize">{categoryName}</span>
+        </div>
+      </div>
+      <div className='grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:gap-3 mt-2 md:mt-4 px-2'>
+        <ProductFilter/>
+        <div className="md:col-span-2 lg:col-span-3 xl:col-span-4 max-h-screen overflow-y-auto">
+          {/* Products will be loaded here */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+            {data.map((product) => (
+              <ProductCard2 key={product.id} item={product}/>
+            ))}
+            {data.map((product) => (
+              <ProductCard2 key={`${product.id}-2`} item={product}/>
+            ))}
+            {data.map((product) => (
+              <ProductCard2 key={`${product.id}-3`} item={product}/>
+            ))}
+            {data.map((product) => (
+              <ProductCard2 key={`${product.id}-4`} item={product}/>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
