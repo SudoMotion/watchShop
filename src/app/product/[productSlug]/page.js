@@ -206,12 +206,21 @@ export default function ProductPage() {
       </div>
 
       {/* DESCRIPTION */}
-      <div className="max-w-6xl mx-auto px-4 mt-8">
-        <h3 className="font-semibold mb-2">Description</h3>
-        <p className="text-sm leading-relaxed">
-          This is placeholder content describing the product. Replace this text
-          with your own original description.
-        </p>
+      <div className="max-w-7xl mx-auto px-4 mt-8">
+        <div className="flex items-center gap-6 rounded-md">
+            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">Editor's Note</button>
+            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">Full Specification</button>
+            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">About the collection</button>
+            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">MOVEMENT</button>
+        </div>
+        <div className="bg-gray-100 mt-4 p-4">
+          <div id="editor-note border-b pb-10">
+            <p className="text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.’s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement’s structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.’s design philosophy.</p>
+          </div>
+          <div id="editor-note border-b pb-10">
+            <p className="text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.’s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement’s structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.’s design philosophy.</p>
+          </div>
+        </div>
       </div>
 
       {/* RELATED PRODUCTS */}
