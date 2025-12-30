@@ -12,7 +12,7 @@ import React from 'react';
 export default function page() {
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
-    <div className='mt-[-75px]'>
+    <div>
       <HeroSlider/>
       <div className='py-10 bg-gray-50'>
         <div className='max-w-7xl mx-auto'>
