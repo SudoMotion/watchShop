@@ -2,11 +2,18 @@
 import { productList } from "@/_lib/productList";
 import ProductCard2 from "@/component/ProductCard2";
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 
 export default function ProductPage() {
   const [mainImg, setMainImg] = useState("/images/mockProduct/1.png");
+  const [activeTab, setActiveTab] = useState("editor-note");
   const scrollRef = useRef(null);
+  
+  // Refs for each section
+  const editorNoteRef = useRef(null);
+  const specificationRef = useRef(null);
+  const collectionRef = useRef(null);
+  const movementRef = useRef(null);
   
   // Product price (in Taka) - replace with actual product data
   const productPrice = 42000; // ৳42,000.00
@@ -34,6 +41,50 @@ export default function ProductPage() {
   const scrollRight = () => {
     scrollRef.current?.scrollBy({ left: 120, behavior: "smooth" });
   };
+
+  // Scroll to section function
+  const scrollToSection = (sectionId) => {
+    const sectionMap = {
+      "editor-note": editorNoteRef,
+      "specification": specificationRef,
+      "collection": collectionRef,
+      "movement": movementRef,
+    };
+
+    const sectionRef = sectionMap[sectionId];
+    if (sectionRef?.current) {
+      sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
+      setActiveTab(sectionId);
+    }
+  };
+
+  // Detect which section is in view
+  useEffect(() => {
+    const handleScroll = () => {
+      const sections = [
+        { id: "editor-note", ref: editorNoteRef },
+        { id: "specification", ref: specificationRef },
+        { id: "collection", ref: collectionRef },
+        { id: "movement", ref: movementRef },
+      ];
+
+      const scrollPosition = window.scrollY + 200; // Offset for better detection
+
+      for (let i = sections.length - 1; i >= 0; i--) {
+        const section = sections[i];
+        if (section.ref.current) {
+          const offsetTop = section.ref.current.offsetTop;
+          if (scrollPosition >= offsetTop) {
+            setActiveTab(section.id);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   const images = [
     "/images/mockProduct/1.png",
@@ -208,16 +259,52 @@ export default function ProductPage() {
       {/* DESCRIPTION */}
       <div className="max-w-7xl mx-auto px-4 mt-8">
         <div className="flex items-center gap-6 rounded-md">
-            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">Editor's Note</button>
-            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">Full Specification</button>
-            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">About the collection</button>
-            <button className="py-2 border-b-2 border-red-600 font-semibold md:text-lg">MOVEMENT</button>
+            <button 
+              onClick={() => scrollToSection("editor-note")}
+              className={`py-2 font-semibold md:text-lg transition-colors ${
+                activeTab === "editor-note" 
+                  ? "border-b-2 border-red-600 text-black" 
+                  : "border-b-2 border-transparent text-gray-600 hover:text-black"
+              }`}
+            >
+              Editor's Note
+            </button>
+            <button 
+              onClick={() => scrollToSection("specification")}
+              className={`py-2 font-semibold md:text-lg transition-colors ${
+                activeTab === "specification" 
+                  ? "border-b-2 border-red-600 text-black" 
+                  : "border-b-2 border-transparent text-gray-600 hover:text-black"
+              }`}
+            >
+              Full Specification
+            </button>
+            <button 
+              onClick={() => scrollToSection("collection")}
+              className={`py-2 font-semibold md:text-lg transition-colors ${
+                activeTab === "collection" 
+                  ? "border-b-2 border-red-600 text-black" 
+                  : "border-b-2 border-transparent text-gray-600 hover:text-black"
+              }`}
+            >
+              About the collection
+            </button>
+            <button 
+              onClick={() => scrollToSection("movement")}
+              className={`py-2 font-semibold md:text-lg transition-colors ${
+                activeTab === "movement" 
+                  ? "border-b-2 border-red-600 text-black" 
+                  : "border-b-2 border-transparent text-gray-600 hover:text-black"
+              }`}
+            >
+              MOVEMENT
+            </button>
         </div>
         <div className="bg-gray-100 mt-4 p-4">
-          <div id="editor-note border-b pb-10">
-            <p className="text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.’s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement’s structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.’s design philosophy.</p>
+          <div id="editor-note" ref={editorNoteRef} className="border-b pb-10">
+            <p className="text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.'s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement's structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.'s design philosophy.</p>
           </div>
-          <div id="specification border-b pb-10">
+          <div id="specification" ref={specificationRef} className="border-b pb-10">
             <div className="max-w-7xl mx-auto mt-10 text-gray-700">
               {/* Title */}
               <h2 className="text-sm font-semibold tracking-widest text-red-600">
@@ -406,7 +493,7 @@ export default function ProductPage() {
               </div>
             </div>
           </div>
-          <div id="collection" className="max-w-7xl mx-auto mt-12">
+          <div id="collection" ref={collectionRef} className="max-w-7xl mx-auto mt-12">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
 
               {/* LEFT CONTENT */}
@@ -474,7 +561,7 @@ export default function ProductPage() {
 
             </div>
           </div>
-          <div id="movement" className="max-w-7xl mx-auto mt-14 px-4">
+          <div id="movement" ref={movementRef} className="max-w-7xl mx-auto mt-14 px-4">
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
 
               {/* LEFT CONTENT */}
