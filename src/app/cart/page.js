@@ -260,9 +260,12 @@ export default function CartPage() {
               </div>
 
               {/* Checkout Button */}
-              <button className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-4">
+              <Link 
+                href="/checkout"
+                className="block w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 transition-colors mb-4 text-center"
+              >
                 Proceed to Checkout
-              </button>
+              </Link>
 
               {/* Security Badge */}
               <div className="text-center text-xs text-gray-500 mt-4">
