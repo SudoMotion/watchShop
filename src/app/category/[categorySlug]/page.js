@@ -3,6 +3,23 @@ import ProductCard2 from '@/component/ProductCard2';
 import ProductFilter from '@/component/ProductFilter';
 import React from 'react'
 
+export async function generateStaticParams() {
+  const categories = [
+    'men-watch',
+    'ladies-watch',
+    'couple-watch',
+    'accessories',
+    'men-fashion',
+    'ladies-fashion',
+    'limited-edition',
+    'best-deal'
+  ];
+
+  return categories.map(categorySlug => ({
+    categorySlug: categorySlug
+  }));
+}
+
 export default async function CategoryPage({ params }) {
   const { categorySlug } = await params;
   const data = productList;
