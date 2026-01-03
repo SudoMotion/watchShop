@@ -92,7 +92,9 @@ export default function Footer() {
               <li>
                 <Link href="/about-us">About Us</Link>
               </li>
-              <li>Blog</li>
+              <li>
+                <Link href="/blog">Blog</Link>
+              </li>
               <li>Authenticity</li>
               <li>Coupon Code</li>
               <li>Wholesale</li>
