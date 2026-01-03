@@ -95,10 +95,14 @@ export default function Footer() {
               <li>
                 <Link href="/blog">Blog</Link>
               </li>
-              <li>Authenticity</li>
+              <li>
+                <Link href="/authenticity">Authenticity</Link>
+              </li>
               <li>Coupon Code</li>
               <li>Wholesale</li>
-              <li>Privacy Policy</li>
+              <li>
+                <Link href="/privacy-policy">Privacy Policy</Link>
+              </li>
               <li>Terms And Conditions</li>
             </ul>
           </div>
@@ -174,7 +178,7 @@ export default function Footer() {
         <div className="border-t border-gray-700 mt-10 pt-4 flex flex-wrap justify-between text-sm text-gray-300">
 
           <div className="flex space-x-6">
-            <span>Privacy Policy</span>
+            <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <span>Terms And Conditions</span>
             <span>Careers</span>
           </div>
