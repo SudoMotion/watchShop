@@ -103,7 +103,9 @@ export default function Footer() {
               <li>
                 <Link href="/privacy-policy">Privacy Policy</Link>
               </li>
-              <li>Terms And Conditions</li>
+              <li>
+                <Link href="/terms-and-conditions">Terms And Conditions</Link>
+              </li>
             </ul>
           </div>
 
@@ -179,7 +181,7 @@ export default function Footer() {
 
           <div className="flex space-x-6">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
-            <span>Terms And Conditions</span>
+            <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms And Conditions</Link>
             <span>Careers</span>
           </div>
 
