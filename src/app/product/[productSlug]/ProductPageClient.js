@@ -105,26 +105,26 @@ export default function ProductPageClient({ params }) {
     <div className="w-full bg-white text-gray-800">
 
       {/* CONTAINER */}
-      <div className="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-2 gap-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
 
         {/* LEFT: IMAGES */}
-        <div>
-          <div className="border rounded-xl p-5 flex justify-center">
+        <div className="order-1 lg:order-1">
+          <div className="border rounded-xl p-3 sm:p-4 md:p-5 flex justify-center">
             <Image
               src={mainImg}
               width={400}
               height={400}
               alt="Watch"
-              className="object-contain"
+              className="object-contain w-full h-auto max-w-full sm:max-w-md md:max-w-lg"
             />
           </div>
 
-          <div className="flex items-center gap-3 mt-4">
+          <div className="flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
 
             {/* LEFT ARROW */}
             <button
                 onClick={scrollLeft}
-                className="p-2 border rounded-lg hover:bg-gray-100"
+                className="p-1.5 sm:p-2 border rounded-lg hover:bg-gray-100 flex-shrink-0 text-sm sm:text-base"
             >
                 ◀
             </button>
@@ -132,13 +132,14 @@ export default function ProductPageClient({ params }) {
             {/* THUMB ROW */}
             <div
                 ref={scrollRef}
-                className="flex gap-3 overflow-hidden"
+                className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-1"
+                style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
                 {images.map((img, i) => (
                 <button
                     key={i}
                     onClick={() => setMainImg(img)}
-                    className={`border rounded-lg p-2 min-w-20 ${
+                    className={`border rounded-lg p-1.5 sm:p-2 min-w-[60px] sm:min-w-[70px] md:min-w-20 flex-shrink-0 ${
                     mainImg === img ? "border-red-500" : "border-gray-300"
                     }`}
                 >
@@ -147,7 +148,7 @@ export default function ProductPageClient({ params }) {
                     width={90}
                     height={90}
                     alt="Thumb"
-                    className="w-20 h-20 object-contain"
+                    className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain"
                     />
                 </button>
                 ))}
@@ -156,7 +157,7 @@ export default function ProductPageClient({ params }) {
             {/* RIGHT ARROW */}
             <button
                 onClick={scrollRight}
-                className="p-2 border rounded-lg hover:bg-gray-100"
+                className="p-1.5 sm:p-2 border rounded-lg hover:bg-gray-100 flex-shrink-0 text-sm sm:text-base"
             >
                 ▶
             </button>
@@ -164,92 +165,92 @@ export default function ProductPageClient({ params }) {
         </div>
 
         {/* RIGHT: DETAILS */}
-        <div>
-          <h1 className="text-xl font-semibold">
+        <div className="order-2 lg:order-2">
+          <h1 className="text-lg sm:text-xl md:text-2xl font-semibold">
             Product Title Goes Here
           </h1>
 
-          <div className="mt-3">
-            <span className="line-through text-sm mr-3">৳56,000.00</span>
-            <span className="text-red-600 font-bold text-lg">৳42,000.00</span>
+          <div className="mt-2 sm:mt-3">
+            <span className="line-through text-xs sm:text-sm mr-2 sm:mr-3">৳56,000.00</span>
+            <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl">৳42,000.00</span>
           </div>
 
-          <p className="text-sm mt-1">Model: XXXXX</p>
+          <p className="text-xs sm:text-sm mt-1">Model: XXXXX</p>
 
           {/* EMI Section */}
-          <div className="mt-4 border rounded-xl p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+          <div className="mt-3 sm:mt-4 border rounded-xl p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
             {isEmiAvailable ? (
               <>
-                <div className="flex items-center gap-2 mb-3">
+                <div className="flex items-center gap-2 mb-2 sm:mb-3">
                   <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="font-semibold text-sm text-gray-800">EMI Available</span>
+                  <span className="font-semibold text-xs sm:text-sm text-gray-800">EMI Available</span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 mt-3">
+                <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2 sm:mt-3">
                   {/* 3 Months EMI */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
                     <div className="text-xs text-gray-600 mb-1">3 Months EMI</div>
-                    <div className="text-lg font-bold text-indigo-600">
+                    <div className="text-base sm:text-lg font-bold text-indigo-600">
                       ৳{emi3Months.toLocaleString('en-US')}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">per month</div>
                   </div>
 
                   {/* 6 Months EMI */}
-                  <div className="bg-white rounded-lg p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
                     <div className="text-xs text-gray-600 mb-1">6 Months EMI</div>
-                    <div className="text-lg font-bold text-indigo-600">
+                    <div className="text-base sm:text-lg font-bold text-indigo-600">
                       ৳{emi6Months.toLocaleString('en-US')}
                     </div>
                     <div className="text-xs text-gray-500 mt-1">per month</div>
                   </div>
                 </div>
 
-                <p className="text-xs text-gray-600 mt-3 text-center">
+                <p className="text-xs text-gray-600 mt-2 sm:mt-3 text-center">
                   Interest rate: 0% | Terms & conditions apply
                 </p>
               </>
             ) : (
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                <span className="font-semibold text-sm text-gray-600">EMI Not Available</span>
+                <span className="font-semibold text-xs sm:text-sm text-gray-600">EMI Not Available</span>
               </div>
             )}
           </div>
 
-          <p className="mt-2 text-sm font-medium text-red-500">
+          <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">
             OUT OF STOCK
           </p>
 
-          <div className="mt-6 grid grid-cols-3 gap-5 text-center">
+          <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-5 text-center">
             <div>
-              <div className="font-semibold text-sm">100% Authentic</div>
+              <div className="font-semibold text-xs sm:text-sm">100% Authentic</div>
             </div>
             <div>
-              <div className="font-semibold text-sm">Fast Delivery</div>
+              <div className="font-semibold text-xs sm:text-sm">Fast Delivery</div>
             </div>
             <div>
-              <div className="font-semibold text-sm">Secure Checkout</div>
+              <div className="font-semibold text-xs sm:text-sm">Secure Checkout</div>
             </div>
           </div>
 
           {/* SPECS */}
-          <div className="mt-8 border rounded-xl p-5">
-            <h2 className="text-xl md:text-2xl font-semibold mb-3">To speak an Expert 24/7</h2>
-            <h2 className="font-semibold mb-3">WhatsApp us at +8801000000000</h2>
+          <div className="mt-6 sm:mt-8 border rounded-xl p-3 sm:p-4 md:p-5">
+            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3">To speak an Expert 24/7</h2>
+            <h2 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">WhatsApp us at +8801000000000</h2>
 
-            <div className="grid grid-cols-2 md:grid-cols-2 text-sm gap-2">
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
-                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} />
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
               </div>
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
-                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} />
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
               </div>
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
-                <Image src="/images/busket.jpg" alt="Cycle" width={100} height={100} />
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/busket.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
               </div>
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-3">
-                <Image src="/images/warrenty.png" alt="Cycle" width={100} height={100} />
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/warrenty.png" alt="Cycle" width={100} height={100} className="w-full h-auto" />
               </div>
             </div>
           </div>
@@ -257,11 +258,11 @@ export default function ProductPageClient({ params }) {
       </div>
 
       {/* DESCRIPTION */}
-      <div className="max-w-7xl mx-auto px-4 mt-8">
-        <div className="flex items-center gap-6 sticky top-[75px] bg-white shadow-md px-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8">
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 sticky top-[60px] sm:top-[75px] bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button
               onClick={() => scrollToSection("editor-note")}
-              className={`py-2 font-semibold md:text-lg transition-colors ${
+              className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
                 activeTab === "editor-note"
                   ? "border-b-2 border-red-600 text-black"
                   : "border-b-2 border-transparent text-gray-600 hover:text-black"
@@ -271,7 +272,7 @@ export default function ProductPageClient({ params }) {
             </button>
             <button
               onClick={() => scrollToSection("specification")}
-              className={`py-2 font-semibold md:text-lg transition-colors ${
+              className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
                 activeTab === "specification"
                   ? "border-b-2 border-red-600 text-black"
                   : "border-b-2 border-transparent text-gray-600 hover:text-black"
@@ -281,7 +282,7 @@ export default function ProductPageClient({ params }) {
             </button>
             <button
               onClick={() => scrollToSection("collection")}
-              className={`py-2 font-semibold md:text-lg transition-colors ${
+              className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
                 activeTab === "collection"
                   ? "border-b-2 border-red-600 text-black"
                   : "border-b-2 border-transparent text-gray-600 hover:text-black"
@@ -291,7 +292,7 @@ export default function ProductPageClient({ params }) {
             </button>
             <button
               onClick={() => scrollToSection("movement")}
-              className={`py-2 font-semibold md:text-lg transition-colors ${
+              className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
                 activeTab === "movement"
                   ? "border-b-2 border-red-600 text-black"
                   : "border-b-2 border-transparent text-gray-600 hover:text-black"
@@ -300,18 +301,18 @@ export default function ProductPageClient({ params }) {
               MOVEMENT
             </button>
         </div>
-        <div className="bg-gray-100 mt-4 p-4">
-          <div id="editor-note" ref={editorNoteRef} className="border-b pb-10">
-            <p className="text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.'s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement's structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.'s design philosophy.</p>
+        <div className="bg-gray-100 mt-3 sm:mt-4 p-3 sm:p-4 md:p-6">
+          <div id="editor-note" ref={editorNoteRef} className="border-b pb-6 sm:pb-8 md:pb-10">
+            <p className="text-xs sm:text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.'s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement's structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.'s design philosophy.</p>
           </div>
-          <div id="specification" ref={specificationRef} className="border-b pb-10">
-            <div className="max-w-7xl mx-auto mt-10 text-gray-700">
+          <div id="specification" ref={specificationRef} className="border-b pb-6 sm:pb-8 md:pb-10">
+            <div className="max-w-7xl mx-auto mt-6 sm:mt-8 md:mt-10 text-gray-700">
               {/* Title */}
-              <h2 className="text-sm font-semibold tracking-widest text-red-600">
+              <h2 className="text-xs sm:text-sm font-semibold tracking-widest text-red-600">
                 FULL SPECIFICATION
               </h2>
 
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mt-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 mt-4 sm:mt-6">
 
                 {/* COLUMN 1 */}
                 <div className="space-y-8">
@@ -493,17 +494,17 @@ export default function ProductPageClient({ params }) {
               </div>
             </div>
           </div>
-          <div id="collection" ref={collectionRef} className="max-w-7xl mx-auto mt-12">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
+          <div id="collection" ref={collectionRef} className="max-w-7xl mx-auto mt-8 sm:mt-10 md:mt-12">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10">
 
               {/* LEFT CONTENT */}
-              <div className="lg:col-span-3 text-gray-700 leading-relaxed">
+              <div className="lg:col-span-3 text-gray-700 leading-relaxed order-2 lg:order-1">
 
-                <h2 className="text-sm font-semibold tracking-widest text-red-600 mb-3">
+                <h2 className="text-xs sm:text-sm font-semibold tracking-widest text-red-600 mb-2 sm:mb-3">
                   ABOUT THE JACOB & CO. EPIC X COLLECTION
                 </h2>
 
-                <p className="text-sm mb-6">
+                <p className="text-xs sm:text-sm mb-4 sm:mb-6">
                   The Epic X collection, launched in 2015, quickly became a hallmark of Jacob & Co.'s
                   innovative spirit and bold design. Defined by the striking "X" motif, which
                   symbolises mystery and allure, the collection reflects their daring approach to
@@ -514,11 +515,11 @@ export default function ProductPageClient({ params }) {
                   luxury watchmaking.
                 </p>
 
-                <h3 className="font-semibold mb-1">
+                <h3 className="text-sm sm:text-base font-semibold mb-1">
                   Timeless Designs And Precision Engineering
                 </h3>
 
-                <p className="text-sm mb-6">
+                <p className="text-xs sm:text-sm mb-4 sm:mb-6">
                   The 2022 Epic X collection retains its signature X-shaped case, with angular lugs
                   that seamlessly integrate into the bezel for a refined, cohesive design. The
                   high-polished stainless steel and rose gold versions exude luxury, while the stainless
@@ -531,11 +532,11 @@ export default function ProductPageClient({ params }) {
                   redesigned crown guards, elevating the collection's sophistication.
                 </p>
 
-                <h3 className="font-semibold mb-1">
+                <h3 className="text-sm sm:text-base font-semibold mb-1">
                   Honouring Heritage: The Epic X India Edition
                 </h3>
 
-                <p className="text-sm">
+                <p className="text-xs sm:text-sm">
                   India holds significant promise for Jacob & Co., inspiring the brand to create
                   exclusive limited editions in collaboration with Ethos. The Epic X India Edition
                   showcases four iconic monuments — Taj Mahal, India Gate, Gateway of India, and Qutub
@@ -549,28 +550,28 @@ export default function ProductPageClient({ params }) {
               </div>
 
               {/* RIGHT IMAGE */}
-              <div className="w-full">
+              <div className="w-full order-1 lg:order-2">
                 <Image
                   src="/images/collection.jpg"   // update path to your image
                   width={600}
                   height={800}
                   alt="Jacob & Co Epic X Watch"
-                  className="rounded-lg object-cover w-full h-full"
+                  className="rounded-lg object-cover w-full h-auto"
                 />
               </div>
 
             </div>
           </div>
-          <div id="movement" ref={movementRef} className="max-w-7xl mx-auto mt-14 px-4">
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
+          <div id="movement" ref={movementRef} className="max-w-7xl mx-auto mt-8 sm:mt-10 md:mt-14 px-2 sm:px-4">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 items-start">
 
               {/* LEFT CONTENT */}
-              <div className="lg:col-span-3">
-                <h2 className="text-sm font-semibold tracking-widest text-red-600 mb-3">
+              <div className="lg:col-span-3 order-2 lg:order-1">
+                <h2 className="text-xs sm:text-sm font-semibold tracking-widest text-red-600 mb-2 sm:mb-3">
                   ABOUT THE MOVEMENT
                 </h2>
 
-                <p className="text-sm text-gray-700 leading-relaxed">
+                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
                   The calibre JCAM45 is an in-house movement created by Jacob & Co. specifically
                   for their Epic X Bridges watches. It features a highly skeletonised design with
                   a vertical structure to provide maximum transparency. In lieu of a traditional
@@ -584,7 +585,7 @@ export default function ProductPageClient({ params }) {
                 </p>
 
                 {/* SPECS GRID */}
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-y-8 gap-x-10 mt-10 text-sm text-gray-700">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 sm:gap-y-6 md:gap-y-8 gap-x-4 sm:gap-x-6 md:gap-x-10 mt-6 sm:mt-8 md:mt-10 text-xs sm:text-sm text-gray-700">
 
                   <div>
                     <p className="text-gray-400">Brand</p>
@@ -625,13 +626,13 @@ export default function ProductPageClient({ params }) {
               </div>
 
               {/* RIGHT IMAGE */}
-              <div className="flex justify-center">
+              <div className="flex justify-center order-1 lg:order-2">
                 <Image
                   src="/images/circular.avif"  // update path
                   width={500}
                   height={500}
                   alt="Watch Movement"
-                  className="object-contain"
+                  className="object-contain w-full h-auto max-w-xs sm:max-w-sm md:max-w-md"
                 />
               </div>
             </div>
@@ -640,12 +641,12 @@ export default function ProductPageClient({ params }) {
       </div>
 
       {/* RELATED PRODUCTS */}
-      <div className="max-w-7xl mx-auto px-4 mt-10 mb-16">
-        <h3 className="font-semibold mb-4 text-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10 mb-8 sm:mb-12 md:mb-16">
+        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 text-center">
           Related Products
         </h3>
 
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
           {productList.map((item) => (
             <ProductCard2 key={item.id} item={item} />
           ))}
