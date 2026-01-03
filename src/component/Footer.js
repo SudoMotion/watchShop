@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import Link from 'next/link'
 import React from 'react'
 
 export default function Footer() {
@@ -88,7 +89,9 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-2 text-sm">
-              <li>About Us</li>
+              <li>
+                <Link href="/about-us">About Us</Link>
+              </li>
               <li>Blog</li>
               <li>Authenticity</li>
               <li>Coupon Code</li>
@@ -105,7 +108,9 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-2 text-sm">
-              <li>Order Information</li>
+              <li>
+                <Link href="/order-information">Order Information</Link>
+              </li>
               <li>Shipping Information</li>
               <li>International Shipping</li>
               <li>Payment Options</li>
