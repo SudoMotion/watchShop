@@ -125,7 +125,7 @@ export default function page() {
       <div className='max-w-7xl mx-auto'>
         <Image src="/images/payment-method.png" alt="payment-method" width={3000} height={800}/>
       </div>
-      <div className='max-w-7xl mx-auto'>
+      <div className='max-w-7xl mx-auto px-2'>
         <h1>Find the Best Watch Price in Bangladesh – 100% Genuine Watches</h1>
         <p>Welcome to <Link href='/' className='font-semibold text-blue-800'>WatchShop BD</Link>, your ultimate destination for premium timepieces in Bangladesh. Whether you're looking for a sophisticated accessory for a formal event, a casual watch for everyday wear, or a special gift for a loved one, we have the perfect collection to meet your needs. Our goal is to bring you a diverse range of high-quality, authentic watches from renowned international brands, offering unparalleled value, style, and reliability.</p>
         <Link href='/' className='font-semibold text-blue-800'>The Best Place to Find Your Ideal Watch</Link>
