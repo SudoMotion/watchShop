@@ -7,7 +7,15 @@ export default function Header() {
   const [open, setOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
   const userMenuRef = useRef(null);
+
+  // Helper function to convert brand name to brandId format
+  const brandToSlug = (brandName) => {
+    return brandName.toLowerCase().replace(/\s+/g, '-');
+  };
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -15,30 +23,119 @@ export default function Header() {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
+      
+      // Close dropdowns when clicking outside - check if click is not within any dropdown
+      if (activeDropdown !== null) {
+        const dropdownElement = document.querySelector(`[data-dropdown-index="${activeDropdown}"]`);
+        if (dropdownElement && !dropdownElement.contains(event.target)) {
+          setActiveDropdown(null);
+        }
+      }
     };
 
-    if (showUserMenu) {
+    if (showUserMenu || activeDropdown !== null) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showUserMenu]);
+  }, [showUserMenu, activeDropdown]);
   
   // Mock data - in real app, get from context/state
   const cartCount = 0;
   const wishlistCount = 0;
 
+  // Men's Watch Brands
+  const mensWatchBrands = [
+    "Seiko", "Tissot", "Citizen", "Rado", "Fossil", "Emporio Armani", "Orient", "Omega",
+    "Pagani Design", "Titan", "Casio", "Casio Edifice", "Casio G-Shock", "Longines", "Oris",
+    "TAG Heuer", "Tommy Hilfiger", "Daniel Klein (DK)", "Hamilton", "Victorinox",
+    "West End Watch", "Swatch", "Mido", "Michael Kors (MK)", "Hugo Boss", "Guess", "Fastrack",
+    "Certina", "Frederique Constant", "Mathey Tissot", "Police", "Curren", "Naviforce", "Timex",
+    "Olevs", "Tudor", "Omax", "Casio Pro Trek", "Q&Q", "Santa Barbara PRC", "Movado", "Invicta"
+  ];
+
+  // Ladies Watch Brands
+  const ladiesWatchBrands = [
+    "Seiko", "Tissot", "Rado", "Fossil", "Emporio Armani", "Omega", "Pagani Design", "Titan",
+    "Casio", "Casio G-Shock", "Tommy Hilfiger", "Daniel Klein (DK)", "Michael Kors (MK)",
+    "Hugo Boss", "Guess", "Fastrack", "Mathey Tissot", "Naviforce", "Olevs", "Q&Q",
+    "Santa Barbara PRC"
+  ];
+
+  // Couple Watch Brands
+  const coupleWatchBrands = [
+    "Rado", "Fossil", "Emporio Armani", "Titan", "Casio", "Daniel Klein (DK)", "Louis Cardin",
+    "Guess", "Mathey Tissot", "Naviforce", "Timex", "Olevs", "Oliya"
+  ];
+
+  // Watch Accessories
+  const watchAccessories = [
+    "Watch Organizer Box", "Fossil Watch Strap", "Watch Winder", "Watch Strap"
+  ];
+
+  // Men's Fashion
+  const mensFashion = [
+    "Perfume", "Wallet", "Sunglass", "Ties", "Cufflinks"
+  ];
+
+  // Ladies Fashion
+  const ladiesFashion = [
+    "Perfume", "Wallet", "Sunglass", "Sholder Bag"
+  ];
+
   const navigationItems = [
-    { label: "MEN'S WATCH", href: "/category/men-watch" },
-    { label: "LADIES WATCH", href: "/category/ladies-watch" },
-    { label: "COUPLE WATCH", href: "/category/couple-watch" },
-    { label: "WATCH ACCESSORIES", href: "/category/accessories" },
-    { label: "MEN'S FASHION", href: "/category/men-fashion" },
-    { label: "LADIES FASHION", href: "/category/ladies-fashion" },
-    { label: "LIMITED EDITION", href: "/category/limited-edition" },
-    { label: "BEST DEAL", href: "/category/best-deal", highlight: true },
+    { 
+      label: "MEN'S WATCH", 
+      href: "/category/men-watch",
+      submenu: mensWatchBrands.map(brand => ({
+        label: brand,
+        href: `/brand/${brandToSlug(brand)}`
+      }))
+    },
+    { 
+      label: "LADIES WATCH", 
+      href: "/category/ladies-watch",
+      submenu: ladiesWatchBrands.map(brand => ({
+        label: brand,
+        href: `/brand/${brandToSlug(brand)}`
+      }))
+    },
+    { 
+      label: "COUPLE WATCH", 
+      href: "/category/couple-watch",
+      submenu: coupleWatchBrands.map(brand => ({
+        label: brand,
+        href: `/brand/${brandToSlug(brand)}`
+      }))
+    },
+    { 
+      label: "WATCH ACCESSORIES", 
+      href: "/category/accessories",
+      submenu: watchAccessories.map(accessory => ({
+        label: accessory,
+        href: `/category/accessories?filter=${brandToSlug(accessory)}`
+      }))
+    },
+    { 
+      label: "MEN'S FASHION", 
+      href: "/category/men-fashion",
+      submenu: mensFashion.map(item => ({
+        label: item,
+        href: `/category/men-fashion?filter=${brandToSlug(item)}`
+      }))
+    },
+    { 
+      label: "LADIES FASHION", 
+      href: "/category/ladies-fashion",
+      submenu: ladiesFashion.map(item => ({
+        label: item,
+        href: `/category/ladies-fashion?filter=${brandToSlug(item)}`
+      }))
+    },
+    { label: "LIMITED EDITION", href: "/category/limited-edition", submenu: [] },
+    { label: "BEST DEAL", href: "/category/best-deal", highlight: true, submenu: [] },
   ];
 
   const handleSearch = (e) => {
@@ -198,9 +295,72 @@ export default function Header() {
       </div>
 
       {/* Bottom Navigation Bar - Sticky */}
-      <nav className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-40">
+      <nav className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-40 lg:block hidden">
         <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-4 md:gap-6 overflow-x-auto scrollbar-hide py-3">
+          <div className="flex items-center gap-4 md:gap-6 scrollbar-hide">
+            {/* Home Icon */}
+            <Link href="/" className="flex-shrink-0 text-gray-700 hover:text-red-600 transition-colors py-3">
+              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+            </Link>
+
+            {/* Navigation Items */}
+            {navigationItems.map((item, index) => {
+              const hasSubmenu = item.submenu && item.submenu.length > 0;
+              const isDropdownOpen = activeDropdown === index;
+
+              return (
+                <div
+                  key={index}
+                  data-dropdown-index={index}
+                  className="relative flex-shrink-0 py-3"
+                  onMouseEnter={() => hasSubmenu && setActiveDropdown(index)}
+                  onMouseLeave={() => hasSubmenu && setActiveDropdown(null)}
+                >
+                  <Link
+                    href={item.href}
+                    onClick={() => !hasSubmenu && setActiveDropdown(null)}
+                    className={`flex items-center gap-1 text-sm font-medium whitespace-nowrap transition-colors ${
+                      item.highlight
+                        ? 'text-green-600 hover:text-green-700'
+                        : 'text-gray-700 hover:text-red-600'
+                    }`}
+                  >
+                    {item.label}
+                    {item.highlight && <span className="ml-1">🤝</span>}
+                    {hasSubmenu && (
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                      </svg>
+                    )}
+                  </Link>
+                  
+                  {/* Dropdown Menu */}
+                  {hasSubmenu && isDropdownOpen && (
+                    <div className="absolute z-50 top-10 left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto">
+                      {item.submenu.map((subItem, subIndex) => (
+                        <Link
+                          key={subIndex}
+                          href={subItem.href}
+                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-colors"
+                          onClick={() => setActiveDropdown(null)}
+                        >
+                          {subItem.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+      {/* Mobile Navigation Bar - Sticky */}
+      <nav className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-40 lg:hidden">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between py-3">
             {/* Home Icon */}
             <Link href="/" className="flex-shrink-0 text-gray-700 hover:text-red-600 transition-colors">
               <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -208,22 +368,89 @@ export default function Header() {
               </svg>
             </Link>
 
-            {/* Navigation Items */}
-            {navigationItems.map((item, index) => (
-              <Link
-                key={index}
-                href={item.href}
-                className={`flex-shrink-0 text-sm font-medium whitespace-nowrap transition-colors ${
-                  item.highlight
-                    ? 'text-green-600 hover:text-green-700'
-                    : 'text-gray-700 hover:text-red-600'
-                }`}
-              >
-                {item.label}
-                {item.highlight && <span className="ml-1">🤝</span>}
-              </Link>
-            ))}
+            {/* Hamburger Menu Button */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className="flex items-center justify-center p-2 text-gray-700 hover:text-red-600 transition-colors"
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              ) : (
+                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
           </div>
+
+          {/* Mobile Menu Dropdown */}
+          {mobileMenuOpen && (
+            <div className="pb-4 border-t border-gray-200 mt-2">
+              <div className="flex flex-col space-y-1 pt-2">
+                {navigationItems.map((item, index) => {
+                  const hasSubmenu = item.submenu && item.submenu.length > 0;
+                  const isDropdownOpen = mobileActiveDropdown === index;
+
+                  return (
+                    <div key={index} className="border-b border-gray-100 last:border-b-0">
+                      <div className="flex items-center justify-between">
+                        <Link
+                          href={item.href}
+                          onClick={() => !hasSubmenu && setMobileMenuOpen(false)}
+                          className={`flex-1 py-3 px-2 text-sm font-medium transition-colors ${
+                            item.highlight
+                              ? 'text-green-600 hover:text-green-700'
+                              : 'text-gray-700 hover:text-red-600'
+                          }`}
+                        >
+                          {item.label}
+                          {item.highlight && <span className="ml-1">🤝</span>}
+                        </Link>
+                        {hasSubmenu && (
+                          <button
+                            onClick={() => setMobileActiveDropdown(isDropdownOpen ? null : index)}
+                            className="p-3 text-gray-700 hover:text-red-600 transition-colors"
+                            aria-label="Toggle submenu"
+                          >
+                            <svg 
+                              className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                          </button>
+                        )}
+                      </div>
+                      
+                      {/* Mobile Submenu */}
+                      {hasSubmenu && isDropdownOpen && (
+                        <div className="bg-gray-50 pb-2">
+                          {item.submenu.map((subItem, subIndex) => (
+                            <Link
+                              key={subIndex}
+                              href={subItem.href}
+                              onClick={() => {
+                                setMobileActiveDropdown(null);
+                                setMobileMenuOpen(false);
+                              }}
+                              className="block py-2 px-6 text-sm text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors"
+                            >
+                              {subItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
     </header>
