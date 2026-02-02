@@ -36,7 +36,7 @@ export default function page() {
       </div>
       <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-5 mb-10 md:h-[400px]'>
         <div className='col-span-1 md:col-span-4 rounded-md md:rounded-lg overflow-hidden'>
-          <video preload autoPlay loop muted playsInline>
+          <video preload='true' autoPlay loop muted playsInline>
             <source src="/intro.mp4" type="video/mp4" />            
             Your browser does not support the video.
           </video>
@@ -120,7 +120,7 @@ export default function page() {
         </div>
       </div>
       <div className='max-w-7xl mx-auto h-[720px] mb-10'>
-        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
       </div>
       <div className='max-w-7xl mx-auto'>
         <Image src="/images/payment-method.png" alt="payment-method" width={3000} height={800}/>
