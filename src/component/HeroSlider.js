@@ -10,27 +10,6 @@ import { getHome } from "@/stores/HomeAPI";
 import { getSliders } from "@/stores/homeSpecification";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 
-const slides = [
-  {
-    image: "/images/1.jpg",
-    title: "Prospex",
-    subtitle: "Keep Going Forward",
-    link: "/prospex",
-  },
-  {
-    image: "/images/2.jpg",
-    title: "Presage",
-    subtitle: "The Beauty of Japanese Craftsmanship",
-    link: "/presage",
-  },
-  {
-    image: "/images/3.jpg",
-    title: "Astron",
-    subtitle: "The World’s First GPS Solar Watch",
-    link: "/astron",
-  },
-];
-
 export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
   const [homeData, setHomeData] = useState(null);
