@@ -6,6 +6,9 @@ import { Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
+import { getHome } from "@/stores/HomeAPI";
+import { getSliders } from "@/stores/homeSpecification";
+import { NEXT_PUBLIC_API_URL } from "@/config";
 
 const slides = [
   {
@@ -30,18 +33,33 @@ const slides = [
 
 export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
+  const [homeData, setHomeData] = useState(null);
+  const [sliders, setSliders] = useState([]);
 
   // 🔑 Prevent Swiper from initializing during hydration
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  // Fetch sliders data
+  useEffect(() => {
+    const fetchSliders = async () => {
+      try {
+        const data = await getSliders();
+        setSliders(data);
+      } catch (error) {
+        console.error('Failed to fetch sliders:', error);
+      }
+    };
+    fetchSliders();
+  }, []);
+  console.log('slider', sliders);
+
   if (!mounted) {
     return (
       <section className="relative w-full h-screen bg-black" />
     );
   }
-
   return (
     <section className="relative w-full h-screen overflow-hidden">
       <Swiper
@@ -61,13 +79,13 @@ export default function HeroSlider() {
         }}
         className="h-full w-full"
       >
-        {slides.map((slide, index) => (
+        {sliders.map((slide, index) => (
           <SwiperSlide key={index} className="w-full h-full">
             <div className="relative w-full h-screen overflow-hidden">
               {/* Background image */}
               <div
                 className="hero-bg absolute inset-0 bg-cover bg-center"
-                style={{ backgroundImage: `url(${slide.image})` }}
+                  style={{ backgroundImage: `url(${NEXT_PUBLIC_API_URL}/${slide.image})` }}
               />
 
               {/* Overlay */}
