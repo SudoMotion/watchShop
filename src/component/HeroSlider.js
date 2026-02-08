@@ -7,13 +7,13 @@ import { Autoplay, Pagination } from "swiper/modules";
 import "swiper/css";
 import "swiper/css/pagination";
 import { getHome } from "@/stores/HomeAPI";
-import { getSliders } from "@/stores/homeSpecification";
+import { getMobileSliders, getSliders } from "@/stores/homeSpecification";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 
 export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
   const [sliders, setSliders] = useState([]);
-
+  const [mobileSliders, setMobileSliders] = useState([]);
   // 🔑 Prevent Swiper from initializing during hydration
   useEffect(() => {
     setMounted(true);
@@ -24,7 +24,9 @@ export default function HeroSlider() {
     const fetchSliders = async () => {
       try {
         const data = await getSliders();
+        const mobileData = await getMobileSliders();
         setSliders(data);
+        setMobileSliders(mobileData);
       } catch (error) {
         console.error('Failed to fetch sliders:', error);
       }
