@@ -12,7 +12,6 @@ import { NEXT_PUBLIC_API_URL } from "@/config";
 
 export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
-  const [homeData, setHomeData] = useState(null);
   const [sliders, setSliders] = useState([]);
 
   // 🔑 Prevent Swiper from initializing during hydration
@@ -32,7 +31,6 @@ export default function HeroSlider() {
     };
     fetchSliders();
   }, []);
-  console.log('slider', sliders);
 
   if (!mounted) {
     return (
