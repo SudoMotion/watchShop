@@ -5,11 +5,15 @@ import HeroSlider from '@/component/HeroSlider';
 import ProductCard from '@/component/ProductCard';
 import ProductSection from '@/component/ProductSection';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
+import { Backend_Base_Url } from '@/config';
+import { getTopBrands } from '@/stores/homeSpecification';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
-export default function page() {
+export default async function page() {
+  const topBrands = await getTopBrands();
+  console.log(topBrands)
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
     <div>
@@ -22,7 +26,7 @@ export default function page() {
               <div key={index} className='flex flex-col items-center p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 w-full'>
                 <div className='relative w-full h-16 md:h-20'>
                   <Image
-                    src={brand.image}
+                    src={Backend_Base_Url + '/' + brand.banner_img}
                     alt={brand.name}
                     fill
                     className='object-contain p-2'
