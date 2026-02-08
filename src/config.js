@@ -1,1 +1,2 @@
 export const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://backend.watchshopbd.com';
+export const Backend_Base_Url = process.env.NEXT_PUBLIC_API_URL || 'https://backend.watchshopbd.com';
