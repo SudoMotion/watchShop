@@ -5,7 +5,12 @@ import { getProductBySlug } from "@/stores/ProductAPI";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 
-const imgUrl = (path) => (path ? `${NEXT_PUBLIC_API_URL}/${path}` : "");
+/** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
+const productImagePath = (path) => {
+  if (!path || path.startsWith("http")) return path || "";
+  return path.includes("/") ? path : `uploads/product/${path}`;
+};
+const imgUrl = (path) => (path ? `${NEXT_PUBLIC_API_URL}/${productImagePath(path)}` : "");
 
 export default function ProductPageClient({ params }) {
   const productSlug = params?.productSlug ?? "";
@@ -543,6 +548,7 @@ export default function ProductPageClient({ params }) {
                 price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
                 discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
                 discount: r.discount ? `${r.discount}% OFF` : "",
+                image: r.image || r.thumb_image,
                 otherimage: r.otherimage || r.image,
                 image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),
               }}
