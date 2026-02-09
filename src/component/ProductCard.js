@@ -1,3 +1,4 @@
+import { Backend_Base_Url } from "@/config";
 import Image from "next/image";
 
 // Base64 encoded SVG for blur placeholder
@@ -19,8 +20,8 @@ export default function ProductCard({ item }) {
     <div className="flex flex-col gap-y-2 items-center text-center">
       <div className="relative w-[200px] h-[200px] rounded-md overflow-hidden">
         <Image
-          src={item.image}
-          alt={item.title}
+          src={Backend_Base_Url + '/' + item.otherimage}
+          alt={item.meta_title}
           fill
           className="object-cover"
           placeholder="blur"
@@ -28,8 +29,8 @@ export default function ProductCard({ item }) {
           sizes="(max-width: 768px) 50vw, 33vw"
         />
       </div>
-      <h3 className="font-medium">{item.title}</h3>
-      <p className="text-sm text-gray-500">{item.brand}</p>
+      <h3 className="font-medium">{item.name}</h3>
+      <p className="text-sm text-gray-500">{item.brand?.name}</p>
       <p className="font-semibold">{item.price}</p>
     </div>
   );
