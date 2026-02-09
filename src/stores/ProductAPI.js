@@ -189,6 +189,40 @@ export const getProductBySlug = async (slug) => {
   }
 };
 
+/**
+ * Get all product slugs (for generateStaticParams).
+ * Paginates through getAllProducts and collects slugs.
+ * @param {string} [slug] - Optional slug to pass to the API (e.g. for filtering).
+ * @returns {Promise<string[]>}
+ */
+export const getAllProductSlugs = async (slug) => {
+  const slugs = [];
+  let page = 1;
+  const perPage = 100;
+  let hasMore = true;
+
+  while (hasMore) {
+    const params = { page, limit: perPage };
+    if (slug) params.slug = slug;
+    const res = await getAllProducts(params);
+    if (!res) break;
+
+    const list = Array.isArray(res) ? res : res?.data ?? res?.products ?? [];
+    const total = res?.total ?? res?.meta?.total ?? list.length;
+    const lastPage = res?.last_page ?? res?.meta?.last_page ?? (Math.ceil(total / perPage) || 1);
+
+    for (const item of list) {
+      const itemSlug = item?.slug ?? item?.product_slug;
+      if (itemSlug) slugs.push(itemSlug);
+    }
+
+    hasMore = page < lastPage && list.length === perPage;
+    page += 1;
+  }
+
+  return slugs;
+};
+
 export default {
   getMensProducts,
   getLadiesProducts,
@@ -202,4 +236,5 @@ export default {
   getBestDealProducts,
   getNewArrivalProducts,
   getProductBySlug,
+  getAllProductSlugs,
 };

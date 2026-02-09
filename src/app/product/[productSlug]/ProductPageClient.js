@@ -1,11 +1,33 @@
 "use client";
-import { productList } from "@/_lib/productList";
 import ProductCard2 from "@/component/ProductCard2";
+import { NEXT_PUBLIC_API_URL } from "@/config";
+import { getProductBySlug } from "@/stores/ProductAPI";
 import Image from "next/image";
 import { useRef, useState, useEffect } from "react";
 
+const imgUrl = (path) => (path ? `${NEXT_PUBLIC_API_URL}/${path}` : "");
+
 export default function ProductPageClient({ params }) {
-  const [mainImg, setMainImg] = useState("/images/mockProduct/1.png");
+  const productSlug = params?.productSlug ?? "";
+  const [productData, setProductData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [mainImg, setMainImg] = useState("");
+
+  useEffect(() => {
+    if (!productSlug) return;
+    setLoading(true);
+    getProductBySlug(productSlug)
+      .then((data) => {
+        setProductData(data);
+        const p = data?.product;
+        if (p) {
+          const first = p.product_image?.[0]?.multiimage || p.thumb_image || p.image;
+          setMainImg(imgUrl(first));
+        }
+      })
+      .finally(() => setLoading(false));
+  }, [productSlug]);
+
   const [activeTab, setActiveTab] = useState("editor-note");
   const scrollRef = useRef(null);
 
@@ -15,24 +37,34 @@ export default function ProductPageClient({ params }) {
   const collectionRef = useRef(null);
   const movementRef = useRef(null);
 
-  // Product price (in Taka) - replace with actual product data
-  const productPrice = 42000; // ৳42,000.00
-  const isEmiAvailable = true; // Set based on product data
+  const product = productData?.product ?? null;
+  const priceNum = Number(product?.selling_price || product?.price || 0);
+  const isEmiAvailable = product?.is_emi_available === "1";
+  const inStock = Number(product?.quantity || 0) > 0;
 
-  // Calculate EMI amounts
   const calculateEMI = (price, months, interestRate = 0) => {
-    if (interestRate === 0) {
-      return Math.round(price / months);
-    }
+    if (interestRate === 0) return Math.round(price / months);
     const monthlyRate = interestRate / 100 / 12;
-    const emi = (price * monthlyRate * Math.pow(1 + monthlyRate, months)) /
-                (Math.pow(1 + monthlyRate, months) - 1);
-    return Math.round(emi);
+    return Math.round(
+      (price * monthlyRate * Math.pow(1 + monthlyRate, months)) /
+        (Math.pow(1 + monthlyRate, months) - 1)
+    );
   };
+  const emi3Months = calculateEMI(priceNum, 3);
+  const emi6Months = calculateEMI(priceNum, 6);
 
-  const emi3Months = calculateEMI(productPrice, 3);
-  const emi6Months = calculateEMI(productPrice, 6);
-
+  const images = product
+    ? [
+        imgUrl(product.thumb_image || product.image),
+        ...(product.product_image || product.productImages || []).map((img) =>
+          imgUrl(img.multiimage)
+        ).filter(Boolean),
+      ].filter(Boolean)
+    : [];
+  const displayImages = images.length ? images : (mainImg ? [mainImg] : []);
+  const authentics = productData?.authentics ?? [];
+  const related = productData?.related ?? [];
+  const productItem = product?.productItem ?? [];
 
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -120, behavior: "smooth" });
@@ -86,20 +118,23 @@ export default function ProductPageClient({ params }) {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const images = [
-    "/images/mockProduct/1.png",
-    "/images/mockProduct/2.png",
-    "/images/mockProduct/3.png",
-    "/images/mockProduct/4.png",
-    "/images/mockProduct/1.png",
-    "/images/mockProduct/2.png",
-    "/images/mockProduct/3.png",
-    "/images/mockProduct/4.png",
-    "/images/mockProduct/1.png",
-    "/images/mockProduct/2.png",
-    "/images/mockProduct/3.png",
-    "/images/mockProduct/4.png",
-  ];
+  const thumbImages = displayImages.length ? displayImages : ["/images/mockProduct/1.png"];
+
+  if (loading) {
+    return (
+      <div className="w-full min-h-[60vh] flex items-center justify-center bg-white">
+        <div className="animate-pulse text-gray-400">Loading product...</div>
+      </div>
+    );
+  }
+
+  if (!productData && !loading) {
+    return (
+      <div className="w-full min-h-[60vh] flex items-center justify-center bg-white">
+        <p className="text-gray-500">Product not found.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-white text-gray-800">
@@ -135,12 +170,12 @@ export default function ProductPageClient({ params }) {
                 className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-1"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-                {images.map((img, i) => (
+                {thumbImages.map((img, i) => (
                 <button
                     key={i}
                     onClick={() => setMainImg(img)}
                     className={`border rounded-lg p-1.5 sm:p-2 min-w-[60px] sm:min-w-[70px] md:min-w-20 flex-shrink-0 ${
-                    mainImg === img ? "border-red-500" : "border-gray-300"
+                    (mainImg || thumbImages[0]) === img ? "border-red-500" : "border-gray-300"
                     }`}
                 >
                     <Image
@@ -218,20 +253,34 @@ export default function ProductPageClient({ params }) {
             )}
           </div>
 
-          <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">
-            OUT OF STOCK
-          </p>
+          {!inStock && (
+            <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">OUT OF STOCK</p>
+          )}
 
-          <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-3 md:gap-5 text-center">
-            <div>
-              <div className="font-semibold text-xs sm:text-sm">100% Authentic</div>
-            </div>
-            <div>
-              <div className="font-semibold text-xs sm:text-sm">Fast Delivery</div>
-            </div>
-            <div>
-              <div className="font-semibold text-xs sm:text-sm">Secure Checkout</div>
-            </div>
+          <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-5 text-center">
+            {authentics.length > 0
+              ? authentics.map((a) => (
+                  <div key={a.id} className="flex flex-col items-center">
+                    {a.image && (
+                      <div className="w-10 h-10 sm:w-12 sm:h-12 relative mb-1">
+                        <Image
+                          src={imgUrl(a.image)}
+                          alt={a.title}
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
+                    )}
+                    <div className="font-semibold text-xs sm:text-sm">{a.title}</div>
+                  </div>
+                ))
+              : (
+                <>
+                  <div><div className="font-semibold text-xs sm:text-sm">100% Authentic</div></div>
+                  <div><div className="font-semibold text-xs sm:text-sm">Fast Delivery</div></div>
+                  <div><div className="font-semibold text-xs sm:text-sm">Secure Checkout</div></div>
+                </>
+              )}
           </div>
 
           {/* SPECS */}
@@ -303,195 +352,31 @@ export default function ProductPageClient({ params }) {
         </div>
         <div className="bg-gray-100 mt-3 sm:mt-4 p-3 sm:p-4 md:p-6">
           <div id="editor-note" ref={editorNoteRef} className="border-b pb-6 sm:pb-8 md:pb-10">
-            <p className="text-xs sm:text-sm leading-relaxed">The Epic X Baguette represents a more opulent evolution of Jacob & Co.'s bold 2016 Epic X concept. Retaining the skeletonised architecture that defined the original design, this 44mm creation brings together high watchmaking and high jewellery in a single, cohesive statement. The X-shaped lugs remain a defining element, while the engraved Clou de Paris vertical bridges highlight the movement's structure and create a strong visual backbone. Set within an 18K rose gold and ceramic case, the bezel and crown are adorned with baguette-cut white diamonds, adding significant brilliance without overwhelming the mechanical depth on display. At its core lies the hand-wound JCAM45 calibre, featuring a one-minute tourbillon and a power reserve of 48 hours. With its blue Neoralithe inner ring, rubber strap and sapphire crystal apertures, the Epic X Baguette merges transparency, colour and innovation into a distinctly modern expression of Jacob & Co.'s design philosophy.</p>
+            {product?.description ? (
+              <div
+                className="text-xs sm:text-sm leading-relaxed prose prose-sm max-w-none"
+                dangerouslySetInnerHTML={{ __html: product.description }}
+              />
+            ) : (
+              <p className="text-xs sm:text-sm leading-relaxed text-gray-500">No description available.</p>
+            )}
           </div>
           <div id="specification" ref={specificationRef} className="border-b pb-6 sm:pb-8 md:pb-10">
             <div className="max-w-7xl mx-auto mt-6 sm:mt-8 md:mt-10 text-gray-700">
-              {/* Title */}
               <h2 className="text-xs sm:text-sm font-semibold tracking-widest text-red-600">
                 FULL SPECIFICATION
               </h2>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 md:gap-10 mt-4 sm:mt-6">
-
-                {/* COLUMN 1 */}
-                <div className="space-y-8">
-                  <div>
-                    <p className="text-sm font-medium">Brand</p>
-                    <p className="text-sm mt-1">Jacob & Co.</p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-4 sm:mt-6">
+                {productItem.filter((item) => item.value != null && item.value !== "").map((item) => (
+                  <div key={item.id} className="border-b border-gray-200 pb-2">
+                    <p className="text-xs text-gray-500 uppercase">{item.label}</p>
+                    <p className="text-sm font-medium mt-0.5">{item.value}</p>
                   </div>
-
-                  <div>
-                    <h3 className="uppercase text-sm font-semibold border-t pt-3">
-                      Movement
-                    </h3>
-
-                    <div className="mt-4 space-y-4 text-sm">
-                      <div>
-                        <p className="font-medium">Features</p>
-                        <p>60 Seconds Tourbillon</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Movement</p>
-                        <p>Manual Winding</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Calibre</p>
-                        <p>JCAM45</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* COLUMN 2 */}
-                <div className="space-y-8">
-                  <div>
-                    <p className="text-sm font-medium">Collection</p>
-                    <p className="text-sm mt-1">Epic X</p>
-                  </div>
-
-                  <div>
-                    <h3 className="uppercase text-sm font-semibold border-t pt-3">
-                      Case
-                    </h3>
-
-                    <div className="mt-4 space-y-4 text-sm">
-                      <div>
-                        <p className="font-medium">Case Size</p>
-                        <p>44 mm</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Case Thickness</p>
-                        <p>12.3 mm</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Case Shape</p>
-                        <p>Round</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Case Material</p>
-                        <p>Rose Gold</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Case Back</p>
-                        <p>See-through Case Back</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Glass Material</p>
-                        <p>Sapphire Crystal</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* COLUMN 3 */}
-                <div className="space-y-8">
-                  <div>
-                    <p className="text-sm font-medium">Series</p>
-                    <p className="text-sm mt-1">Epic X Baguette</p>
-                  </div>
-
-                  <div>
-                    <h3 className="uppercase text-sm font-semibold border-t pt-3">
-                      Dial
-                    </h3>
-
-                    <div className="mt-4 space-y-4 text-sm">
-                      <div>
-                        <p className="font-medium">Luminosity</p>
-                        <p>On Hands</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Dial Colour</p>
-                        <p>Skeleton</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Hands</p>
-                        <p>Baton</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* COLUMN 4 */}
-                <div className="space-y-8">
-                  <div>
-                    <p className="text-sm font-medium">Model No</p>
-                    <p className="text-sm mt-1">EX100.43.BA.AF.ABRUA</p>
-                  </div>
-
-                  <div>
-                    <h3 className="uppercase text-sm font-semibold border-t pt-3">
-                      Strap
-                    </h3>
-
-                    <div className="mt-4 space-y-4 text-sm">
-                      <div>
-                        <p className="font-medium">Strap Material</p>
-                        <p>Rubber</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Strap Colour</p>
-                        <p>Blue</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Clasp Type</p>
-                        <p>Folding Clasp</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Buckle/Clasp Material</p>
-                        <p>Rose Gold</p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="uppercase text-sm font-semibold border-t pt-3">
-                      Other
-                    </h3>
-
-                    <div className="mt-4 space-y-4 text-sm">
-                      <div>
-                        <p className="font-medium">Precious Stone</p>
-                        <p>Diamond</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Gender</p>
-                        <p>Men</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Water Resistance (M)</p>
-                        <p>100</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Warranty Period</p>
-                        <p>2 Years</p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium">Country Of Origin</p>
-                        <p>Switzerland</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
+                ))}
               </div>
+              {productItem.length === 0 && (
+                <p className="text-sm text-gray-500 mt-4">No specifications available.</p>
+              )}
             </div>
           </div>
           <div id="collection" ref={collectionRef} className="max-w-7xl mx-auto mt-8 sm:mt-10 md:mt-12">
@@ -647,8 +532,21 @@ export default function ProductPageClient({ params }) {
         </h3>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
-          {productList.map((item) => (
-            <ProductCard2 key={item.id} item={item} />
+          {related.map((r) => (
+            <ProductCard2
+              key={r.id}
+              item={{
+                id: r.id,
+                slug: r.slug,
+                name: r.name,
+                meta_title: r.meta_title || r.name,
+                price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
+                discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
+                discount: r.discount ? `${r.discount}% OFF` : "",
+                otherimage: r.otherimage || r.image,
+                image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),
+              }}
+            />
           ))}
         </div>
       </div>
