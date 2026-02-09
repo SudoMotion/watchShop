@@ -1,3 +1,4 @@
+import { Backend_Base_Url } from "@/config";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -21,8 +22,8 @@ export default function ProductCard2({ item }) {
       <div className="h-80 group relative rounded-md overflow-hidden bg-gray-200 w-full flex items-center justify-center py-5">
         {item.discount && <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-br-md">{item.discount}</div>}
         <Image
-          src={item.image}
-          alt={item.title}
+          src={Backend_Base_Url +'/'+ item.otherimage}
+          alt={item.meta_title}
           width={200}
           height={200}
           className="object-cover scale-100 group-hover:scale-105 transition-all duration-300 group-hover:hidden"
@@ -41,10 +42,10 @@ export default function ProductCard2({ item }) {
           sizes="(max-width: 768px) 50vw, 33vw"
         />
       </div>
-      <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg">{item.title}</Link>
+      <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg">{item.name}</Link>
       <div className="flex items-center justify-center gap-x-2 text-base md:text-lg font-semibold">
-      <p className="line-through text-gray-500">{item.originalPrice}</p>
-      <p className="text-red-600">{item.price}</p>
+      <p className="line-through text-gray-500">{item.price}</p>
+      <p className="text-red-600">{item.discount_price}</p>
       </div>
     </div>
   );
