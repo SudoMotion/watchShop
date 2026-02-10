@@ -14,6 +14,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const pathname = usePathname();
   const isHome = pathname === '/';
+  const onTransparent = isHome && !isScrolled;
   const userMenuRef = useRef(null);
 
   // Helper function to convert brand name to brandId format
@@ -161,50 +162,148 @@ export default function Header() {
   return (
   <header className={`${isHome ? 'fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
 
-      {/* Main Header */}
+      {/* Main Header: single row */}
       <div
-        className={`border-b py-4 px-4 transition-colors duration-300 ${
-          isHome && !isScrolled
-            ? 'bg-transparent border-transparent'
-            : 'bg-white border-gray-200'
+        className={`border-b py-3 lg:py-4 px-4 transition-colors duration-300 ${
+          onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200'
         }`}
       >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
-          {/* Logo */}
-          <Link href="/">
-            <Image src={'/logo.png'} height={100} width={250} alt='watchshopbd' className='h-10 object-contain'/>
-          </Link>
-
-          {/* Search Bar - Hidden on mobile */}
-          <form onSubmit={handleSearch} className="hidden lg:flex flex-1 max-w-2xl mx-8">
-            <div className="relative w-full flex items-center">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for products"
-                className="w-full px-4 py-2.5 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          {/* Left: Logo + main menu (desktop) */}
+          <div className="flex items-center gap-6">
+            {/* Logo */}
+            <Link href="/">
+              <Image
+                src={'/logo.png'}
+                height={100}
+                width={250}
+                alt="watchshopbd"
+                className="h-10 object-contain"
               />
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition-colors"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </div>
-          </form>
+            </Link>
 
-          {/* Right Icons */}
-          <div className="flex items-center gap-4 md:gap-6">
+            {/* Main navigation - desktop */}
+            <div className="hidden lg:flex items-center gap-4 md:gap-6">
+              {navigationItems.map((item, index) => {
+                const hasSubmenu = item.submenu && item.submenu.length > 0;
+                const isDropdownOpen = activeDropdown === index;
+
+                return (
+                  <div
+                    key={index}
+                    data-dropdown-index={index}
+                    className="relative"
+                    onMouseEnter={() => hasSubmenu && setActiveDropdown(index)}
+                    onMouseLeave={() => hasSubmenu && setActiveDropdown(null)}
+                  >
+                    <Link
+                      href={item.href}
+                      onClick={() => !hasSubmenu && setActiveDropdown(null)}
+                      className={`flex items-center gap-1 text-xs md:text-sm font-medium whitespace-nowrap transition-colors ${
+                        item.highlight
+                          ? onTransparent
+                            ? 'text-green-300 hover:text-green-200'
+                            : 'text-green-600 hover:text-green-700'
+                          : onTransparent
+                            ? 'text-white hover:text-white/80'
+                            : 'text-gray-700 hover:text-red-600'
+                      }`}
+                    >
+                      {item.label}
+                      {item.highlight && <span className="ml-1">🤝</span>}
+                      {hasSubmenu && (
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      )}
+                    </Link>
+
+                    {/* Dropdown Menu */}
+                    {hasSubmenu && isDropdownOpen && (
+                      <div className="absolute z-50 top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-96 overflow-y-auto">
+                        {item.submenu.map((subItem, subIndex) => (
+                          <Link
+                            key={subIndex}
+                            href={subItem.href}
+                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-colors"
+                            onClick={() => setActiveDropdown(null)}
+                          >
+                            {subItem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Right: search + shortcuts */}
+          <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end">
+            {/* Search Bar - desktop */}
+            <form
+              onSubmit={handleSearch}
+                  className="hidden lg:flex flex-1 max-w-xl"
+            >
+              <div className="relative w-full flex items-center">
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search for products"
+                  className="w-full px-4 py-2.5 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                />
+                <button
+                  type="submit"
+                  className="px-6 py-2.5 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition-colors"
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+              </div>
+            </form>
+
             {/* Mobile Search Button */}
             <button
               onClick={() => setOpen(!open)}
-              className="lg:hidden text-gray-700 hover:text-gray-900"
+              className={`lg:hidden ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+              }`}
             >
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
             </button>
 
@@ -212,34 +311,60 @@ export default function Header() {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-1 text-gray-700 hover:text-gray-900 transition-colors"
+                className={`flex items-center gap-1 text-xs md:text-sm font-medium transition-colors ${
+                  onTransparent
+                    ? 'text-white hover:text-white/80'
+                    : 'text-gray-700 hover:text-gray-900'
+                }`}
               >
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                  />
                 </svg>
-                <span className="hidden md:inline text-sm font-medium">Sign In</span>
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                <span className="hidden md:inline text-sm font-medium">
+                  Sign In
+                </span>
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
                 </svg>
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <Link 
-                    href="/login" 
+                  <Link
+                    href="/login"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setShowUserMenu(false)}
                   >
                     Sign In
                   </Link>
-                  <Link 
-                    href="/signup" 
+                  <Link
+                    href="/signup"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setShowUserMenu(false)}
                   >
                     Register
                   </Link>
-                  <Link 
-                    href="/account" 
+                  <Link
+                    href="/account"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     onClick={() => setShowUserMenu(false)}
                   >
@@ -250,9 +375,24 @@ export default function Header() {
             </div>
 
             {/* Wishlist */}
-            <Link href="/wishlist" className="relative text-gray-700 hover:text-red-600 transition-colors">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            <Link
+              href="/wishlist"
+              className={`relative transition-colors ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
+              }`}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
               </svg>
               {wishlistCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-[11px] rounded-full w-4 h-4 flex items-center justify-center">
@@ -262,9 +402,24 @@ export default function Header() {
             </Link>
 
             {/* Cart */}
-            <Link href="/cart" className="relative text-gray-700 hover:text-gray-900 transition-colors">
-              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+            <Link
+              href="/cart"
+              className={`relative transition-colors ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+              }`}
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"
+                />
               </svg>
               {cartCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-[11px] rounded-full w-4 h-4 flex items-center justify-center">
@@ -272,6 +427,45 @@ export default function Header() {
                 </span>
               )}
             </Link>
+
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`lg:hidden flex items-center justify-center p-2 transition-colors ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
+              }`}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
 
@@ -299,177 +493,87 @@ export default function Header() {
         )}
       </div>
 
-      {/* Bottom Navigation Bar */}
-      <nav
-        className={`lg:block hidden border-b shadow-sm z-40 transition-colors duration-300 ${
-          isHome && !isScrolled
-            ? 'bg-transparent border-transparent shadow-none'
-            : 'bg-white border-gray-200 bg-opacity-95 backdrop-blur'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center gap-4 md:gap-6 scrollbar-hide">
-            {/* Home Icon */}
-            <Link href="/" className="flex-shrink-0 text-gray-700 hover:text-red-600 transition-colors py-3">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-            </Link>
+      {/* Mobile Menu Dropdown (below main header) */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden border-b border-gray-200 bg-white/95 backdrop-blur px-4 pb-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col space-y-1 pt-2">
+              {navigationItems.map((item, index) => {
+                const hasSubmenu = item.submenu && item.submenu.length > 0;
+                const isDropdownOpen = mobileActiveDropdown === index;
 
-            {/* Navigation Items */}
-            {navigationItems.map((item, index) => {
-              const hasSubmenu = item.submenu && item.submenu.length > 0;
-              const isDropdownOpen = activeDropdown === index;
-
-              return (
-                <div
-                  key={index}
-                  data-dropdown-index={index}
-                  className="relative flex-shrink-0 py-3"
-                  onMouseEnter={() => hasSubmenu && setActiveDropdown(index)}
-                  onMouseLeave={() => hasSubmenu && setActiveDropdown(null)}
-                >
-                  <Link
-                    href={item.href}
-                    onClick={() => !hasSubmenu && setActiveDropdown(null)}
-                    className={`flex items-center gap-1 text-sm font-medium whitespace-nowrap transition-colors ${
-                      item.highlight
-                        ? 'text-green-600 hover:text-green-700'
-                        : 'text-gray-700 hover:text-red-600'
-                    }`}
+                return (
+                  <div
+                    key={index}
+                    className="border-b border-gray-100 last:border-b-0"
                   >
-                    {item.label}
-                    {item.highlight && <span className="ml-1">🤝</span>}
-                    {hasSubmenu && (
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                      </svg>
-                    )}
-                  </Link>
-                  
-                  {/* Dropdown Menu */}
-                  {hasSubmenu && isDropdownOpen && (
-                    <div className="absolute z-50 top-10 left-0 mt-1 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50 max-h-96 overflow-y-auto">
-                      {item.submenu.map((subItem, subIndex) => (
-                        <Link
-                          key={subIndex}
-                          href={subItem.href}
-                          className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-colors"
-                          onClick={() => setActiveDropdown(null)}
+                    <div className="flex items-center justify-between">
+                      <Link
+                        href={item.href}
+                        onClick={() => !hasSubmenu && setMobileMenuOpen(false)}
+                        className={`flex-1 py-3 px-2 text-sm font-medium transition-colors ${
+                          item.highlight
+                            ? 'text-green-600 hover:text-green-700'
+                            : 'text-gray-700 hover:text-red-600'
+                        }`}
+                      >
+                        {item.label}
+                        {item.highlight && <span className="ml-1">🤝</span>}
+                      </Link>
+                      {hasSubmenu && (
+                        <button
+                          onClick={() =>
+                            setMobileActiveDropdown(
+                              isDropdownOpen ? null : index
+                            )
+                          }
+                          className="p-3 text-gray-700 hover:text-red-600 transition-colors"
+                          aria-label="Toggle submenu"
                         >
-                          {subItem.label}
-                        </Link>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </nav>
-      {/* Mobile Navigation Bar */}
-      <nav
-        className={`lg:hidden border-b shadow-sm z-40 transition-colors duration-300 ${
-          isHome && !isScrolled
-            ? 'bg-transparent border-transparent shadow-none'
-            : 'bg-white border-gray-200 bg-opacity-95 backdrop-blur'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto px-4">
-          <div className="flex items-center justify-between py-3">
-            {/* Home Icon */}
-            <Link href="/" className="flex-shrink-0 text-gray-700 hover:text-red-600 transition-colors">
-              <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-              </svg>
-            </Link>
-
-            {/* Hamburger Menu Button */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="flex items-center justify-center p-2 text-gray-700 hover:text-red-600 transition-colors"
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              ) : (
-                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              )}
-            </button>
-          </div>
-
-          {/* Mobile Menu Dropdown */}
-          {mobileMenuOpen && (
-            <div className="pb-4 border-t border-gray-200 mt-2">
-              <div className="flex flex-col space-y-1 pt-2">
-                {navigationItems.map((item, index) => {
-                  const hasSubmenu = item.submenu && item.submenu.length > 0;
-                  const isDropdownOpen = mobileActiveDropdown === index;
-
-                  return (
-                    <div key={index} className="border-b border-gray-100 last:border-b-0">
-                      <div className="flex items-center justify-between">
-                        <Link
-                          href={item.href}
-                          onClick={() => !hasSubmenu && setMobileMenuOpen(false)}
-                          className={`flex-1 py-3 px-2 text-sm font-medium transition-colors ${
-                            item.highlight
-                              ? 'text-green-600 hover:text-green-700'
-                              : 'text-gray-700 hover:text-red-600'
-                          }`}
-                        >
-                          {item.label}
-                          {item.highlight && <span className="ml-1">🤝</span>}
-                        </Link>
-                        {hasSubmenu && (
-                          <button
-                            onClick={() => setMobileActiveDropdown(isDropdownOpen ? null : index)}
-                            className="p-3 text-gray-700 hover:text-red-600 transition-colors"
-                            aria-label="Toggle submenu"
+                          <svg
+                            className={`w-5 h-5 transition-transform ${
+                              isDropdownOpen ? 'rotate-180' : ''
+                            }`}
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
                           >
-                            <svg 
-                              className={`w-5 h-5 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} 
-                              fill="none" 
-                              viewBox="0 0 24 24" 
-                              stroke="currentColor"
-                            >
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </button>
-                        )}
-                      </div>
-                      
-                      {/* Mobile Submenu */}
-                      {hasSubmenu && isDropdownOpen && (
-                        <div className="bg-gray-50 pb-2">
-                          {item.submenu.map((subItem, subIndex) => (
-                            <Link
-                              key={subIndex}
-                              href={subItem.href}
-                              onClick={() => {
-                                setMobileActiveDropdown(null);
-                                setMobileMenuOpen(false);
-                              }}
-                              className="block py-2 px-6 text-sm text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors"
-                            >
-                              {subItem.label}
-                            </Link>
-                          ))}
-                        </div>
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M19 9l-7 7-7-7"
+                            />
+                          </svg>
+                        </button>
                       )}
                     </div>
-                  );
-                })}
-              </div>
+
+                    {/* Mobile Submenu */}
+                    {hasSubmenu && isDropdownOpen && (
+                      <div className="bg-gray-50 pb-2">
+                        {item.submenu.map((subItem, subIndex) => (
+                          <Link
+                            key={subIndex}
+                            href={subItem.href}
+                            onClick={() => {
+                              setMobileActiveDropdown(null);
+                              setMobileMenuOpen(false);
+                            }}
+                            className="block py-2 px-6 text-sm text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors"
+                          >
+                            {subItem.label}
+                          </Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
-          )}
+          </div>
         </div>
-      </nav>
+      )}
     </header>
   );
 }
