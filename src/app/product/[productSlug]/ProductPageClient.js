@@ -43,7 +43,10 @@ export default function ProductPageClient({ params }) {
   const movementRef = useRef(null);
 
   const product = productData?.product ?? null;
-  const priceNum = Number(product?.selling_price || product?.price || 0);
+  const sellingPriceNum = Number(
+    product?.selling_price || product?.discount_price || product?.price || 0
+  );
+  const originalPriceNum = Number(product?.price || sellingPriceNum);
   const isEmiAvailable = product?.is_emi_available === "1";
   const inStock = Number(product?.quantity || 0) > 0;
 
@@ -55,8 +58,8 @@ export default function ProductPageClient({ params }) {
         (Math.pow(1 + monthlyRate, months) - 1)
     );
   };
-  const emi3Months = calculateEMI(priceNum, 3);
-  const emi6Months = calculateEMI(priceNum, 6);
+  const emi3Months = calculateEMI(sellingPriceNum, 3);
+  const emi6Months = calculateEMI(sellingPriceNum, 6);
 
   const images = product
     ? [
@@ -69,7 +72,27 @@ export default function ProductPageClient({ params }) {
   const displayImages = images.length ? images : (mainImg ? [mainImg] : []);
   const authentics = productData?.authentics ?? [];
   const related = productData?.related ?? [];
-  const productItem = product?.productItem ?? [];
+  const productItem = productData?.productItem || product?.productItem || [];
+  const brand = product?.brand || null;
+  const category = product?.category || null;
+  const modelText =
+    product?.model ||
+    productItem.find((item) => item.label === "Model")?.value ||
+    "";
+  const movementSpecs = productItem.filter((item) =>
+    [
+      "Movement",
+      "Movement Source",
+      "Power Reserve",
+      "Precision",
+      "Jewels",
+      "Caliber No",
+      "Functions",
+      "Frequency",
+    ].includes(item.label)
+  );
+  const movementSummary =
+    movementSpecs.find((item) => item.label === "Movement")?.value || "";
 
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -120, behavior: "smooth" });
@@ -207,15 +230,25 @@ export default function ProductPageClient({ params }) {
         {/* RIGHT: DETAILS */}
         <div className="order-2 lg:order-2">
           <h1 className="text-lg sm:text-xl md:text-2xl font-semibold">
-            Product Title Goes Here
+            {product?.name || product?.meta_title || "Product"}
           </h1>
 
-          <div className="mt-2 sm:mt-3">
-            <span className="line-through text-xs sm:text-sm mr-2 sm:mr-3">৳56,000.00</span>
-            <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl">৳42,000.00</span>
+          <div className="mt-2 sm:mt-3 flex items-baseline gap-2 sm:gap-3">
+            {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
+              <span className="line-through text-xs sm:text-sm text-gray-500">
+                ৳{originalPriceNum.toLocaleString("en-BD")}
+              </span>
+            )}
+            {sellingPriceNum > 0 && (
+              <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl">
+                ৳{sellingPriceNum.toLocaleString("en-BD")}
+              </span>
+            )}
           </div>
 
-          <p className="text-xs sm:text-sm mt-1">Model: XXXXX</p>
+          {modelText && (
+            <p className="text-xs sm:text-sm mt-1">Model: {modelText}</p>
+          )}
 
           {/* EMI Section */}
           <div className="mt-3 sm:mt-4 border rounded-xl p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
@@ -389,63 +422,30 @@ export default function ProductPageClient({ params }) {
 
               {/* LEFT CONTENT */}
               <div className="lg:col-span-3 text-gray-700 leading-relaxed order-2 lg:order-1">
-
                 <h2 className="text-xs sm:text-sm font-semibold tracking-widest text-red-600 mb-2 sm:mb-3">
-                  ABOUT THE JACOB & CO. EPIC X COLLECTION
+                  {brand?.name
+                    ? `ABOUT THE ${brand.name.toUpperCase()} COLLECTION`
+                    : "ABOUT THE COLLECTION"}
                 </h2>
 
-                <p className="text-xs sm:text-sm mb-4 sm:mb-6">
-                  The Epic X collection, launched in 2015, quickly became a hallmark of Jacob & Co.'s
-                  innovative spirit and bold design. Defined by the striking "X" motif, which
-                  symbolises mystery and allure, the collection reflects their daring approach to
-                  contemporary watchmaking. By 2022, the Epic X underwent a significant transformation
-                  at Geneva Watch Days, introducing new materials and refined craftsmanship across five
-                  distinct versions. With its iconic X-shaped lugs and skeletonised dials, the Epic X
-                  perfectly balances elegance and innovation, showcasing the brand's commitment to
-                  luxury watchmaking.
-                </p>
-
-                <h3 className="text-sm sm:text-base font-semibold mb-1">
-                  Timeless Designs And Precision Engineering
-                </h3>
-
-                <p className="text-xs sm:text-sm mb-4 sm:mb-6">
-                  The 2022 Epic X collection retains its signature X-shaped case, with angular lugs
-                  that seamlessly integrate into the bezel for a refined, cohesive design. The
-                  high-polished stainless steel and rose gold versions exude luxury, while the stainless
-                  steel model features blue aluminium accents on the inner bezel, bridges, and crown
-                  base. A newly designed five-link bracelet with angular profiles adds to its modern
-                  appeal. All Epic X models share common specifications, including a 44mm case diameter
-                  and a thickness of 13.05mm. Powered by the hand-wound calibre JCAM45, recognised for
-                  its skeletonised vertical construction, the collection operates at 28,800 vph with a
-                  48-hour power reserve. The 2022 update introduces Clous de Paris-textured bridges and
-                  redesigned crown guards, elevating the collection's sophistication.
-                </p>
-
-                <h3 className="text-sm sm:text-base font-semibold mb-1">
-                  Honouring Heritage: The Epic X India Edition
-                </h3>
-
-                <p className="text-xs sm:text-sm">
-                  India holds significant promise for Jacob & Co., inspiring the brand to create
-                  exclusive limited editions in collaboration with Ethos. The Epic X India Edition
-                  showcases four iconic monuments — Taj Mahal, India Gate, Gateway of India, and Qutub
-                  Minar — in intricate 2D titanium designs, honouring Indian heritage. Further
-                  enriching its thematic offerings, Jacob & Co. introduced two exclusive Ram
-                  Janmabhoomi editions, incorporating distinctive cultural motifs and historical
-                  significance. In October 2024, Jacob & Co. elevated the collection with the Wonders
-                  of India, replacing the Gateway of India with the Ram Mandir, an emblem of India's
-                  diverse heritage and the brand's dedication to authentic cultural representation.
-                </p>
+                {brand?.meta_description || category?.meta_description ? (
+                  <p className="text-xs sm:text-sm mb-4 sm:mb-6">
+                    {brand?.meta_description || category?.meta_description}
+                  </p>
+                ) : (
+                  <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-gray-500">
+                    Collection information is not available for this product.
+                  </p>
+                )}
               </div>
 
               {/* RIGHT IMAGE */}
               <div className="w-full order-1 lg:order-2">
                 <Image
-                  src="/images/collection.jpg"   // update path to your image
+                  src="/images/collection.jpg"
                   width={600}
                   height={800}
-                  alt="Jacob & Co Epic X Watch"
+                  alt={brand?.name ? `${brand.name} collection` : "Watch collection"}
                   className="rounded-lg object-cover w-full h-auto"
                 />
               </div>
@@ -461,67 +461,39 @@ export default function ProductPageClient({ params }) {
                   ABOUT THE MOVEMENT
                 </h2>
 
-                <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
-                  The calibre JCAM45 is an in-house movement created by Jacob & Co. specifically
-                  for their Epic X Bridges watches. It features a highly skeletonised design with
-                  a vertical structure to provide maximum transparency. In lieu of a traditional
-                  mainplate, the entire movement is suspended on two vertical bridges, which are
-                  finished with a Clou de Paris pattern. This is a manual winding movement that
-                  operates at 28,800 vibrations per hour, consists of 158 components and 21 jewels,
-                  and displays hours and minutes. It is equipped with an open-worked barrel that
-                  provides a power reserve of 48 hours. The Calibre JCAM45 is meticulously finished,
-                  with components featuring bevelled edges and a combination of polished and matte
-                  finishes.
-                </p>
+                {movementSpecs.length > 0 ? (
+                  <>
+                    {movementSummary && (
+                      <p className="text-xs sm:text-sm text-gray-700 leading-relaxed">
+                        This watch features a {movementSummary} movement with the following key
+                        specifications:
+                      </p>
+                    )}
 
-                {/* SPECS GRID */}
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 sm:gap-y-6 md:gap-y-8 gap-x-4 sm:gap-x-6 md:gap-x-10 mt-6 sm:mt-8 md:mt-10 text-xs sm:text-sm text-gray-700">
-
-                  <div>
-                    <p className="text-gray-400">Brand</p>
-                    <p className="font-medium">Jacob & Co.</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Reference</p>
-                    <p className="font-medium">JCAM45</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Movement</p>
-                    <p className="font-medium">Manual Winding</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Power Reserve</p>
-                    <p className="font-medium">Approx. 48 hours</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Jewels</p>
-                    <p className="font-medium">21</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Frequency</p>
-                    <p className="font-medium">28,800 bph</p>
-                  </div>
-
-                  <div>
-                    <p className="text-gray-400">Display</p>
-                    <p className="font-medium">Analog</p>
-                  </div>
-
-                </div>
+                    {/* SPECS GRID */}
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 sm:gap-y-6 md:gap-y-8 gap-x-4 sm:gap-x-6 md:gap-x-10 mt-4 sm:mt-6 md:mt-8 text-xs sm:text-sm text-gray-700">
+                      {movementSpecs.map((spec) => (
+                        <div key={spec.id}>
+                          <p className="text-gray-400">{spec.label}</p>
+                          <p className="font-medium">{spec.value || "-"}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
+                    Movement information is not available for this product.
+                  </p>
+                )}
               </div>
 
               {/* RIGHT IMAGE */}
               <div className="flex justify-center order-1 lg:order-2">
                 <Image
-                  src="/images/circular.avif"  // update path
+                  src="/images/circular.avif"
                   width={500}
                   height={500}
-                  alt="Watch Movement"
+                  alt={movementSummary ? `${movementSummary} movement` : "Watch movement"}
                   className="object-contain w-full h-auto max-w-xs sm:max-w-sm md:max-w-md"
                 />
               </div>
