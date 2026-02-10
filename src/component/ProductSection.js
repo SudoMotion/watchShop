@@ -1,5 +1,6 @@
 import React from 'react'
 import ProductCard2 from './ProductCard2'
+import Link from 'next/link'
 
 export default function ProductSection({title, products}) {
   return (
@@ -10,8 +11,8 @@ export default function ProductSection({title, products}) {
                 <ProductCard2 key={index} item={product} />
             ))}
         </div>
-        <div className='flex items-center justify-center my-3'>
-          <button className='px-8 py-2 border border-gray-500 rounded mx-auto text-base md:text-lg font-medium'>See More</button>
+        <div className='flex items-center justify-center my-3'> 
+          <Link href={`/product`} className='px-8 py-2 border border-gray-500 rounded mx-auto text-base md:text-lg font-medium'>See More</Link>
         </div>
     </div>
   )

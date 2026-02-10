@@ -72,9 +72,9 @@ export default async function page() {
                 <ProductCard item={item} key={index} />
               ))}
           </div>
-          <div className='flex items-center justify-center'>
+          <Link href={"/product"} className='flex items-center justify-center'>
             <BigButton label="View All Watches" className='mt-10'/>
-          </div>
+          </Link>
         </div>
       </div>
       <ProductSection products={new_arrival} title="New Arrival"/>
