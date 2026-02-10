@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 
 export default function Header() {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(false); // search modal
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
@@ -133,24 +133,7 @@ export default function Header() {
         href: `/category/accessories?filter=${brandToSlug(accessory)}`
       }))
     },
-    { 
-      label: "MEN'S FASHION", 
-      href: "/category/men-fashion",
-      submenu: mensFashion.map(item => ({
-        label: item,
-        href: `/category/men-fashion?filter=${brandToSlug(item)}`
-      }))
-    },
-    { 
-      label: "LADIES FASHION", 
-      href: "/category/ladies-fashion",
-      submenu: ladiesFashion.map(item => ({
-        label: item,
-        href: `/category/ladies-fashion?filter=${brandToSlug(item)}`
-      }))
-    },
     { label: "LIMITED EDITION", href: "/category/limited-edition", submenu: [] },
-    { label: "BEST DEAL", href: "/category/best-deal", highlight: true, submenu: [] },
   ];
 
   const handleSearch = (e) => {
@@ -168,7 +151,7 @@ export default function Header() {
           onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200'
         }`}
       >
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className=" flex items-center justify-between gap-4">
           {/* Left: Logo + main menu (desktop) */}
           <div className="flex items-center gap-6">
             {/* Logo */}
@@ -199,7 +182,7 @@ export default function Header() {
                     <Link
                       href={item.href}
                       onClick={() => !hasSubmenu && setActiveDropdown(null)}
-                      className={`flex items-center gap-1 text-xs md:text-sm font-medium whitespace-nowrap transition-colors ${
+                      className={`flex items-center gap-1 text-[10px] md:text-xs font-medium whitespace-nowrap transition-colors ${
                         item.highlight
                           ? onTransparent
                             ? 'text-green-300 hover:text-green-200'
@@ -251,44 +234,10 @@ export default function Header() {
 
           {/* Right: search + shortcuts */}
           <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end">
-            {/* Search Bar - desktop */}
-            <form
-              onSubmit={handleSearch}
-                  className="hidden lg:flex flex-1 max-w-xl"
-            >
-              <div className="relative w-full flex items-center">
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search for products"
-                  className="w-full px-4 py-2.5 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-                <button
-                  type="submit"
-                  className="px-6 py-2.5 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600 transition-colors"
-                >
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                    />
-                  </svg>
-                </button>
-              </div>
-            </form>
-
-            {/* Mobile Search Button */}
+            {/* Search icon (all viewports) */}
             <button
-              onClick={() => setOpen(!open)}
-              className={`lg:hidden ${
+              onClick={() => setOpen(true)}
+              className={`flex items-center justify-center p-2 ${
                 onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
               }`}
             >
@@ -469,28 +418,6 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile Search Bar */}
-        {open && (
-          <div className="mt-4 lg:hidden">
-            <form onSubmit={handleSearch} className="flex items-center">
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search for products"
-                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
-              <button
-                type="submit"
-                className="px-6 py-2.5 bg-blue-500 text-white rounded-r-lg hover:bg-blue-600"
-              >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
-              </button>
-            </form>
-          </div>
-        )}
       </div>
 
       {/* Mobile Menu Dropdown (below main header) */}
@@ -571,6 +498,78 @@ export default function Header() {
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Search Modal */}
+      {open && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setOpen(false)}
+        >
+          <div
+            className="w-full max-w-md mx-4 bg-white rounded-2xl shadow-xl p-5"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between mb-3">
+              <h2 className="text-sm font-semibold text-gray-800">
+                Search products
+              </h2>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
+            </div>
+            <form
+              onSubmit={(e) => {
+                handleSearch(e);
+                setOpen(false);
+              }}
+              className="flex items-stretch gap-2"
+            >
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for products"
+                autoFocus
+                className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+              />
+              <button
+                type="submit"
+                className="px-4 py-2.5 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center"
+              >
+                <svg
+                  className="w-5 h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  />
+                </svg>
+              </button>
+            </form>
           </div>
         </div>
       )}
