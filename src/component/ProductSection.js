@@ -6,7 +6,7 @@ export default function ProductSection({title, products}) {
     <div className='max-w-7xl mx-auto'>
         <h1 className='title'>{title}</h1>
         <div className='grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-10'>
-            {products.map((product, index) => (
+            {products?.map((product, index) => (
                 <ProductCard2 key={index} item={product} />
             ))}
         </div>
