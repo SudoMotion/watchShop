@@ -1,6 +1,7 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 
 export default function Header() {
@@ -10,12 +11,25 @@ export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const pathname = usePathname();
+  const isHome = pathname === '/';
   const userMenuRef = useRef(null);
 
   // Helper function to convert brand name to brandId format
   const brandToSlug = (brandName) => {
     return brandName.toLowerCase().replace(/\s+/g, '-');
   };
+
+  // Change header style on scroll (for transparent-on-hero effect)
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // Close user menu when clicking outside
   useEffect(() => {
@@ -145,25 +159,16 @@ export default function Header() {
   };
 
   return (
-    <header className="bg-white w-full z-50">
-      {/* Top Bar */}
-      <div className="bg-gray-100 py-2 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-2 text-xs md:text-sm">
-          <div className="flex items-center gap-2 text-gray-700">
-            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-            </svg>
-            <span>01720392824</span>
-          </div>
-          <div className="flex items-center gap-2 text-gray-700">
-            <span>Enjoy Year Ending Sale Flat 30% Discount!</span>
-            <span>⌚</span>
-          </div>
-        </div>
-      </div>
+  <header className={`${isHome ? 'fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
 
       {/* Main Header */}
-      <div className="border-b border-gray-200 py-4 px-4">
+      <div
+        className={`border-b py-4 px-4 transition-colors duration-300 ${
+          isHome && !isScrolled
+            ? 'bg-transparent border-transparent'
+            : 'bg-white border-gray-200'
+        }`}
+      >
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/">
@@ -294,8 +299,14 @@ export default function Header() {
         )}
       </div>
 
-      {/* Bottom Navigation Bar - Sticky */}
-      <nav className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-40 lg:block hidden">
+      {/* Bottom Navigation Bar */}
+      <nav
+        className={`lg:block hidden border-b shadow-sm z-40 transition-colors duration-300 ${
+          isHome && !isScrolled
+            ? 'bg-transparent border-transparent shadow-none'
+            : 'bg-white border-gray-200 bg-opacity-95 backdrop-blur'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center gap-4 md:gap-6 scrollbar-hide">
             {/* Home Icon */}
@@ -357,8 +368,14 @@ export default function Header() {
           </div>
         </div>
       </nav>
-      {/* Mobile Navigation Bar - Sticky */}
-      <nav className="sticky top-0 bg-white border-b border-gray-200 shadow-sm z-40 lg:hidden">
+      {/* Mobile Navigation Bar */}
+      <nav
+        className={`lg:hidden border-b shadow-sm z-40 transition-colors duration-300 ${
+          isHome && !isScrolled
+            ? 'bg-transparent border-transparent shadow-none'
+            : 'bg-white border-gray-200 bg-opacity-95 backdrop-blur'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between py-3">
             {/* Home Icon */}
