@@ -72,7 +72,9 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-2 text-sm">
-              <li>Customer Service</li>
+              <li>
+                <Link href="/customer-service">Customer Service</Link>
+              </li>
               <li>Order Status</li>
               <li>Update Your Email Preference</li>
               <li>Trade-In Your Watch</li>
@@ -98,6 +100,9 @@ export default function Footer() {
               <li>
                 <Link href="/authenticity">Authenticity</Link>
               </li>
+              <li>
+                <Link href="/physical-store">Physical Store</Link>
+              </li>
               <li>Coupon Code</li>
               <li>Wholesale</li>
               <li>
@@ -119,7 +124,15 @@ export default function Footer() {
               <li>
                 <Link href="/order-information">Order Information</Link>
               </li>
-              <li>Shipping Information</li>
+              <li>
+                <Link href="/shipping-information">Shipping Information</Link>
+              </li>
+              <li>
+                <Link href="/fastest-delivery">Fastest Delivery</Link>
+              </li>
+              <li>
+                <Link href="/faq">FAQ</Link>
+              </li>
               <li>International Shipping</li>
               <li>Payment Options</li>
               <li>Pay With BD Taka</li>
@@ -133,9 +146,15 @@ export default function Footer() {
             </h3>
 
             <ul className="space-y-2 text-sm">
-              <li>Returns & Exchange Policy</li>
-              <li>Returns Center</li>
-              <li>Warranty Policy</li>
+              <li>
+                <Link href="/return-policy">Returns & Exchange Policy</Link>
+              </li>
+              <li>
+                <Link href="/return-policy">Returns Center</Link>
+              </li>
+              <li>
+                <Link href="/warranty-policy">Warranty Policy</Link>
+              </li>
               <li>Warranty Repair Center</li>
             </ul>
           </div>
@@ -182,6 +201,7 @@ export default function Footer() {
           <div className="flex space-x-6">
             <Link href="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <Link href="/terms-and-conditions" className="hover:text-white transition-colors">Terms And Conditions</Link>
+            <Link href="/contact" className="hover:text-white transition-colors">Contact Us</Link>
             <span>Careers</span>
           </div>
 
