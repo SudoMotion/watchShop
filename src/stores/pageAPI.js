@@ -119,3 +119,13 @@ export const getPhysicalStore = async (params = {}) => {
     return null;
   }
 };
+
+export const sendContact = async (body) => {
+  try {
+    const response = await apiRequest('/api/contact/send', 'POST', body);
+    return response;
+  } catch (error) {
+    console.error('Error sending contact:', error);
+    return null;
+  }
+};
