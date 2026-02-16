@@ -1,11 +1,17 @@
+'use client';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Pagination } from '@/component/Pagination';
 import { getBlogs } from '@/stores/homeSpecification';
 import { NEXT_PUBLIC_API_URL } from '@/config';
+import { getBlogList } from '@/stores/blogAPI';
+import { useState } from 'react';
 
 export default async function BlogPage() {
-  const blogs = await getBlogs();
+  const [currentPage, setCurrentPage] = useState(1);
+  // const blogs = await getBlogs();
+  const {data: blogs} = await getBlogList({ page: currentPage });
+  console.log('data', blogs)
 
   return (
     <div className="min-h-screen bg-white">
@@ -52,9 +58,12 @@ export default async function BlogPage() {
                     <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
                       {post.title}
                     </h2>
-                    <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 flex-1 line-clamp-3">
-                      {post.excerpt || post.description || ''}
-                    </p>
+                    <div
+                      className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 flex-1 line-clamp-3 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800"
+                      dangerouslySetInnerHTML={{
+                        __html: post.excerpt || post.description || '',
+                      }}
+                    />
                     <div className="text-xs text-gray-500 mt-auto">
                       {date ? new Date(date).toLocaleDateString('en-US', {
                         year: 'numeric',
