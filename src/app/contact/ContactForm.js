@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { sendContact } from '@/stores/pageAPI';
 
 const INPUT_CLASS =
   'w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-red-500/30 focus:border-red-500 outline-none transition-colors text-gray-900 placeholder:text-gray-400';
@@ -43,12 +44,24 @@ export default function ContactForm() {
 
     setStatus('sending');
     try {
-      // Replace with your API endpoint when ready
-      // const res = await fetch('/api/contact', { method: 'POST', body: JSON.stringify(form) });
-      await new Promise((r) => setTimeout(r, 800));
-      setStatus('success');
-      setForm({ name: '', phone: '', email: '', subject: 'Inquiry', message: '' });
-      setErrors({});
+      const body = {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+        message: form.message.trim(),
+        subject: form.subject?.trim() || 'Inquiry',
+      };
+      if (form.email?.trim()) body.email = form.email.trim();
+
+      const response = await sendContact(body);
+      const ok = response && response.status >= 200 && response.status < 300;
+
+      if (ok) {
+        setStatus('success');
+        setForm({ name: '', phone: '', email: '', subject: 'Inquiry', message: '' });
+        setErrors({});
+      } else {
+        setStatus('error');
+      }
     } catch {
       setStatus('error');
     }
