@@ -295,7 +295,60 @@ export default function ProductPageClient({ params }) {
             <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">OUT OF STOCK</p>
           )}
 
-          <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-5 text-center">
+          {/* <ul className="space-y-1.5 text-sm text-gray-700">
+            <li className="flex items-center gap-2">
+              <span className="text-red-500">●</span> 100% Authentic
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="text-red-500">●</span> Fast Delivery
+            </li>
+            <li className="flex items-center gap-2">
+              <span className="text-red-500">●</span> Secure Checkout
+            </li>
+          </ul> */}
+
+          {productItem.filter((item) => item.value != null && item.value !== "").length > 0 && (
+            <div className="mt-4 sm:mt-5 pt-4 border-t border-gray-200">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 sm:mb-3">
+                Watch Specifications
+              </h3>
+              <ul className="space-y-1.5 text-sm text-gray-700">
+                {productItem
+                  .filter((item) => item.value != null && item.value !== "")
+                  .slice(0, 6)
+                  .map((item) => (
+                    <li key={item.id ?? item.label} className="flex items-start gap-2">
+                      <span className="text-red-500 mt-0.5 shrink-0">●</span>
+                      <span>
+                        <span className="font-medium text-gray-800">{item.label}:</span>{" "}
+                        <span className="text-gray-600">{item.value}</span>
+                      </span>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+          )}
+
+          {/* SPECS */}
+          <div className="mt-6 sm:mt-8 border rounded-xl p-3 sm:p-4 md:p-5">
+            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3">To speak an Expert 24/7</h2>
+            <h2 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">WhatsApp us at +8801000000000</h2>
+
+            {/* <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
+              </div>
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
+              </div>
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/busket.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
+              </div>
+              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
+                <Image src="/images/warrenty.png" alt="Cycle" width={100} height={100} className="w-full h-auto" />
+              </div>
+            </div> */}
+            <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-5 text-center">
             {authentics.length > 0
               ? authentics.map((a) => (
                   <div key={a.id} className="flex flex-col items-center">
@@ -320,26 +373,6 @@ export default function ProductPageClient({ params }) {
                 </>
               )}
           </div>
-
-          {/* SPECS */}
-          <div className="mt-6 sm:mt-8 border rounded-xl p-3 sm:p-4 md:p-5">
-            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3">To speak an Expert 24/7</h2>
-            <h2 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">WhatsApp us at +8801000000000</h2>
-
-            <div className="grid grid-cols-2 gap-2 sm:gap-3">
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
-                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
-              </div>
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
-                <Image src="/images/cycle.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
-              </div>
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
-                <Image src="/images/busket.jpg" alt="Cycle" width={100} height={100} className="w-full h-auto" />
-              </div>
-              <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
-                <Image src="/images/warrenty.png" alt="Cycle" width={100} height={100} className="w-full h-auto" />
-              </div>
-            </div>
           </div>
         </div>
       </div>
