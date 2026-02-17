@@ -30,15 +30,14 @@ export default function ProductCard2({ item }) {
 
   return (
     <div className="flex flex-col gap-y-2 items-center text-center">
-      <div className="h-80 group relative rounded-md overflow-hidden bg-gray-200 w-full flex items-center justify-center py-5">
-        {item.discount && <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-br-md">{item.discount}</div>}
+      <div className="group relative rounded-md overflow-hidden bg-white w-full aspect-[3/4] min-h-64">
+        {item.discount && <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-br-md z-10">{item.discount}</div>}
         {mainImage && (
           <Image
             src={mainImageSrc}
             alt={item.meta_title || item.name || "Product"}
-            width={200}
-            height={200}
-            className="object-cover scale-100 group-hover:scale-105 transition-all duration-300 group-hover:hidden"
+            fill
+            className="object-cover scale-100 group-hover:scale-105 transition-all duration-300 group-hover:hidden absolute inset-0"
             placeholder="blur"
             blurDataURL={blurSvg}
             sizes="(max-width: 768px) 50vw, 33vw"
@@ -48,9 +47,8 @@ export default function ProductCard2({ item }) {
           <Image
             src={hoverImageSrc}
             alt={item.meta_title || item.name || "Product"}
-            width={200}
-            height={200}
-            className="absolute object-cover scale-100 group-hover:scale-125 transition-all duration-[1000ms] group-hover:opacity-100 opacity-0"
+            fill
+            className="object-cover scale-100 group-hover:scale-105 transition-all duration-[1000ms] group-hover:opacity-100 opacity-0 absolute inset-0"
             placeholder="blur"
             blurDataURL={blurSvg}
             sizes="(max-width: 768px) 50vw, 33vw"
