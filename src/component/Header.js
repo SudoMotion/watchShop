@@ -16,6 +16,7 @@ export default function Header() {
   const isHome = pathname === '/';
   const onTransparent = isHome && !isScrolled;
   const userMenuRef = useRef(null);
+  const searchRef = useRef(null);
 
   // Helper function to convert brand name to brandId format
   const brandToSlug = (brandName) => {
@@ -32,11 +33,15 @@ export default function Header() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  // Close user menu when clicking outside
+  // Close user menu, dropdowns, and search when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
+      }
+
+      if (open && searchRef.current && !searchRef.current.contains(event.target)) {
+        setOpen(false);
       }
       
       // Close dropdowns when clicking outside - check if click is not within any dropdown
@@ -48,14 +53,14 @@ export default function Header() {
       }
     };
 
-    if (showUserMenu || activeDropdown !== null) {
+    if (showUserMenu || activeDropdown !== null || open) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showUserMenu, activeDropdown]);
+  }, [showUserMenu, activeDropdown, open]);
   
   // Mock data - in real app, get from context/state
   const cartCount = 0;
@@ -148,7 +153,7 @@ export default function Header() {
       {/* Main Header: single row */}
       <div
         className={`border-b px-4 transition-colors duration-300 ${
-          onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200 pb-1.5'
+          onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200 pb-1.5 md:pb-0'
         }`}
       >
         <div className="flex items-center justify-between gap-4">
@@ -274,26 +279,50 @@ export default function Header() {
           {/* Right: search + shortcuts */}
           <div className="flex items-center gap-2 md:gap-6 flex-1 justify-end py-3 lg:py-4">
             {/* Search icon (all viewports) */}
-            {/* <button
-              onClick={() => setOpen(true)}
-              className={`flex items-center justify-center p-2 ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
-              }`}
-            >
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button> */}
+            <div className="relative" ref={searchRef}>
+              {
+                !open && (  
+                  <button
+                  onClick={() => setOpen(true)}
+                  className={`hidden md:flex items-center justify-center p-2 ${
+                    onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+                  }`}
+                >
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </button>
+                )
+              }
+              {open && (
+                <div className="mt-1 rounded-md border border-gray-200 bg-white p-2 z-50 flex items-center gap-x-2 min-w-[200px]">
+                  <input type="text" name="" id="" placeholder="Search for products" className="w-full outline-none text-gray-900" />
+                  <svg
+                    className="w-5 h-5 shrink-0 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    />
+                  </svg>
+                </div>
+              )}
+            </div>
 
             {/* User/Sign In */}
             <div className="relative" ref={userMenuRef}>
@@ -318,9 +347,9 @@ export default function Header() {
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                <span className="hidden md:inline text-sm font-medium">
+                {/* <span className="hidden md:inline text-sm font-medium">
                   Sign In
-                </span>
+                </span> */}
                 <svg
                   className="w-4 h-4 hidden md:block"
                   fill="none"
@@ -522,7 +551,7 @@ export default function Header() {
       )}
 
       {/* Search Modal */}
-      {open && (
+      {/* {open && (
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm"
           onClick={() => setOpen(false)}
@@ -591,7 +620,7 @@ export default function Header() {
             </form>
           </div>
         </div>
-      )}
+      )} */}
     </header>
   );
 }
