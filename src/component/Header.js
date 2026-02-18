@@ -147,13 +147,13 @@ export default function Header() {
 
       {/* Main Header: single row */}
       <div
-        className={`border-b py-3 lg:py-4 px-4 transition-colors duration-300 ${
+        className={`border-b px-4 transition-colors duration-300 ${
           onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200'
         }`}
       >
-        <div className=" flex items-center justify-between gap-4">
+        <div className="flex items-center justify-between gap-4">
           {/* Left: Logo + main menu (desktop) */}
-          <div className="flex items-center gap-6">
+          <div className="flex gap-6">
             {/* Logo */}
             <Link href="/">
               <Image
@@ -161,7 +161,7 @@ export default function Header() {
                 height={100}
                 width={250}
                 alt="watchshopbd"
-                className="h-10 object-contain"
+                className="h-10 object-contain my-3 lg:my-4"
               />
             </Link>
 
@@ -175,7 +175,7 @@ export default function Header() {
                   <div
                     key={index}
                     data-dropdown-index={index}
-                    className="relative"
+                    className="relative h-full flex items-center py-3 lg:py-4"
                     onMouseEnter={() => hasSubmenu && setActiveDropdown(index)}
                     onMouseLeave={() => hasSubmenu && setActiveDropdown(null)}
                   >
@@ -213,7 +213,7 @@ export default function Header() {
 
                     {/* Dropdown Menu */}
                     {hasSubmenu && isDropdownOpen && (
-                      <div className="absolute z-50 top-full left-0 mt-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-96 overflow-y-auto">
+                      <div className="absolute z-50 top-full left-0 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-96 overflow-y-auto">
                         {item.submenu.map((subItem, subIndex) => (
                           <Link
                             key={subIndex}
@@ -233,7 +233,7 @@ export default function Header() {
           </div>
 
           {/* Right: search + shortcuts */}
-          <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end">
+          <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end py-3 lg:py-4">
             {/* Search icon (all viewports) */}
             <button
               onClick={() => setOpen(true)}
