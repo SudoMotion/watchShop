@@ -148,12 +148,51 @@ export default function Header() {
       {/* Main Header: single row */}
       <div
         className={`border-b px-4 transition-colors duration-300 ${
-          onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200'
+          onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200 pb-1.5'
         }`}
       >
         <div className="flex items-center justify-between gap-4">
           {/* Left: Logo + main menu (desktop) */}
           <div className="flex gap-6">
+
+            {/* Mobile menu toggle */}
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              className={`lg:hidden flex items-center justify-center transition-colors ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
+              }`}
+              aria-label="Toggle menu"
+            >
+              {mobileMenuOpen ? (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              ) : (
+                <svg
+                  className="w-6 h-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                </svg>
+              )}
+            </button>
             {/* Logo */}
             <Link href="/">
               <Image
@@ -233,9 +272,9 @@ export default function Header() {
           </div>
 
           {/* Right: search + shortcuts */}
-          <div className="flex items-center gap-4 md:gap-6 flex-1 justify-end py-3 lg:py-4">
+          <div className="flex items-center gap-2 md:gap-6 flex-1 justify-end py-3 lg:py-4">
             {/* Search icon (all viewports) */}
-            <button
+            {/* <button
               onClick={() => setOpen(true)}
               className={`flex items-center justify-center p-2 ${
                 onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
@@ -254,7 +293,7 @@ export default function Header() {
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-            </button>
+            </button> */}
 
             {/* User/Sign In */}
             <div className="relative" ref={userMenuRef}>
@@ -267,7 +306,7 @@ export default function Header() {
                 }`}
               >
                 <svg
-                  className="w-6 h-6"
+                  className="w-5 h-5"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -283,7 +322,7 @@ export default function Header() {
                   Sign In
                 </span>
                 <svg
-                  className="w-4 h-4"
+                  className="w-4 h-4 hidden md:block"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -331,7 +370,7 @@ export default function Header() {
               }`}
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -358,7 +397,7 @@ export default function Header() {
               }`}
             >
               <svg
-                className="w-6 h-6"
+                className="w-5 h-5"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -377,46 +416,26 @@ export default function Header() {
               )}
             </Link>
 
-            {/* Mobile menu toggle */}
-            <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden flex items-center justify-center p-2 transition-colors ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
-              }`}
-              aria-label="Toggle menu"
-            >
-              {mobileMenuOpen ? (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M6 18L18 6M6 6l12 12"
-                  />
-                </svg>
-              ) : (
-                <svg
-                  className="w-6 h-6"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 6h16M4 12h16M4 18h16"
-                  />
-                </svg>
-              )}
-            </button>
           </div>
         </div>
+          <div className='md:hidden border bg-gray-200 rounded flex items-center px-2 py-1'>
+            <input type="text" name="" id="" placeholder='Search for products' className='w-full outline-none' />
+            <button>
+            <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+          </div>
 
       </div>
 
