@@ -1,5 +1,6 @@
 "use client";
 import ProductCard2 from "@/component/ProductCard2";
+import ProductSlider from "@/component/ProductSlider";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
 import Image from "next/image";
@@ -309,9 +310,6 @@ export default function ProductPageClient({ params }) {
 
           {productItem.filter((item) => item.value != null && item.value !== "").length > 0 && (
             <div className="mt-4 sm:mt-5 pt-4 border-t border-gray-200">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2 sm:mb-3">
-                Watch Specifications
-              </h3>
               <ul className="space-y-1.5 text-sm text-gray-700">
                 {productItem
                   .filter((item) => item.value != null && item.value !== "")
@@ -541,25 +539,21 @@ export default function ProductPageClient({ params }) {
           Related Products
         </h3>
 
-        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
-          {related.map((r) => (
-            <ProductCard2
-              key={r.id}
-              item={{
-                id: r.id,
-                slug: r.slug,
-                name: r.name,
-                meta_title: r.meta_title || r.name,
-                price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
-                discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
-                discount: r.discount ? `${r.discount}% OFF` : "",
-                image: r.image || r.thumb_image,
-                otherimage: r.otherimage || r.image,
-                image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),
-              }}
-            />
-          ))}
-        </div>
+        <ProductSlider
+          items={related.map((r) => ({
+            id: r.id,
+            slug: r.slug,
+            name: r.name,
+            meta_title: r.meta_title || r.name,
+            price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
+            discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
+            discount: r.discount ? `${r.discount}% OFF` : "",
+            image: r.image || r.thumb_image,
+            otherimage: r.otherimage || r.image,
+            image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),
+          }))}
+          sliderId="related-products"
+        />
       </div>
     </div>
   );
