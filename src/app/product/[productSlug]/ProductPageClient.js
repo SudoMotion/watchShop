@@ -330,7 +330,9 @@ export default function ProductPageClient({ params }) {
           {/* SPECS */}
           <div className="mt-6 sm:mt-8 border rounded-xl p-3 sm:p-4 md:p-5">
             <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3">To speak an Expert 24/7</h2>
-            <h2 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">WhatsApp us at +8801000000000</h2>
+            <h2 className="text-sm sm:text-base font-semibold mb-2 sm:mb-3">WhatsApp us at +88 01720392824 / +88 01939418800
+
+</h2>
 
             {/* <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
