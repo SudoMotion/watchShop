@@ -4,10 +4,25 @@ import ProductFilter from '@/component/ProductFilter';
 import { getProductsByBrand } from '@/stores/ProductAPI';
 import React from 'react'
 
+function brandToSlug(name) {
+  return name.toLowerCase().replace(/\s+/g, '-');
+}
+
+const navBrandNames = [
+  "Seiko", "Tissot", "Citizen", "Rado", "Fossil", "Emporio Armani", "Orient", "Omega",
+  "Pagani Design", "Titan", "Casio", "Casio Edifice", "Casio G-Shock", "Longines", "Oris",
+  "TAG Heuer", "Tommy Hilfiger", "Daniel Klein (DK)", "Hamilton", "Victorinox",
+  "West End Watch", "Swatch", "Mido", "Michael Kors (MK)", "Hugo Boss", "Guess", "Fastrack",
+  "Certina", "Frederique Constant", "Mathey Tissot", "Police", "Curren", "Naviforce", "Timex",
+  "Olevs", "Tudor", "Omax", "Casio Pro Trek", "Q&Q", "Santa Barbara PRC", "Movado", "Invicta",
+  "Louis Cardin", "Oliya",
+];
+
 export async function generateStaticParams() {
-  const uniqueBrands = [...new Set(productList.map(product => product.brand))];
-  return uniqueBrands.map(brand => ({
-    brandId: brand.toLowerCase().replace(/\s+/g, '-')
+  const fromProductList = productList.map((p) => p.brand);
+  const allNames = [...new Set([...fromProductList, ...navBrandNames])];
+  return allNames.map((brand) => ({
+    brandId: brandToSlug(brand),
   }));
 }
 
