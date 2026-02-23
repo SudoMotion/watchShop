@@ -25,7 +25,7 @@ export default async function page() {
         <div className='max-w-7xl mx-auto'>
           <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
           <div className='grid grid-cols-5 md:grid-cols-10 items-center justify-center'>
-            {topBrands.map((brand, index) => (
+            {topBrands.slice(0, 10).map((brand, index) => (
               <div key={index} className='flex flex-col items-center p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 w-full'>
                 <div className='relative w-full h-10 md:h-20'>
                   <Image
