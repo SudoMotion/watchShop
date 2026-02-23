@@ -21,15 +21,15 @@ export default async function page() {
   return (
     <div>
       <HeroSlider/>
-      <div className='py-10 bg-gray-50'>
+      <div className='py-10 bg-gray-50 px-2'>
         <div className='max-w-7xl mx-auto'>
           <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
-          <div className='grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-9 justify-items-center'>
+          <div className='grid grid-cols-5 md:grid-cols-10 items-center justify-center'>
             {topBrands.map((brand, index) => (
               <div key={index} className='flex flex-col items-center p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 w-full'>
-                <div className='relative w-full h-16 md:h-20'>
+                <div className='relative w-full h-10 md:h-20'>
                   <Image
-                    src={Backend_Base_Url + '/' + brand.banner_img}
+                    src={Backend_Base_Url + '/' + brand.image}
                     alt={brand.name}
                     fill
                     className='object-contain p-2'
@@ -41,7 +41,7 @@ export default async function page() {
           </div>
         </div>
       </div>
-      <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-5 mb-10 md:h-[400px]'>
+      <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-5 mb-10 md:h-[400px] px-2'>
         <div className='col-span-1 md:col-span-4 rounded-md md:rounded-lg overflow-hidden'>
           <video preload='true' autoPlay loop muted playsInline>
             <source src="/intro.mp4" type="video/mp4" />            
@@ -52,7 +52,7 @@ export default async function page() {
           <Image src="/images/beside-video.avif" alt="beside-video" width={500} height={500} className='w-full'/>
         </div>
       </div>
-      <div className='py-10 bg-black text-white'>
+      <div className='py-10 bg-black text-white px-2'>
         <div className='max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between'>
           <p>Important</p>
           <div>
@@ -63,7 +63,7 @@ export default async function page() {
           <a href="#">More</a>
         </div>
       </div>
-      <div className='grid grid-cols-1 md:grid-cols-2'>
+      <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
         <SecoundaryProductSlider/>
         <div className='text-center p-5'>
           <h1 className='title'>Discount Products</h1>
@@ -78,7 +78,7 @@ export default async function page() {
         </div>
       </div>
       <ProductSection products={new_arrival} title="New Arrival"/>
-      <div className='max-w-7xl mx-auto my-10'>
+      <div className='max-w-7xl mx-auto my-10 px-2'>
         <h1 className='title'>Trending Now</h1>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
           {
@@ -89,11 +89,11 @@ export default async function page() {
         </div>
       </div>
       <ProductSection products={mens_products} title="MEN'S BEST SELLER"/>
-      <div className='max-w-7xl mx-auto my-10'>
+      <div className='max-w-7xl mx-auto my-10 px-2'>
         <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
       </div>
       <ProductSection products={ladies_products} title="LADIES BEST SELLER"/>
-      <div className='max-w-7xl mx-auto my-10'>
+      <div className='max-w-7xl mx-auto my-10 px-2'>
         <h1 className='title'>Trending Now</h1>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
         {
@@ -103,7 +103,7 @@ export default async function page() {
           }
         </div>
       </div>
-      <div className='max-w-7xl mx-auto mb-10'>
+      <div className='max-w-7xl mx-auto mb-10 px-2'>
         <h1 className='text-2xl md:text-3xl font-semibold'>WATCHSHOPBD: <Link href="#" className='hover:text-red-600 transition-all duration-200'>LATEST MAGAZINE OF WATCH INDUSTRY</Link></h1>
         <div className='grid grid-cols-1 md:grid-cols-3 gap-5 mt-5'>
           <div className='flex flex-col gap-y-1'>
@@ -132,10 +132,10 @@ export default async function page() {
           </div>
         </div>
       </div>
-      <div className='max-w-7xl mx-auto h-[720px] mb-10'>
+      <div className='max-w-7xl mx-auto h-[720px] mb-10 px-2'>
         <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
       </div>
-      <div className='max-w-7xl mx-auto'>
+      <div className='max-w-7xl mx-auto px-2'>
         <Image src="/images/payment-method.png" alt="payment-method" width={3000} height={800}/>
       </div>
       <div className='max-w-7xl mx-auto px-2'>

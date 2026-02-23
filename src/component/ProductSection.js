@@ -4,9 +4,9 @@ import Link from 'next/link'
 
 export default function ProductSection({title, products}) {
   return (
-    <div className='max-w-7xl mx-auto'>
+    <div className='max-w-7xl mx-auto px-2'>
         <h1 className='title'>{title}</h1>
-        <div className='grid grid-cols-2 md:grid-cols-4 gap-x-5 gap-y-10'>
+        <div className='grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-x-5 gap-y-10'>
             {products?.map((product, index) => (
                 <ProductCard2 key={index} item={product} />
             ))}
