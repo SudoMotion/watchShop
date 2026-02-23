@@ -1,24 +1,74 @@
-import React from 'react'
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { useRegisterMutation } from "@/stores/AuthAPI";
 
 export default function SignupPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [address, setAddress] = useState("");
+  const [password, setPassword] = useState("");
+  const [privacyPolicy, setPrivacyPolicy] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setMessage({ type: "", text: "" });
+    setLoading(true);
+    const response = await useRegisterMutation({
+      name: name.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
+      address: address.trim(),
+      password,
+      privacy_policy: privacyPolicy ? 1 : 0,
+    });
+    setLoading(false);
+    if (response?.status >= 200 && response?.status < 300) {
+      setMessage({ type: "success", text: "Account created successfully." });
+      setName("");
+      setEmail("");
+      setPhone("");
+      setAddress("");
+      setPassword("");
+      setPrivacyPolicy(false);
+    } else {
+      const errorMsg = response?.data?.message || response?.data?.error || "Registration failed. Please try again.";
+      setMessage({ type: "error", text: errorMsg });
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="max-w-md mx-auto bg-white rounded-lg shadow-md p-8">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join Watch Shop BD today</p>
         </div>
 
-        {/* Signup Form */}
-        <form className="space-y-6">
+        {message.text && (
+          <div
+            className={`mb-4 p-3 rounded-lg text-sm ${
+              message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
+            }`}
+          >
+            {message.text}
+          </div>
+        )}
+
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Full Name <span className="text-red-500">*</span>
+              Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
-              placeholder="Enter your full name"
+              placeholder="Enter your name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
               required
             />
@@ -26,24 +76,29 @@ export default function SignupPage() {
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Mobile Number <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter your mobile number"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email Address
+              Email <span className="text-red-500">*</span>
             </label>
             <input
               type="email"
-              placeholder="Enter your email address"
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Phone <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="Enter your phone number"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
+              required
             />
           </div>
 
@@ -52,8 +107,10 @@ export default function SignupPage() {
               Address <span className="text-red-500">*</span>
             </label>
             <textarea
-              placeholder="Enter your full address"
+              placeholder="Enter your address"
               rows={3}
+              value={address}
+              onChange={(e) => setAddress(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors resize-none"
               required
             />
@@ -66,18 +123,8 @@ export default function SignupPage() {
             <input
               type="password"
               placeholder="Create a password"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
-              required
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Confirm Password <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="password"
-              placeholder="Confirm your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
               className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
               required
             />
@@ -85,29 +132,28 @@ export default function SignupPage() {
 
           <div className="flex items-center">
             <input
-              id="terms"
-              name="terms"
+              id="privacy_policy"
+              name="privacy_policy"
               type="checkbox"
+              checked={privacyPolicy}
+              onChange={(e) => setPrivacyPolicy(e.target.checked)}
               className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
               required
             />
-            <label htmlFor="terms" className="ml-2 block text-sm text-gray-700">
-              I agree to the{' '}
-              <a href="#" className="text-teal-600 hover:text-teal-500 font-medium">
-                Terms and Conditions
-              </a>{' '}
-              and{' '}
-              <a href="#" className="text-teal-600 hover:text-teal-500 font-medium">
+            <label htmlFor="privacy_policy" className="ml-2 block text-sm text-gray-700">
+              I agree to the{" "}
+              <Link href="/privacy-policy" className="text-teal-600 hover:text-teal-500 font-medium">
                 Privacy Policy
-              </a>
+              </Link>
             </label>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-teal-600 hover:bg-teal-700 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
+            disabled={loading}
+            className="w-full bg-teal-600 hover:bg-teal-700 disabled:opacity-60 text-white font-semibold py-3 px-4 rounded-lg transition-colors duration-200"
           >
-            Create Account
+            {loading ? "Creating Account…" : "Create Account"}
           </button>
         </form>
 
@@ -123,12 +169,12 @@ export default function SignupPage() {
           </div>
 
           <div className="mt-6">
-            <a
+            <Link
               href="/login"
               className="w-full flex justify-center py-3 px-4 border border-teal-600 rounded-lg text-sm font-medium text-teal-600 hover:bg-teal-50 transition-colors duration-200"
             >
               Sign In Instead
-            </a>
+            </Link>
           </div>
         </div>
       </div>
