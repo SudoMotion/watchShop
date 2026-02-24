@@ -22,10 +22,16 @@ export default function LoginPage() {
     });
     setLoading(false);
     if (response?.status >= 200 && response?.status < 300) {
+      const { token, customer } = response?.data ?? {};
+      if (token != null && customer) {
+        try {
+          localStorage.setItem("watchshop_auth", JSON.stringify({ token, customer }));
+        } catch (_) {}
+      }
       setMessage({ type: "success", text: "Signed in successfully." });
       setPhone("");
       setPassword("");
-      router.push("/");
+      router.push("/account");
     } else {
       const errorMsg =
         response?.data?.message || response?.data?.error || "Invalid phone or password. Please try again.";
