@@ -31,9 +31,6 @@ export async function POST(request) {
         xsrfToken = match[1];
       }
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'api/auth/login/route.js',message:'Login proxy CSRF',data:{hasToken:!!xsrfToken},timestamp:Date.now(),runId:'post-fix'})}).catch(()=>{});
-    // #endregion
 
     // 2) POST login with Cookie and X-XSRF-TOKEN
     const headers = {

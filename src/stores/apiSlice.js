@@ -31,22 +31,12 @@ export const getCsrfToken = async () => {
     if (raw) {
       try {
         const token = decodeURIComponent(raw);
-        // #region agent log
-        fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiSlice.js:getCsrfToken',message:'CSRF token obtained',data:{hasToken:true},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
-        // #endregion
         return token;
       } catch {
         return raw;
       }
     }
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiSlice.js:getCsrfToken',message:'CSRF token not readable',data:{hasToken:false},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
-    // #endregion
-  } catch (e) {
-    // #region agent log
-    fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiSlice.js:getCsrfToken',message:'sanctum/csrf-cookie request failed',data:{error:String(e && e.message)},timestamp:Date.now(),hypothesisId:'H5'})}).catch(()=>{});
-    // #endregion
-  }
+  } catch (_) {}
   return null;
 };
 
@@ -57,7 +47,7 @@ export const getCsrfToken = async () => {
  * @param {object} data - Request body data (optional, for POST/PUT/PATCH)
  * @param {object} params - Query parameters (optional, for GET requests)
  * @param {object} headers - Custom headers (optional)
- * @param {object} options - Optional request options, e.g. { withCredentials: true }
+ * @param {object} options - Optional request options, e.g. { withCredentials: true, baseURL: '' }
  * @returns {Promise} - Axios response
  */
 export const apiRequest = async (endpoint, method = 'GET', data = null, params = null, headers = {}, options = {}) => {
@@ -87,29 +77,9 @@ export const apiRequest = async (endpoint, method = 'GET', data = null, params =
       config.params = params;
     }
 
-    // #region agent log
-    const base = options.baseURL !== undefined ? options.baseURL : (axiosInstance.defaults.baseURL || '');
-    const fullUrl = (base || '') + endpoint;
-    fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiSlice.js:apiRequest',message:'API request outgoing',data:{url:fullUrl,method:config.method,hasXsrfHeader:!!headers['X-XSRF-TOKEN'],withCredentials:config.withCredentials ?? axiosInstance.defaults.withCredentials},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-    // #endregion
-
     const response = await axiosInstance(config);
-
-    // #region agent log
-    const isCsrfError = response && (response.status === 419 || (response.data && String(JSON.stringify(response.data)).includes('CSRF')));
-    if (isCsrfError) {
-      fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiSlice.js:apiRequest',message:'CSRF or 419 response',data:{status:response.status,body:response.data},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
-    }
-    // #endregion
-
     return response;
   } catch (error) {
-    // #region agent log
-    const errCsrf = error.response && (error.response.status === 419 || (error.response.data && String(JSON.stringify(error.response.data)).includes('CSRF')));
-    if (errCsrf) {
-      fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'apiSlice.js:apiRequest',message:'CSRF or 419 in catch',data:{status:error.response.status,body:error.response.data},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
-    }
-    // #endregion
     // Return error response instead of throwing
     if (error.response) {
       // Server responded with error status
