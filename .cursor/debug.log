@@ -1,0 +1,4 @@
+{"location":"apiSlice.js:apiRequest","message":"API request outgoing","data":{"url":"/api/auth/login","method":"POST","hasXsrfHeader":false,"withCredentials":false},"timestamp":1771953493788,"hypothesisId":"H1"}
+{"location":"api/auth/login/route.js","message":"Login proxy CSRF","data":{"hasToken":true},"timestamp":1771953498410,"runId":"post-fix"}
+{"location":"apiSlice.js:apiRequest","message":"API request outgoing","data":{"url":"/api/auth/register","method":"POST","hasXsrfHeader":false,"withCredentials":false},"timestamp":1771953584406,"hypothesisId":"H1"}
+{"location":"apiSlice.js:apiRequest","message":"API request outgoing","data":{"url":"/api/auth/register","method":"POST","hasXsrfHeader":false,"withCredentials":false},"timestamp":1771954475042,"hypothesisId":"H1"}
