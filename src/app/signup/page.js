@@ -1,10 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRegisterMutation } from "@/stores/AuthAPI";
+import { isLoggedIn } from "@/lib/auth";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
@@ -13,6 +16,10 @@ export default function SignupPage() {
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
+
+  useEffect(() => {
+    if (isLoggedIn()) router.replace("/account");
+  }, [router]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
