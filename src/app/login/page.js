@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/stores/AuthAPI";
+import { isLoggedIn } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -26,6 +27,7 @@ export default function LoginPage() {
       if (token != null && customer) {
         try {
           localStorage.setItem("watchshop_auth", JSON.stringify({ token, customer }));
+          document.cookie = "watchshop_logged_in=1; path=/; max-age=2592000";
         } catch (_) {}
       }
       setMessage({ type: "success", text: "Signed in successfully." });
