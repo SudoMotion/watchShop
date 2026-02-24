@@ -34,6 +34,7 @@ export default function AccountPage() {
   const handleLogout = () => {
     try {
       localStorage.removeItem(AUTH_KEY);
+      document.cookie = "watchshop_logged_in=; path=/; max-age=0";
     } catch (_) {}
     router.replace("/login");
   };
