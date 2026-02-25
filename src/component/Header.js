@@ -1,8 +1,9 @@
 "use client";
 import Image from 'next/image';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
+import { isLoggedIn } from '@/lib/auth';
 
 export default function Header() {
   const [open, setOpen] = useState(false); // search modal
@@ -12,7 +13,9 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const isHome = pathname === '/';
   const onTransparent = isHome && !isScrolled;
   const userMenuRef = useRef(null);
@@ -22,6 +25,11 @@ export default function Header() {
   const brandToSlug = (brandName) => {
     return brandName.toLowerCase().replace(/\s+/g, '-');
   };
+
+  // Sync login state (client-only to avoid hydration mismatch)
+  useEffect(() => {
+    setLoggedIn(isLoggedIn());
+  }, [pathname]);
 
   // Change header style on scroll (for transparent-on-hero effect)
   useEffect(() => {
@@ -366,27 +374,48 @@ export default function Header() {
               </button>
               {showUserMenu && (
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <Link
-                    href="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    Sign In
-                  </Link>
-                  <Link
-                    href="/signup"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    Register
-                  </Link>
-                  <Link
-                    href="/account"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                    onClick={() => setShowUserMenu(false)}
-                  >
-                    My Account
-                  </Link>
+                  {loggedIn ? (
+                    <>
+                      <Link
+                        href="/account"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        My Account
+                      </Link>
+                      <button
+                        type="button"
+                        className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          try {
+                            localStorage.removeItem('watchshop_auth');
+                            document.cookie = 'watchshop_logged_in=; path=/; max-age=0';
+                          } catch (_) {}
+                          router.push('/login');
+                        }}
+                      >
+                        Log out
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        href="/login"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        Sign In
+                      </Link>
+                      <Link
+                        href="/signup"
+                        className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => setShowUserMenu(false)}
+                      >
+                        Register
+                      </Link>
+                    </>
+                  )}
                 </div>
               )}
             </div>
