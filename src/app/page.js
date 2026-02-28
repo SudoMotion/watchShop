@@ -77,6 +77,9 @@ export default async function page() {
           </Link>
         </div>
       </div>
+      <div className='max-w-7xl mx-auto my-10 px-2'>
+        <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
+      </div>
       <ProductSection products={new_arrival} title="New Arrival"/>
       <div className='max-w-7xl mx-auto my-10 px-2'>
         <h1 className='title'>Trending Now</h1>
