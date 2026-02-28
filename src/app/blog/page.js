@@ -11,7 +11,6 @@ export default async function BlogPage() {
   const [currentPage, setCurrentPage] = useState(1);
   // const blogs = await getBlogs();
   const {data: blogs} = await getBlogList({ page: currentPage });
-  console.log('data', blogs)
 
   return (
     <div className="min-h-screen bg-white">

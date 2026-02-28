@@ -165,7 +165,6 @@ export default function ProductPageClient({ params }) {
       </div>
     );
   }
-console.log(productData.product?.category.name)
   return (
     <div className="w-full bg-white text-gray-800">
 
