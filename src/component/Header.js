@@ -264,20 +264,31 @@ export default function Header() {
                     </Link>
 
                     {/* Dropdown Menu */}
-                    {hasSubmenu && isDropdownOpen && (
-                      <div className="absolute z-50 top-full left-0 w-64 bg-white rounded-lg shadow-lg border border-gray-200 py-2 max-h-96 overflow-y-auto">
-                        {item.submenu.map((subItem, subIndex) => (
-                          <Link
-                            key={subIndex}
-                            href={subItem.href}
-                            className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-colors"
-                            onClick={() => setActiveDropdown(null)}
-                          >
-                            {subItem.label}
-                          </Link>
-                        ))}
-                      </div>
-                    )}
+                    {hasSubmenu && isDropdownOpen && (() => {
+                      const len = item.submenu.length;
+                      const isCol1 = len <= 7;
+                      const isCol2 = len <= 16;
+                      const gridCols = isCol1 ? 'grid-cols-1' : isCol2 ? 'grid-cols-2' : 'grid-cols-4';
+                      const widthClass = isCol1
+                        ? 'w-52 min-w-[13rem] max-w-[18rem]'
+                        : isCol2
+                          ? 'w-80 md:w-96 min-w-[20rem] max-w-[32rem]'
+                          : 'w-64 md:w-[28rem] lg:w-[650px] min-w-[36rem] max-w-[650px]';
+                      return (
+                        <div className={`absolute grid z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${gridCols} ${widthClass}`}>
+                          {item.submenu.map((subItem, subIndex) => (
+                            <Link
+                              key={subIndex}
+                              href={subItem.href}
+                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
+                              onClick={() => setActiveDropdown(null)}
+                            >
+                              {subItem.label}
+                            </Link>
+                          ))}
+                        </div>
+                      );
+                    })()}
                   </div>
                 );
               })}
