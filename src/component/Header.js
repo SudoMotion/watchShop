@@ -147,7 +147,7 @@ export default function Header() {
       }))
     },
     { label: "LIMITED EDITION", href: "/category/limited-edition", submenu: [] },
-    { label: "Outlets", href: "/outlets", submenu: [] },
+    { label: "OUTLETS", href: "/outlets", submenu: [] },
   ];
 
   const handleSearch = (e) => {
