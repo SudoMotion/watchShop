@@ -4,6 +4,7 @@ import ProductSlider from "@/component/ProductSlider";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
 import Image from "next/image";
+import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 
 /** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
@@ -164,7 +165,7 @@ export default function ProductPageClient({ params }) {
       </div>
     );
   }
-
+console.log(productData.product?.category.name)
   return (
     <div className="w-full bg-white text-gray-800">
 
@@ -173,6 +174,22 @@ export default function ProductPageClient({ params }) {
 
         {/* LEFT: IMAGES */}
         <div className="order-1 lg:order-1">
+          <div className="mb-3 flex min-w-0 items-center gap-1.5 overflow-hidden">
+            <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+              <span>Home</span>
+            </Link>
+            /
+            <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold">
+              <span>{productData.product?.category.name}</span>
+            </Link>
+            /
+            <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold">
+              <span>{productData.product?.brand.name}</span>
+            </Link>
+            /
+            <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
+          </div>
           <div className="border rounded-xl p-3 sm:p-4 md:p-5 flex justify-center">
             <Image
               src={mainImg}
