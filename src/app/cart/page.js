@@ -1,48 +1,17 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getCart, setCart } from "@/lib/cartStorage";
 
 export default function CartPage() {
-  // Mock cart data - in real app, this would come from context/state management
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      image: '/images/mockProduct/1.png',
-      title: 'Rolex Submariner',
-      slug: 'rolex-submariner',
-      brand: 'Rolex',
-      price: '৳1,250,000',
-      originalPrice: '৳1,400,000',
-      discount: '11% OFF',
-      quantity: 1,
-      stock: 5
-    },
-    {
-      id: 3,
-      image: '/images/mockProduct/3.png',
-      title: 'TAG Heuer Carrera',
-      slug: 'tag-heuer-carrera',
-      brand: 'TAG Heuer',
-      price: '৳650,000',
-      originalPrice: '৳720,000',
-      discount: '10% OFF',
-      quantity: 2,
-      stock: 12
-    },
-    {
-      id: 5,
-      image: '/images/mockProduct/5.png',
-      title: 'Casio G-Shock GA-2100',
-      slug: 'casio-g-shock-ga-2100',
-      brand: 'Casio',
-      price: '৳25,000',
-      originalPrice: '৳28,000',
-      discount: '11% OFF',
-      quantity: 1,
-      stock: 50
-    }
-  ]);
+  const [cartItems, setCartItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setCartItems(getCart());
+    setLoading(false);
+  }, []);
 
   // Extract numeric price from string (e.g., "৳1,250,000" -> 1250000)
   const getNumericPrice = (priceStr) => {
@@ -72,17 +41,39 @@ export default function CartPage() {
   // Update quantity
   const updateQuantity = (id, newQuantity) => {
     if (newQuantity < 1) return;
-    setCartItems(cartItems.map(item => 
-      item.id === id 
+    const next = cartItems.map((item) =>
+      item.id === id
         ? { ...item, quantity: Math.min(newQuantity, item.stock) }
         : item
-    ));
+    );
+    setCartItems(next);
+    setCart(next);
   };
 
   // Remove item
   const removeItem = (id) => {
-    setCartItems(cartItems.filter(item => item.id !== id));
+    const next = cartItems.filter((item) => item.id !== id);
+    setCartItems(next);
+    setCart(next);
   };
+
+  // Loading state
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold mb-8">Shopping Cart</h1>
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="animate-pulse flex flex-col items-center gap-4">
+              <div className="h-24 w-24 rounded-full bg-gray-200" />
+              <div className="h-6 w-48 bg-gray-200 rounded" />
+              <div className="h-4 w-64 bg-gray-100 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // Empty cart state
   if (cartItems.length === 0) {
