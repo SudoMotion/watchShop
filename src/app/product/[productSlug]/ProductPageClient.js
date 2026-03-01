@@ -3,6 +3,7 @@ import ProductCard2 from "@/component/ProductCard2";
 import ProductSlider from "@/component/ProductSlider";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
+import { getCart, setCart } from "@/lib/cartStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
@@ -14,11 +15,21 @@ const productImagePath = (path) => {
 };
 const imgUrl = (path) => (path ? `${NEXT_PUBLIC_API_URL}/${productImagePath(path)}` : "");
 
+/** Get first available image from product (tries common API field names). */
+const getProductMainImage = (p) => {
+  if (!p) return "";
+  const fromGallery = p.product_image?.[0]?.multiimage || p.product_image?.[0]?.image || p.product_images?.[0]?.multiimage;
+  const fromThumb = p.thumb_image || p.thumbnail || p.thumb || p.image || p.photo;
+  return fromGallery || fromThumb || "";
+};
+
 export default function ProductPageClient({ params }) {
   const productSlug = params?.productSlug ?? "";
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImg, setMainImg] = useState("");
+  const [addToCartLoading, setAddToCartLoading] = useState(false);
+  const [addToCartMessage, setAddToCartMessage] = useState(null);
 
   useEffect(() => {
     if (!productSlug) return;
@@ -28,7 +39,7 @@ export default function ProductPageClient({ params }) {
         setProductData(data);
         const p = data?.product;
         if (p) {
-          const first = p.product_image?.[0]?.multiimage || p.thumb_image || p.image;
+          const first = getProductMainImage(p);
           setMainImg(imgUrl(first));
         }
       })
@@ -65,9 +76,9 @@ export default function ProductPageClient({ params }) {
 
   const images = product
     ? [
-        imgUrl(product.thumb_image || product.image),
+        imgUrl(getProductMainImage(product)),
         ...(product.product_image || product.productImages || []).map((img) =>
-          imgUrl(img.multiimage)
+          imgUrl(img?.multiimage || img?.image)
         ).filter(Boolean),
       ].filter(Boolean)
     : [];
@@ -117,6 +128,45 @@ export default function ProductPageClient({ params }) {
     if (sectionRef?.current) {
       sectionRef.current.scrollIntoView({ behavior: "smooth", block: "start" });
       setActiveTab(sectionId);
+    }
+  };
+
+  const handleAddToCart = () => {
+    if (!product || !inStock) return;
+    setAddToCartMessage(null);
+    setAddToCartLoading(true);
+    try {
+      const slug = product?.slug || productSlug;
+      const image = imgUrl(getProductMainImage(product));
+      const priceStr = `৳${sellingPriceNum.toLocaleString("en-BD")}`;
+      const originalPriceStr = `৳${originalPriceNum.toLocaleString("en-BD")}`;
+      const stock = Number(product?.quantity || 0);
+      const newItem = {
+        id: product.id,
+        image,
+        title: product?.name || product?.meta_title || "Product",
+        slug,
+        brand: product?.brand?.name || "",
+        price: priceStr,
+        originalPrice: originalPriceStr,
+        quantity: 1,
+        stock: Math.max(1, stock),
+      };
+      const cart = getCart();
+      const existing = cart.find((item) => item.id === product.id);
+      const nextCart = existing
+        ? cart.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
+              : item
+          )
+        : [...cart, newItem];
+      setCart(nextCart);
+      setAddToCartMessage("Added to cart");
+    } catch (err) {
+      setAddToCartMessage("Could not add to cart");
+    } finally {
+      setAddToCartLoading(false);
     }
   };
 
@@ -189,14 +239,19 @@ export default function ProductPageClient({ params }) {
             /
             <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
           </div>
-          <div className="border rounded-xl p-3 sm:p-4 md:p-5 flex justify-center">
-            <Image
-              src={mainImg}
-              width={400}
-              height={400}
-              alt="Watch"
-              className="object-contain w-full h-auto max-w-full sm:max-w-md md:max-w-lg"
-            />
+          <div className="border rounded-xl p-3 sm:p-4 md:p-5 flex justify-center min-h-[200px] bg-gray-50">
+            {(mainImg || displayImages[0]) ? (
+              <Image
+                src={mainImg || displayImages[0]}
+                width={400}
+                height={400}
+                alt="Watch"
+                className="object-contain w-full h-auto max-w-full sm:max-w-md md:max-w-lg"
+                unoptimized
+              />
+            ) : (
+              <div className="w-full max-w-md h-64 flex items-center justify-center text-gray-400">No image</div>
+            )}
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3 mt-3 sm:mt-4">
@@ -311,6 +366,29 @@ export default function ProductPageClient({ params }) {
           {!inStock && (
             <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">OUT OF STOCK</p>
           )}
+
+          {/* Add to Cart */}
+          <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!inStock || addToCartLoading}
+              className="px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              {addToCartLoading ? "Adding…" : "Add to Cart"}
+            </button>
+            <Link
+              href="/cart"
+              className="px-5 py-2.5 border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              View Cart
+            </Link>
+            {addToCartMessage && (
+              <span className={`text-sm ${addToCartMessage === "Added to cart" ? "text-green-600" : "text-red-600"}`}>
+                {addToCartMessage}
+              </span>
+            )}
+          </div>
 
           {/* <ul className="space-y-1.5 text-sm text-gray-700">
             <li className="flex items-center gap-2">
