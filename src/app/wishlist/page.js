@@ -1,87 +1,83 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
+import { getCart, setCart } from "@/lib/cartStorage";
+import { NEXT_PUBLIC_API_URL } from "@/config";
+
+/** Ensure image URL is absolute. */
+const wishlistImageUrl = (path) => {
+  if (!path) return "";
+  if (path.startsWith("http")) return path;
+  const base = NEXT_PUBLIC_API_URL || "";
+  return path.startsWith("/") ? `${base}${path}` : `${base}/${path}`;
+};
 
 export default function WishlistPage() {
-  // Mock wishlist data - in real app, this would come from context/state management
-  const [wishlistItems, setWishlistItems] = useState([
-    {
-      id: 1,
-      image: '/images/mockProduct/1.png',
-      image2: '/images/mockProduct/2.png',
-      title: 'Rolex Submariner',
-      slug: 'rolex-submariner',
-      brand: 'Rolex',
-      price: '৳1,250,000',
-      originalPrice: '৳1,400,000',
-      discount: '11% OFF',
-      stock: 5,
-      inStock: true
-    },
-    {
-      id: 2,
-      image: '/images/mockProduct/2.png',
-      image2: '/images/mockProduct/3.png',
-      title: 'Omega Speedmaster Moonwatch',
-      slug: 'omega-speedmaster-moonwatch',
-      brand: 'Omega',
-      price: '৳850,000',
-      originalPrice: '৳920,000',
-      discount: '8% OFF',
-      stock: 8,
-      inStock: true
-    },
-    {
-      id: 4,
-      image: '/images/mockProduct/4.png',
-      image2: '/images/mockProduct/5.png',
-      title: 'Tissot PRX Powermatic 80',
-      slug: 'tissot-prx-powermatic-80',
-      brand: 'Tissot',
-      price: '৳120,000',
-      originalPrice: '৳135,000',
-      discount: '11% OFF',
-      stock: 0,
-      inStock: false
-    },
-    {
-      id: 6,
-      image: '/images/mockProduct/6.png',
-      image2: '/images/mockProduct/1.png',
-      title: 'Seiko Presage Cocktail Time',
-      slug: 'seiko-presage-cocktail-time',
-      brand: 'Seiko',
-      price: '৳85,000',
-      originalPrice: '৳95,000',
-      discount: '11% OFF',
-      stock: 15,
-      inStock: true
-    }
-  ]);
+  const [wishlistItems, setWishlistItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Remove item from wishlist
+  useEffect(() => {
+    setWishlistItems(getWishlist());
+    setLoading(false);
+  }, []);
+
   const removeFromWishlist = (id) => {
-    setWishlistItems(wishlistItems.filter(item => item.id !== id));
+    const next = wishlistItems.filter((item) => item.id !== id);
+    setWishlistItems(next);
+    setWishlist(next);
   };
 
-  // Add to cart (in real app, this would update cart state)
   const addToCart = (item) => {
-    // In real app, this would add item to cart
-    console.log('Added to cart:', item);
-    // You could show a toast notification here
+    const cart = getCart();
+    const existing = cart.find((c) => c.id === item.id);
+    const cartItem = {
+      id: item.id,
+      image: item.image,
+      title: item.title,
+      slug: item.slug,
+      brand: item.brand,
+      price: item.price,
+      originalPrice: item.originalPrice,
+      quantity: 1,
+      stock: Math.max(1, item.stock || 0),
+    };
+    const nextCart = existing
+      ? cart.map((c) =>
+          c.id === item.id ? { ...c, quantity: Math.min(c.quantity + 1, c.stock) } : c
+        )
+      : [...cart, cartItem];
+    setCart(nextCart);
   };
 
-  // Move all to cart
   const moveAllToCart = () => {
-    wishlistItems.forEach(item => {
-      if (item.inStock) {
-        addToCart(item);
-      }
+    wishlistItems.forEach((item) => {
+      if (item.inStock) addToCart(item);
     });
   };
 
-  // Empty wishlist state
+  const clearWishlist = () => {
+    setWishlistItems([]);
+    setWishlist([]);
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-12">
+        <div className="max-w-7xl mx-auto px-4">
+          <h1 className="text-3xl font-bold mb-8">My Wishlist</h1>
+          <div className="bg-white rounded-lg shadow-sm p-12 text-center">
+            <div className="animate-pulse flex flex-col items-center gap-4">
+              <div className="h-24 w-24 rounded-full bg-gray-200" />
+              <div className="h-6 w-48 bg-gray-200 rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (wishlistItems.length === 0) {
     return (
       <div className="min-h-screen bg-gray-50 py-4">
@@ -120,7 +116,7 @@ export default function WishlistPage() {
               Add All to Cart
             </button>
             <button
-              onClick={() => setWishlistItems([])}
+              onClick={clearWishlist}
               className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg font-semibold hover:bg-gray-100 transition-colors text-sm"
             >
               Clear Wishlist
@@ -135,18 +131,28 @@ export default function WishlistPage() {
               {/* Product Image */}
               <Link href={`/product/${item.slug}`} className="relative block">
                 <div className="relative h-64 bg-gray-100 overflow-hidden">
-                  <Image
-                    src={item.image}
-                    alt={item.title}
-                    fill
-                    className="object-contain group-hover:opacity-0 transition-opacity duration-300"
-                  />
-                  <Image
-                    src={item.image2}
-                    alt={item.title}
-                    fill
-                    className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                  />
+                  {wishlistImageUrl(item.image) ? (
+                    <>
+                      <Image
+                        src={wishlistImageUrl(item.image)}
+                        alt={item.title}
+                        fill
+                        className="object-contain group-hover:opacity-0 transition-opacity duration-300"
+                        unoptimized
+                      />
+                      {(item.image2 && wishlistImageUrl(item.image2)) ? (
+                        <Image
+                          src={wishlistImageUrl(item.image2)}
+                          alt={item.title}
+                          fill
+                          className="object-contain opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                          unoptimized
+                        />
+                      ) : null}
+                    </>
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No image</div>
+                  )}
                   {item.discount && (
                     <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
                       {item.discount}

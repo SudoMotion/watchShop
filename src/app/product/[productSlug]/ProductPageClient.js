@@ -4,6 +4,7 @@ import ProductSlider from "@/component/ProductSlider";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
 import { getCart, setCart } from "@/lib/cartStorage";
+import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
@@ -30,6 +31,8 @@ export default function ProductPageClient({ params }) {
   const [mainImg, setMainImg] = useState("");
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [addToCartMessage, setAddToCartMessage] = useState(null);
+  const [addToWishlistMessage, setAddToWishlistMessage] = useState(null);
+  const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
     if (!productSlug) return;
@@ -41,6 +44,7 @@ export default function ProductPageClient({ params }) {
         if (p) {
           const first = getProductMainImage(p);
           setMainImg(imgUrl(first));
+          setIsInWishlist(getWishlist().some((item) => item.id === p.id));
         }
       })
       .finally(() => setLoading(false));
@@ -167,6 +171,44 @@ export default function ProductPageClient({ params }) {
       setAddToCartMessage("Could not add to cart");
     } finally {
       setAddToCartLoading(false);
+    }
+  };
+
+  const handleAddToWishlist = () => {
+    if (!product) return;
+    setAddToWishlistMessage(null);
+    try {
+      const wishlist = getWishlist();
+      if (wishlist.some((item) => item.id === product.id)) {
+        setAddToWishlistMessage("Already in wishlist");
+        return;
+      }
+      const slug = product?.slug || productSlug;
+      const image = imgUrl(getProductMainImage(product));
+      const image2 = product?.product_image?.[1]?.multiimage
+        ? imgUrl(product.product_image[1].multiimage)
+        : image;
+      const stock = Number(product?.quantity || 0);
+      const newItem = {
+        id: product.id,
+        image,
+        image2,
+        title: product?.name || product?.meta_title || "Product",
+        slug,
+        brand: product?.brand?.name || "",
+        price: `৳${sellingPriceNum.toLocaleString("en-BD")}`,
+        originalPrice: `৳${originalPriceNum.toLocaleString("en-BD")}`,
+        discount: originalPriceNum > sellingPriceNum
+          ? `${Math.round(((originalPriceNum - sellingPriceNum) / originalPriceNum) * 100)}% OFF`
+          : "",
+        stock,
+        inStock: stock > 0,
+      };
+      setWishlist([...wishlist, newItem]);
+      setIsInWishlist(true);
+      setAddToWishlistMessage("Added to wishlist");
+    } catch (err) {
+      setAddToWishlistMessage("Could not add to wishlist");
     }
   };
 
@@ -367,7 +409,7 @@ export default function ProductPageClient({ params }) {
             <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">OUT OF STOCK</p>
           )}
 
-          {/* Add to Cart */}
+          {/* Add to Cart & Wishlist */}
           <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
             <button
               type="button"
@@ -377,15 +419,37 @@ export default function ProductPageClient({ params }) {
             >
               {addToCartLoading ? "Adding…" : "Add to Cart"}
             </button>
+            <button
+              type="button"
+              onClick={handleAddToWishlist}
+              className={`px-5 py-2.5 border font-semibold rounded-lg transition-colors ${
+                isInWishlist
+                  ? "border-red-500 text-red-600 bg-red-50"
+                  : "border-gray-300 hover:bg-gray-50"
+              }`}
+            >
+              {isInWishlist ? "In Wishlist" : "Add to Wishlist"}
+            </button>
             <Link
               href="/cart"
               className="px-5 py-2.5 border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
             >
               View Cart
             </Link>
+            <Link
+              href="/wishlist"
+              className="px-5 py-2.5 border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              View Wishlist
+            </Link>
             {addToCartMessage && (
               <span className={`text-sm ${addToCartMessage === "Added to cart" ? "text-green-600" : "text-red-600"}`}>
                 {addToCartMessage}
+              </span>
+            )}
+            {addToWishlistMessage && (
+              <span className={`text-sm ${addToWishlistMessage === "Added to wishlist" ? "text-green-600" : "text-red-600"}`}>
+                {addToWishlistMessage}
               </span>
             )}
           </div>
