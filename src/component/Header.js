@@ -281,7 +281,7 @@ export default function Header() {
                             <Link
                               key={subIndex}
                               href={subItem.href}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
+                              className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
                               onClick={() => setActiveDropdown(null)}
                             >
                               {subItem.label}
