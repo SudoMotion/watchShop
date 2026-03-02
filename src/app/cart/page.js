@@ -13,9 +13,10 @@ export default function CartPage() {
     setLoading(false);
   }, []);
 
-  // Extract numeric price from string (e.g., "৳1,250,000" -> 1250000)
   const getNumericPrice = (priceStr) => {
-    return parseInt(priceStr.replace(/[৳,]/g, ''));
+    if (priceStr == null) return 0;
+    if (typeof priceStr === "number") return priceStr;
+    return parseInt(String(priceStr).replace(/[৳,]/g, ""), 10) || 0;
   };
 
   // Calculate totals
