@@ -1,8 +1,21 @@
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
+"use client";
+import Image from 'next/image';
+import Link from 'next/link';
+import React, { useState } from 'react';
 
 export default function Footer() {
+  const [openSections, setOpenSections] = useState({
+    companyUs: false,
+    companyInfo: false,
+    helpCenter: false,
+    returnsWarranty: false,
+    customerService: false,
+  });
+
+  const toggleSection = (key) => {
+    setOpenSections((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
   return (
     <footer className="bg-black text-white pt-10 px-2 md:px-0">
       <div className="max-w-7xl mx-auto">
@@ -67,11 +80,40 @@ export default function Footer() {
 
           {/* Column 1 */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 tracking-wide">
-              COMPANY US
-            </h3>
+            <div className="flex items-center justify-between md:block">
+              <h3 className="font-semibold text-lg tracking-wide">
+                COMPANY US
+              </h3>
+              <button
+                type="button"
+                onClick={() => toggleSection('companyUs')}
+                className="md:hidden text-gray-300 hover:text-white"
+                aria-label="Toggle COMPANY US links"
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${openSections.companyUs ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
 
-            <ul className="space-y-2 text-sm">
+            <ul
+              className={`
+                space-y-2 text-sm
+                overflow-hidden transition-all duration-300 ease-in-out
+                ${openSections.companyUs ? 'max-h-64 opacity-100 mt-3' : 'max-h-0 opacity-0'}
+                md:max-h-none md:opacity-100 md:mt-3 md:block
+              `}
+            >
               <li>
                 <Link href="/customer-service">Customer Service</Link>
               </li>
@@ -86,11 +128,40 @@ export default function Footer() {
 
           {/* Column 2 */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 tracking-wide">
-              COMPANY INFO
-            </h3>
+            <div className="flex items-center justify-between md:block">
+              <h3 className="font-semibold text-lg tracking-wide">
+                COMPANY INFO
+              </h3>
+              <button
+                type="button"
+                onClick={() => toggleSection('companyInfo')}
+                className="md:hidden text-gray-300 hover:text-white"
+                aria-label="Toggle COMPANY INFO links"
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${openSections.companyInfo ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
 
-            <ul className="space-y-2 text-sm">
+            <ul
+              className={`
+                space-y-2 text-sm
+                overflow-hidden transition-all duration-300 ease-in-out
+                ${openSections.companyInfo ? 'max-h-64 opacity-100 mt-3' : 'max-h-0 opacity-0'}
+                md:max-h-none md:opacity-100 md:mt-3 md:block
+              `}
+            >
               <li>
                 <Link href="/about-us">About Us</Link>
               </li>
@@ -116,11 +187,40 @@ export default function Footer() {
 
           {/* Column 3 */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 tracking-wide">
-              HELP CENTER
-            </h3>
+            <div className="flex items-center justify-between md:block">
+              <h3 className="font-semibold text-lg tracking-wide">
+                HELP CENTER
+              </h3>
+              <button
+                type="button"
+                onClick={() => toggleSection('helpCenter')}
+                className="md:hidden text-gray-300 hover:text-white"
+                aria-label="Toggle HELP CENTER links"
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${openSections.helpCenter ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
 
-            <ul className="space-y-2 text-sm">
+            <ul
+              className={`
+                space-y-2 text-sm
+                overflow-hidden transition-all duration-300 ease-in-out
+                ${openSections.helpCenter ? 'max-h-64 opacity-100 mt-3' : 'max-h-0 opacity-0'}
+                md:max-h-none md:opacity-100 md:mt-3 md:block
+              `}
+            >
               <li>
                 <Link href="/order-information">Order Information</Link>
               </li>
@@ -141,11 +241,40 @@ export default function Footer() {
 
           {/* Column 4 */}
           <div>
-            <h3 className="font-semibold text-lg mb-4 tracking-wide">
-              RETURNS & WARRANTY
-            </h3>
+            <div className="flex items-center justify-between md:block">
+              <h3 className="font-semibold text-lg tracking-wide">
+                RETURNS & WARRANTY
+              </h3>
+              <button
+                type="button"
+                onClick={() => toggleSection('returnsWarranty')}
+                className="md:hidden text-gray-300 hover:text-white"
+                aria-label="Toggle RETURNS & WARRANTY links"
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${openSections.returnsWarranty ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
 
-            <ul className="space-y-2 text-sm">
+            <ul
+              className={`
+                space-y-2 text-sm
+                overflow-hidden transition-all duration-300 ease-in-out
+                ${openSections.returnsWarranty ? 'max-h-64 opacity-100 mt-3' : 'max-h-0 opacity-0'}
+                md:max-h-none md:opacity-100 md:mt-3 md:block
+              `}
+            >
               <li>
                 <Link href="/return-policy">Returns & Exchange Policy</Link>
               </li>
@@ -160,10 +289,39 @@ export default function Footer() {
           </div>
           {/* Customer Service */}
           <div className='md:col-span-2'>
-            <h3 className="font-semibold text-lg mb-3">
-              CUSTOMER SERVICE
-            </h3>
+            <div className="flex items-center justify-between md:block">
+              <h3 className="font-semibold text-lg mb-3">
+                CUSTOMER SERVICE
+              </h3>
+              <button
+                type="button"
+                onClick={() => toggleSection('customerService')}
+                className="md:hidden text-gray-300 hover:text-white"
+                aria-label="Toggle CUSTOMER SERVICE content"
+              >
+                <svg
+                  className={`w-4 h-4 transition-transform ${openSections.customerService ? 'rotate-180' : ''}`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
+            </div>
 
+            <div
+              className={`
+                overflow-hidden transition-all duration-300 ease-in-out
+                ${openSections.customerService ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'}
+                md:max-h-none md:opacity-100 md:mt-0 md:block
+              `}
+            >
             <p className="text-sm">
               💬 Chat or Call :- +88 01720392824 /
             </p>
@@ -191,6 +349,7 @@ export default function Footer() {
               No- 203 Dhanmondi, Dhaka ,Bangladesh.( Click
               Here For Map )
             </p>
+            </div>
           </div>
         </div>
 
