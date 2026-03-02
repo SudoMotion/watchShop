@@ -37,8 +37,10 @@ export const updateAddress = async (id, body) =>
 export const getOrderList = async (params = {}) =>
   apiRequest('/api/customer/order', 'GET', null, params);
 
-export const getOrderSuccess = async (id, params = {}) =>
-  apiRequest(`/api/customer/order/success/${id}`, 'GET', null, params);
+export const getOrderSuccess = async (id, params = {}, token = null) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return apiRequest(`/api/customer/order/success/${id}`, 'GET', null, params, headers);
+};
 
 export const getOrderDetail = async (id, params = {}) =>
   apiRequest(`/api/customer/order/show/${id}`, 'GET', null, params);
@@ -58,11 +60,15 @@ export const logout = async (params = {}) =>
 export const getShipAmount = async (id, params = {}) =>
   apiRequest(`/api/get-shipamount/${id}`, 'GET', null, params);
 
-export const checkoutStore = async (body) =>
-  apiRequest('/api/checkout/store', 'POST', body);
+export const checkoutStore = async (body, token = null) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return apiRequest('/api/checkout/store', 'POST', body, null, headers);
+};
 
-export const getCheckoutData = async (params = {}) =>
-  apiRequest('/api/products/checkout', 'GET', null, params);
+export const getCheckoutData = async (params = {}, token = null) => {
+  const headers = token ? { Authorization: `Bearer ${token}` } : {};
+  return apiRequest('/api/products/checkout', 'GET', null, params, headers);
+};
 
 export const wishlistDelete = async (id, params = {}) =>
   apiRequest(`/api/wishlist-delete/${id}`, 'GET', null, params);
