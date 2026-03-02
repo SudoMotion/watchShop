@@ -10,3 +10,27 @@ export function isLoggedIn() {
     return false;
   }
 }
+
+export function getAuthToken() {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("watchshop_auth");
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return data?.token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+export function getCustomer() {
+  if (typeof localStorage === "undefined") return null;
+  try {
+    const raw = localStorage.getItem("watchshop_auth");
+    if (!raw) return null;
+    const data = JSON.parse(raw);
+    return data?.customer ?? null;
+  } catch {
+    return null;
+  }
+}
