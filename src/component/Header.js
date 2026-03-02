@@ -12,6 +12,7 @@ export default function Header() {
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const pathname = usePathname();
@@ -20,6 +21,7 @@ export default function Header() {
   const onTransparent = isHome && !isScrolled;
   const userMenuRef = useRef(null);
   const searchRef = useRef(null);
+  const headerRef = useRef(null);
 
   // Helper function to convert brand name to brandId format
   const brandToSlug = (brandName) => {
@@ -59,16 +61,21 @@ export default function Header() {
           setActiveDropdown(null);
         }
       }
+
+      // Close mobile search when clicking completely outside header
+      if (mobileSearchOpen && headerRef.current && !headerRef.current.contains(event.target)) {
+        setMobileSearchOpen(false);
+      }
     };
 
-    if (showUserMenu || activeDropdown !== null || open) {
+    if (showUserMenu || activeDropdown !== null || open || mobileSearchOpen) {
       document.addEventListener('mousedown', handleClickOutside);
     }
 
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, [showUserMenu, activeDropdown, open]);
+  }, [showUserMenu, activeDropdown, open, mobileSearchOpen]);
   
   // Mock data - in real app, get from context/state
   const cartCount = 0;
@@ -157,7 +164,7 @@ export default function Header() {
   };
 
   return (
-  <header className={`${isHome ? 'fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
+  <header ref={headerRef} className={`${isHome ? 'fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
 
       {/* Main Header: single row */}
       <div
@@ -432,10 +439,34 @@ export default function Header() {
               )}
             </div>
 
-            {/* Wishlist */}
+            {/* Mobile search toggle (replaces wishlist on mobile) */}
+            <button
+              type="button"
+              onClick={() => setMobileSearchOpen((prev) => !prev)}
+              className={`flex md:hidden items-center justify-center transition-colors ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+              }`}
+              aria-label="Toggle search"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
+
+            {/* Wishlist (desktop only) */}
             <Link
               href="/wishlist"
-              className={`relative transition-colors ${
+              className={`relative transition-colors hidden md:inline-flex ${
                 onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
               }`}
             >
@@ -488,6 +519,7 @@ export default function Header() {
 
           </div>
         </div>
+          {mobileSearchOpen && (
           <div className='md:hidden border bg-gray-200 rounded flex items-center px-2 py-1'>
             <input type="text" name="" id="" placeholder='Search for products' className='w-full outline-none' />
             <button>
@@ -501,11 +533,12 @@ export default function Header() {
                   strokeLinecap="round"
                   strokeLinejoin="round"
                   strokeWidth={1}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
             </button>
           </div>
+          )}
 
       </div>
 
