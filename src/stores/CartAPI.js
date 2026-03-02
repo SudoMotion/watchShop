@@ -27,5 +27,10 @@ export const cartRemove = async (rowId, params = {}) =>
 export const clearCart = async (params = {}) =>
   apiRequest('/api/clear-cart', 'GET', null, params);
 
+export const couponCheck = async (code, subtotal = null) => {
+  const params = subtotal != null ? { code, subtotal } : { code };
+  return apiRequest('/api/coupon/check', 'GET', null, params);
+};
+
 export const couponApply = async (couponName) =>
   apiRequest('/api/coupon-apply', 'POST', { coupon_name: couponName });
