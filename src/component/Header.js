@@ -164,7 +164,7 @@ export default function Header() {
   };
 
   return (
-  <header ref={headerRef} className={`${isHome ? 'fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
+  <header ref={headerRef} className={`${isHome ? 'md:fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
 
       {/* Main Header: single row */}
       <div
@@ -180,7 +180,7 @@ export default function Header() {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className={`lg:hidden flex items-center justify-center transition-colors ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
+                onTransparent ? 'md:md:text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
               }`}
               aria-label="Toggle menu"
             >
@@ -248,7 +248,7 @@ export default function Header() {
                             ? 'text-green-300 hover:text-green-200'
                             : 'text-green-600 hover:text-green-700'
                           : onTransparent
-                            ? 'text-white hover:text-white/80'
+                            ? 'md:text-white hover:text-white/80'
                             : 'text-gray-700 hover:text-red-600'
                       }`}
                     >
@@ -312,7 +312,7 @@ export default function Header() {
                   <button
                   onClick={() => setOpen(true)}
                   className={`hidden md:flex items-center justify-center p-2 ${
-                    onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+                    onTransparent ? 'md:md:text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
                   }`}
                 >
                   <svg
@@ -356,7 +356,7 @@ export default function Header() {
               type="button"
               onClick={() => setMobileSearchOpen((prev) => !prev)}
               className={`flex md:hidden items-center justify-center transition-colors ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+                onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
               }`}
               aria-label="Toggle search"
             >
@@ -381,7 +381,7 @@ export default function Header() {
                 onClick={() => setShowUserMenu(!showUserMenu)}
                 className={`flex items-center gap-1 text-xs md:text-sm font-medium transition-colors ${
                   onTransparent
-                    ? 'text-white hover:text-white/80'
+                    ? 'md:text-white hover:text-white/80'
                     : 'text-gray-700 hover:text-gray-900'
                 }`}
               >
@@ -467,7 +467,7 @@ export default function Header() {
             <Link
               href="/wishlist"
               className={`relative transition-colors hidden md:inline-flex ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
+                onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
               }`}
             >
               <svg
@@ -494,7 +494,7 @@ export default function Header() {
             <Link
               href="/cart"
               className={`relative transition-colors ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+                onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
               }`}
             >
               <svg
