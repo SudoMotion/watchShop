@@ -305,7 +305,7 @@ export default function Header() {
 
           {/* Right: search + shortcuts */}
           <div className="flex items-center gap-2 md:gap-6 flex-1 justify-end py-3 lg:py-4">
-            {/* Search icon (all viewports) */}
+            {/* Desktop search icon */}
             <div className="relative" ref={searchRef}>
               {
                 !open && (  
@@ -316,7 +316,7 @@ export default function Header() {
                   }`}
                 >
                   <svg
-                    className="w-5 h-5"
+                    className="w-6 h-6"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
@@ -350,6 +350,30 @@ export default function Header() {
                 </div>
               )}
             </div>
+
+            {/* Mobile search toggle (first icon on mobile) */}
+            <button
+              type="button"
+              onClick={() => setMobileSearchOpen((prev) => !prev)}
+              className={`flex md:hidden items-center justify-center transition-colors ${
+                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
+              }`}
+              aria-label="Toggle search"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
+              </svg>
+            </button>
 
             {/* User/Sign In */}
             <div className="relative" ref={userMenuRef}>
@@ -438,30 +462,6 @@ export default function Header() {
                 </div>
               )}
             </div>
-
-            {/* Mobile search toggle (replaces wishlist on mobile) */}
-            <button
-              type="button"
-              onClick={() => setMobileSearchOpen((prev) => !prev)}
-              className={`flex md:hidden items-center justify-center transition-colors ${
-                onTransparent ? 'text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
-              }`}
-              aria-label="Toggle search"
-            >
-              <svg
-                className="w-5 h-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
-            </button>
 
             {/* Wishlist (desktop only) */}
             <Link
