@@ -135,8 +135,8 @@ export default async function page() {
           </div>
         </div>
       </div>
-      <div className='max-w-7xl mx-auto h-[720px] mb-10 px-2'>
-        <iframe width="100%" height="100%" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+      <div className='max-w-7xl mx-auto aspect-video mb-10 px-2'>
+        <iframe className='w-full h-full' src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
       </div>
       <div className='max-w-7xl mx-auto px-2'>
         <Image src="/images/payment-method.png" alt="payment-method" width={3000} height={800}/>
