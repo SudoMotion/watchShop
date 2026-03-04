@@ -30,7 +30,7 @@ export default function ProductCard2({ item }) {
 
   return (
     <div className="flex flex-col gap-y-2 items-center text-center">
-      <div className="group relative rounded-md overflow-hidden bg-white w-full aspect-[3/4] min-h-64">
+      <Link href={`/product/${item.slug}`} className="group relative rounded-md overflow-hidden bg-white w-full aspect-square min-h-64">
         {item.discount && <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-br-md z-10">{item.discount}</div>}
         {mainImage && (
           <Image
@@ -54,7 +54,7 @@ export default function ProductCard2({ item }) {
             sizes="(max-width: 768px) 50vw, 33vw"
           />
         )}
-      </div>
+      </Link>
       <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg">{item.name}</Link>
       <div className="flex items-center justify-center gap-x-2 text-base md:text-lg font-semibold">
       <p className="line-through text-gray-500">{item.price}</p>
