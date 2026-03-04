@@ -32,7 +32,7 @@ export default async function page({ params }) {
   const products = await getProductsByBrand(brandId);
   return (
     <div>
-      <div className="py-24 flex items-center justify-center" style={{backgroundImage: "url('/images/brand-banner.webp')",}}>
+      <div className="py-16 flex items-center justify-center" style={{backgroundImage: "url('/images/brand-banner.webp')",}}>
         <div className="text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
           <span className="capitalize">{brandId}</span>
         </div>
