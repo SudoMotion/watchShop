@@ -90,6 +90,14 @@ export default function ProductPageClient({ params }) {
   const displayImages = images.length ? images : (mainImg ? [mainImg] : []);
   const authentics = productData?.authentics ?? [];
   const related = productData?.related ?? [];
+
+  const mockReviews = [
+    { id: 1, name: "Rahim Khan", rating: 4.5, comment: "Great watch, looks exactly as shown. Delivery was fast and packaging was secure. Very satisfied with the purchase." },
+    { id: 2, name: "Sara Ahmed", rating: 5.0, comment: "Excellent quality and finish. The strap is comfortable and the dial is easy to read. Would definitely buy again from WatchShop BD." },
+    { id: 3, name: "Karim Hossain", rating: 4.0, comment: "Good value for money. Only minor issue was the clasp took a few days to break in, but now it's perfect." },
+    { id: 4, name: "Fatima Islam", rating: 4.8, comment: "Beautiful timepiece! Gifted it to my husband and he loves it. Authentic and well-packaged. Highly recommend." },
+    { id: 5, name: "Tariq Mahmud", rating: 3.5, comment: "Decent watch for the price. Keeps time well. Would have given 5 stars if the box had been a bit sturdier." },
+  ];
   const productItem = productData?.productItem || product?.productItem || [];
   const brand = product?.brand || null;
   const category = product?.category || null;
@@ -713,6 +721,34 @@ export default function ProductPageClient({ params }) {
           }))}
           sliderId="related-products"
         />
+      </div>
+
+      {/* REVIEWS */}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10 mb-8 sm:mb-12 md:mb-16">
+        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 text-center">
+          Customer Reviews
+        </h3>
+        <div className="space-y-4 sm:space-y-5">
+          {mockReviews.map((review) => (
+            <div
+              key={review.id}
+              className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 shadow-sm"
+            >
+              <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2">
+                <span className="font-medium text-gray-900">{review.name}</span>
+                <span className="flex items-center gap-0.5 text-amber-500" title={`${review.rating} out of 5`}>
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span key={star} className={star <= review.rating ? "text-amber-500" : "text-gray-300"}>
+                      {star <= review.rating ? "★" : "☆"}
+                    </span>
+                  ))}
+                  <span className="text-sm text-gray-500 ml-1">({review.rating})</span>
+                </span>
+              </div>
+              <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{review.comment}</p>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
