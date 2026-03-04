@@ -8,6 +8,7 @@ import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
+import Loading from "@/component/Loading";
 
 /** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
 const productImagePath = (path) => {
@@ -244,9 +245,7 @@ export default function ProductPageClient({ params }) {
 
   if (loading) {
     return (
-      <div className="w-full min-h-[60vh] flex items-center justify-center bg-white">
-        <div className="animate-pulse text-gray-400">Loading product...</div>
-      </div>
+      <Loading/>
     );
   }
 
