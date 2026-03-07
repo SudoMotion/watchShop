@@ -175,7 +175,7 @@ export default function CheckoutPage() {
           return;
         }
         if (orderId) {
-          window.location.href = `/order/success/${orderId}`;
+          window.location.href = `/order/success?id=${orderId}`;
         } else {
           window.location.href = "/order/success";
         }
