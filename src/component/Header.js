@@ -282,18 +282,37 @@ export default function Header() {
                         : isCol2
                           ? 'w-80 md:w-96 min-w-[20rem] max-w-[32rem]'
                           : 'w-64 md:w-[28rem] lg:w-[650px] min-w-[36rem] max-w-[650px]';
+
+                          if(isCol1 || isCol2){
+                            return (
+                              <div className={`absolute grid z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${gridCols} ${widthClass}`}>
+                                {item.submenu.map((subItem, subIndex) => (
+                                  <Link
+                                    key={subIndex}
+                                    href={subItem.href}
+                                    className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
+                                    onClick={() => setActiveDropdown(null)}
+                                  >
+                                    {subItem.label}
+                                  </Link>
+                                ))}
+                              </div>
+                            );
+                          }
                       return (
-                        <div className={`absolute grid z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${gridCols} ${widthClass}`}>
-                          {item.submenu.map((subItem, subIndex) => (
-                            <Link
-                              key={subIndex}
-                              href={subItem.href}
-                              className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
-                              onClick={() => setActiveDropdown(null)}
-                            >
-                              {subItem.label}
-                            </Link>
-                          ))}
+                        <div className='fixed top-[72px] bg-white shadow-lg border border-gray-200 w-screen left-0 flex justify-center items-center'>
+                          <div className={`grid z-50 top-full left-0 py-2 ${gridCols} w-64 md:w-[28rem] lg:w-[850px] min-w-[36rem] max-w-[850px]`}>
+                            {item.submenu.map((subItem, subIndex) => (
+                              <Link
+                                key={subIndex}
+                                href={subItem.href}
+                                className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
+                                onClick={() => setActiveDropdown(null)}
+                              >
+                                {subItem.label}
+                              </Link>
+                            ))}
+                          </div>
                         </div>
                       );
                     })()}
