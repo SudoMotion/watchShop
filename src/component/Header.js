@@ -4,8 +4,10 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 import { isLoggedIn } from '@/lib/auth';
+import { getCategories } from '@/stores/ProductAPI';
 
 export default function Header() {
+  
   const [open, setOpen] = useState(false); // search modal
   const [searchQuery, setSearchQuery] = useState('');
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -119,6 +121,20 @@ export default function Header() {
   const ladiesFashion = [
     "Perfume", "Wallet", "Sunglass", "Sholder Bag"
   ];
+
+  // Fetch categories once (for debugging / future use)
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const data = await getCategories();
+        console.log('Header categories:', data);
+      } catch (error) {
+        console.error('Error loading categories in Header:', error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const navigationItems = [
     { 
