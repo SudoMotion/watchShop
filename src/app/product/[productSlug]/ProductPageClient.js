@@ -98,6 +98,11 @@ export default function ProductPageClient({ params }) {
     { id: 4, name: "Fatima Islam", rating: 4.8, comment: "Beautiful timepiece! Gifted it to my husband and he loves it. Authentic and well-packaged. Highly recommend." },
     { id: 5, name: "Tariq Mahmud", rating: 3.5, comment: "Decent watch for the price. Keeps time well. Would have given 5 stars if the box had been a bit sturdier." },
   ];
+  const totalReviews = mockReviews.length;
+  const averageRating =
+    totalReviews > 0
+      ? mockReviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
+      : 0;
   const productItem = productData?.productItem || product?.productItem || [];
   const brand = product?.brand || null;
   const category = product?.category || null;
@@ -369,6 +374,24 @@ export default function ProductPageClient({ params }) {
 
           {modelText && (
             <p className="text-xs sm:text-sm mt-1">Model: {modelText}</p>
+          )}
+
+          {totalReviews > 0 && (
+            <div className="flex items-center gap-2 mt-2">
+              <div className="flex items-center text-amber-500 text-sm">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <span
+                    key={star}
+                    className={star <= Math.round(averageRating) ? "text-amber-500" : "text-gray-300"}
+                  >
+                    ★
+                  </span>
+                ))}
+              </div>
+              <span className="text-xs sm:text-sm text-gray-600">
+                {averageRating.toFixed(1)} ({totalReviews} reviews)
+              </span>
+            </div>
           )}
 
           {/* EMI Section */}
