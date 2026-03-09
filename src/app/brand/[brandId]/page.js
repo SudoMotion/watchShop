@@ -30,6 +30,7 @@ export default async function page({ params }) {
   const { brandId } = await params;
   const data = productList;
   const products = await getProductsByBrand(brandId);
+  console.log('brandId', brandId)
   return (
     <div>
       <div className="py-16 flex items-center justify-center" style={{backgroundImage: "url('/images/brand-banner.webp')",}}>
