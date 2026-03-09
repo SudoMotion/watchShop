@@ -51,6 +51,21 @@ export const getAllProducts = async (params = {}) => {
 };
 
 /**
+ * Get categories
+ * @param {object} params - Optional query parameters
+ * @returns {Promise} - API response
+ */
+export const getCategories = async (params = {}) => {
+  try {
+    const response = await apiRequest('/api/get-category', 'GET', null, params);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching categories:', error);
+    return null;
+  }
+};
+
+/**
  * Shop by category
  * @param {string} category - Category slug
  * @param {object} params - Query parameters (page, limit, etc.)
@@ -227,6 +242,7 @@ export default {
   getMensProducts,
   getLadiesProducts,
   getAllProducts,
+  getCategories,
   getProductsByCategory,
   getProductsByBrand,
   getProductsByCat,
