@@ -13,8 +13,8 @@ import Link from 'next/link';
 import React from 'react';
 
 export default async function page() {
+  const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = await getHome();
   const topBrands = await getTopBrands();
-  const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = await getHome() || {};
   const HomeData = await getHome();
   // console.log('trending_banners', HomeData)
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
