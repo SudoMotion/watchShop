@@ -86,7 +86,6 @@ export default function Header() {
     const fetchCategories = async () => {
       try {
         const data = await getCategories();
-        console.log('Header categories:', data);
         setCategories(data);
 
         // Build navigation items from real category data
