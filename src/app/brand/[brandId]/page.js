@@ -5,13 +5,78 @@ import { getProductsByBrand } from '@/stores/ProductAPI';
 import React from 'react'
 
 export async function generateStaticParams() {
-  // Minimal static params to satisfy `output: export` build.
-  // Add more known brand slugs here if needed.
-  return [
-    { brandId: 'seiko' },
-    { brandId: 'casio' },
-    { brandId: 'tissot' },
+  const brandSlugs = [
+    // Core watch brands
+    'seiko',
+    'tissot',
+    'citizen',
+    'rado',
+    'orient',
+    'fossil',
+    'emporio-armani',
+    'omega',
+    'pagani-design',
+    'titan',
+    'casio',
+    'casio-edifice',
+    'casio-g-shock',
+    'longines',
+    'oris',
+    'tag-heuer',
+    'tommy-hilfiger',
+    'daniel-klein-dk',
+    'hamilton',
+    'victorinox',
+    'mido',
+    'michael-kors-mk',
+    'hugo-boss',
+    'guess',
+    'fastrack',
+    'certina',
+    'frederique-constant',
+    'mathey-tissot',
+    'police',
+    'curren',
+    'naviforce',
+    'timex',
+    'olevs',
+    'tudor',
+    'omax',
+    'casio-pro-trek',
+    'qq',
+    'santa-barbara-prc',
+    'movado',
+    'invicta',
+
+    // Accessories / fashion brands present in API
+    'watch-organizer-box',
+    'fossil-watch-strap',
+    'watch-winder',
+    'watch-strap',
+    'perfume',
+    'wallet',
+    'sunglass',
+    'ties',
+    'cufflinks',
+    'bentley',
+    'poedagar',
+    'creed',
+    'mens',
+    'ladies',
+    'limited-edition',
+    'oliya',
+    'ferrari',
+    'sholder-bag',
+    'jaguar',
+    'maserati',
+    'arabian-oud',
+    'montblanc',
+    'dunhill',
+    'dior',
+    'giorgio-armani',
   ];
+
+  return brandSlugs.map((slug) => ({ brandId: slug }));
 }
 
 export default async function page({ params }) {
@@ -22,7 +87,7 @@ export default async function page({ params }) {
   ? products
   : products?.data ?? products?.products ?? [];
   
-  console.log('products', products);
+  console.log('products adsdf', products?.brand.product);
   return (
     <div>
       <div className="py-16 flex items-center justify-center" style={{backgroundImage: "url('/images/brand-banner.webp')",}}>
@@ -35,7 +100,7 @@ export default async function page({ params }) {
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4 max-h-screen overflow-y-auto">
           {/* Products will be loaded here */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {productItems.map((product, index) => (
+            {products?.brand.product?.map((product, index) => (
               <ProductCard2 item={product} key={index} />
             ))}
           </div>
