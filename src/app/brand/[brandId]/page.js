@@ -1,7 +1,6 @@
 
 import ProductCard2 from '@/component/ProductCard2';
 import ProductFilter from '@/component/ProductFilter';
-import { useCategoryStore } from '@/stores/categoryStore';
 import { getProductsByBrand } from '@/stores/ProductAPI';
 import React from 'react'
 
