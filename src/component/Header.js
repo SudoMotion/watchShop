@@ -25,11 +25,6 @@ export default function Header() {
   const searchRef = useRef(null);
   const headerRef = useRef(null);
 
-  // Helper function to convert brand name to brandId format
-  const brandToSlug = (brandName) => {
-    return brandName.toLowerCase().replace(/\s+/g, '-');
-  };
-
   // Sync login state (client-only to avoid hydration mismatch)
   useEffect(() => {
     setLoggedIn(isLoggedIn());
@@ -83,44 +78,8 @@ export default function Header() {
   const cartCount = 0;
   const wishlistCount = 0;
 
-  // Men's Watch Brands
-  const mensWatchBrands = [
-    "Seiko", "Tissot", "Citizen", "Rado", "Fossil", "Emporio Armani", "Orient", "Omega",
-    "Pagani Design", "Titan", "Casio", "Casio Edifice", "Casio G-Shock", "Longines", "Oris",
-    "TAG Heuer", "Tommy Hilfiger", "Daniel Klein (DK)", "Hamilton", "Victorinox",
-    "West End Watch", "Swatch", "Mido", "Michael Kors (MK)", "Hugo Boss", "Guess", "Fastrack",
-    "Certina", "Frederique Constant", "Mathey Tissot", "Police", "Curren", "Naviforce", "Timex",
-    "Olevs", "Tudor", "Omax", "Casio Pro Trek", "Q&Q", "Santa Barbara PRC", "Movado", "Invicta"
-  ];
-
-  // Ladies Watch Brands
-  const ladiesWatchBrands = [
-    "Seiko", "Tissot", "Rado", "Fossil", "Emporio Armani", "Omega", "Pagani Design", "Titan",
-    "Casio", "Casio G-Shock", "Tommy Hilfiger", "Daniel Klein (DK)", "Michael Kors (MK)",
-    "Hugo Boss", "Guess", "Fastrack", "Mathey Tissot", "Naviforce", "Olevs", "Q&Q",
-    "Santa Barbara PRC"
-  ];
-
-  // Couple Watch Brands
-  const coupleWatchBrands = [
-    "Rado", "Fossil", "Emporio Armani", "Titan", "Casio", "Daniel Klein (DK)", "Louis Cardin",
-    "Guess", "Mathey Tissot", "Naviforce", "Timex", "Olevs", "Oliya"
-  ];
-
-  // Watch Accessories
-  const watchAccessories = [
-    "Watch Organizer Box", "Fossil Watch Strap", "Watch Winder", "Watch Strap"
-  ];
-
-  // Men's Fashion
-  const mensFashion = [
-    "Perfume", "Wallet", "Sunglass", "Ties", "Cufflinks"
-  ];
-
-  // Ladies Fashion
-  const ladiesFashion = [
-    "Perfume", "Wallet", "Sunglass", "Sholder Bag"
-  ];
+  const [categories, setCategories] = useState([]);
+  const [navigationItems, setNavigationItems] = useState([]);
 
   // Fetch categories once (for debugging / future use)
   useEffect(() => {
@@ -128,6 +87,25 @@ export default function Header() {
       try {
         const data = await getCategories();
         console.log('Header categories:', data);
+        setCategories(data);
+
+        // Build navigation items from real category data
+        if (Array.isArray(data)) {
+          const navItems = data
+            .filter((cat) => cat && cat.parent_id === 0) // top-level categories
+            .map((cat) => ({
+              label: cat.name || '',
+              href: `/category/${cat.slug}`,
+              submenu: Array.isArray(cat.brands)
+                ? cat.brands.map((brand) => ({
+                    label: brand.name || '',
+                    href: `/brand/${brand.slug}`,
+                  }))
+                : [],
+            }));
+
+          setNavigationItems(navItems);
+        }
       } catch (error) {
         console.error('Error loading categories in Header:', error);
       }
@@ -135,43 +113,6 @@ export default function Header() {
 
     fetchCategories();
   }, []);
-
-  const navigationItems = [
-    { 
-      label: "MEN'S WATCH", 
-      href: "/category/men-watch",
-      submenu: mensWatchBrands.map(brand => ({
-        label: brand,
-        href: `/brand/${brandToSlug(brand)}`
-      }))
-    },
-    { 
-      label: "LADIES WATCH", 
-      href: "/category/ladies-watch",
-      submenu: ladiesWatchBrands.map(brand => ({
-        label: brand,
-        href: `/brand/${brandToSlug(brand)}`
-      }))
-    },
-    { 
-      label: "COUPLE WATCH", 
-      href: "/category/couple-watch",
-      submenu: coupleWatchBrands.map(brand => ({
-        label: brand,
-        href: `/brand/${brandToSlug(brand)}`
-      }))
-    },
-    { 
-      label: "WATCH ACCESSORIES", 
-      href: "/category/accessories",
-      submenu: watchAccessories.map(accessory => ({
-        label: accessory,
-        href: `/category/accessories?filter=${brandToSlug(accessory)}`
-      }))
-    },
-    { label: "LIMITED EDITION", href: "/category/limited-edition", submenu: [] },
-    { label: "OUTLETS", href: "/outlets", submenu: [] },
-  ];
 
   const handleSearch = (e) => {
     e.preventDefault();
