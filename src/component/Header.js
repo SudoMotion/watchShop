@@ -103,7 +103,10 @@ export default function Header() {
                 : [],
             }));
 
-          setNavigationItems(navItems);
+          setNavigationItems([
+            ...navItems,
+            { label: 'Outlets', href: '/outlets', submenu: [] },
+          ]);
         }
       } catch (error) {
         console.error('Error loading categories in Header:', error);
