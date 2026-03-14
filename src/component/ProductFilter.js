@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react'
 
-export default function ProductFilter() {
+export default function ProductFilter({ brandId }) {
   const [open, setOpen] = useState('gender');
 
   const toggle = (key) => {
@@ -27,11 +27,31 @@ export default function ProductFilter() {
         {open === 'gender' && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'gender',
+                    value: 'mens',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Mens Watch</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'gender',
+                    value: 'ladies',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Ladies Watch</span>
             </label>
           </div>
@@ -53,11 +73,31 @@ export default function ProductFilter() {
         {open === 'available' && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'availability',
+                    value: 'in_stock',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>In Stock</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'availability',
+                    value: 'out_of_stock',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Out of Stock</span>
             </label>
           </div>
@@ -79,15 +119,45 @@ export default function ProductFilter() {
         {open === 'movement' && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'movement',
+                    value: 'automatic',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Automatic</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'movement',
+                    value: 'quartz',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Quartz</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'movement',
+                    value: 'solar',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Solar</span>
             </label>
           </div>
@@ -109,35 +179,115 @@ export default function ProductFilter() {
         {open === 'band' && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'stainless_steel',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Stainless Steel</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'leather',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Leather</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'rubber',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Rubber</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'calfskin',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Calfskin</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'nylon',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Nylon</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'silicone',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Silicone</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'canvas',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Canvas</span>
             </label>
             <label className='flex items-center gap-x-1'>
-              <input type="checkbox" />
+              <input
+                type="checkbox"
+                onChange={(e) =>
+                  console.log('Filter changed', {
+                    type: 'band',
+                    value: 'calfskin_silicone',
+                    checked: e.target.checked,
+                    brandId,
+                  })
+                }
+              />
               <span>Calfskin + Silicone</span>
             </label>
           </div>
