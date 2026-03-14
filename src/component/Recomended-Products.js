@@ -5,8 +5,12 @@ import BigButton from './BigButton';
 import ProductCard from './ProductCard';
 
 export default async function RecomendedProducts() {
-    const {products, brands, categories    } = await getDiscountProducts();
-    const items = products.data.slice(0, 9);
+    const result = await getDiscountProducts();
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'Recomended-Products.js:RecomendedProducts',message:'getDiscountProducts result',data:{resultIsNull:result==null,hasProducts:result?.products!=null,hasProductsData:result?.products?.data!=null},timestamp:Date.now(),hypothesisId:'H3'})}).catch(()=>{});
+    // #endregion
+    const {products, brands, categories    } = result || {};
+    const items = (products?.data ?? (Array.isArray(products) ? products : [])).slice(0, 9);
   return (
     <div className='text-center p-5'>
         <h1 className='title'>recomended Products</h1>

@@ -82,11 +82,14 @@ export async function generateStaticParams() {
 export default async function page({ params }) {
   const { brandId } = await params;
   const products = await getProductsByBrand(brandId);
-  
+  // #region agent log
+  fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'brand/[brandId]/page.js:page',message:'brand page data',data:{brandId,productsIsNull:products==null,hasBrand:products?.brand!=null,hasBrandProduct:products?.brand?.product!=null,productItemsLen:Array.isArray(products)?products.length:(products?.data??products?.products??[]).length},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
+  // #endregion
   const productItems = Array.isArray(products)
-  ? products
-  : products?.data ?? products?.products ?? [];
-  
+    ? products
+    : products?.data ?? products?.products ?? products?.brand?.product ?? [];
+  const safeItems = Array.isArray(productItems) ? productItems : [];
+
   return (
     <div>
       <div className="py-16 flex items-center justify-center" style={{backgroundImage: "url('/images/brand-banner.webp')",}}>
@@ -99,7 +102,7 @@ export default async function page({ params }) {
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4 max-h-screen overflow-y-auto">
           {/* Products will be loaded here */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {products?.brand.product?.map((product, index) => (
+            {safeItems.map((product, index) => (
               <ProductCard2 item={product} key={index} />
             ))}
           </div>
