@@ -4,6 +4,7 @@ import BigButton from '@/component/BigButton';
 import HeroSlider from '@/component/HeroSlider';
 import ProductCard from '@/component/ProductCard';
 import ProductSection from '@/component/ProductSection';
+import RecomendedProducts from '@/component/Recomended-Products';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
 import { Backend_Base_Url } from '@/config';
 import { getHome } from '@/stores/HomeAPI';
@@ -65,17 +66,7 @@ export default async function page() {
       </div>
       <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
         <SecoundaryProductSlider/>
-        <div className='text-center p-5'>
-          <h1 className='title'>recomended Products</h1>
-          <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
-              {discount_products?.map((item, index) => (
-                <ProductCard item={item} key={index} />
-              ))}
-          </div>
-          <Link href={"/product"} className='flex items-center justify-center'>
-            <BigButton label="View All Watches" className='mt-10'/>
-          </Link>
-        </div>
+        <RecomendedProducts/>
       </div>
       <div className='max-w-7xl mx-auto my-10 px-2'>
         <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
