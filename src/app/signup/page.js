@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRegisterMutation } from "@/stores/AuthAPI";
 import { isLoggedIn } from "@/lib/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -15,7 +17,6 @@ export default function SignupPage() {
   const [password, setPassword] = useState("");
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
 
   useEffect(() => {
     if (isLoggedIn()) router.replace("/account");
@@ -23,7 +24,6 @@ export default function SignupPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" });
     setLoading(true);
     const response = await useRegisterMutation({
       name: name.trim(),
@@ -35,7 +35,7 @@ export default function SignupPage() {
     });
     setLoading(false);
     if (response?.status >= 200 && response?.status < 300) {
-      setMessage({ type: "success", text: "Account created successfully." });
+      toast.success("Account created successfully.");
       setName("");
       setEmail("");
       setPhone("");
@@ -44,7 +44,7 @@ export default function SignupPage() {
       setPrivacyPolicy(false);
     } else {
       const errorMsg = response?.data?.message || response?.data?.error || "Registration failed. Please try again.";
-      setMessage({ type: "error", text: errorMsg });
+      toast.error(errorMsg);
     }
   };
 
@@ -55,16 +55,6 @@ export default function SignupPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Create Account</h1>
           <p className="text-gray-600">Join Watch Shop BD today</p>
         </div>
-
-        {message.text && (
-          <div
-            className={`mb-4 p-3 rounded-lg text-sm ${
-              message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -185,6 +175,7 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+      <ToastContainer position="top-right" autoClose={3000} newestOnTop />
     </div>
   )
 }
