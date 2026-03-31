@@ -1,5 +1,6 @@
 import { Backend_Base_Url } from "@/config";
 import Image from "next/image";
+import Link from "next/link";
 
 // Base64 encoded SVG for blur placeholder
 const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
@@ -29,7 +30,9 @@ export default function ProductCard({ item }) {
           sizes="(max-width: 768px) 50vw, 33vw"
         />
       </div>
-      <h3 className="font-medium">{item.name}</h3>
+      <Link href={`/product/${item.slug}`}>
+        <h3 className="font-medium">{item.name}</h3>
+      </Link>
       <p className="text-sm text-gray-500">{item.brand?.name}</p>
       <p className="font-semibold">{item.price}</p>
     </div>
