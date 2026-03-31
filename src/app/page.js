@@ -14,16 +14,12 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 
+export const dynamic = 'force-dynamic';
+
 export default async function page() {
   const home = await getHome() || {};
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/page.js:page',message:'home page',data:{homeWasNull:Object.keys(home).length===0},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
-  // #endregion
   const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = home;
   const topBrands = await getTopBrands();
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/page.js:page',message:'topBrands',data:{isArray:Array.isArray(topBrands),length:topBrands?.length},timestamp:Date.now(),hypothesisId:'H4'})}).catch(()=>{});
-  // #endregion
   // console.log('trending_banners', HomeData)
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (

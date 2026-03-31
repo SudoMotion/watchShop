@@ -82,9 +82,6 @@ export async function generateStaticParams() {
 export default async function page({ params }) {
   const { brandId } = await params;
   const products = await getProductsByBrand(brandId);
-  // #region agent log
-  fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'brand/[brandId]/page.js:page',message:'brand page data',data:{brandId,productsIsNull:products==null,hasBrand:products?.brand!=null,hasBrandProduct:products?.brand?.product!=null,productItemsLen:Array.isArray(products)?products.length:(products?.data??products?.products??[]).length},timestamp:Date.now(),hypothesisId:'H1'})}).catch(()=>{});
-  // #endregion
   const productItems = Array.isArray(products)
     ? products
     : products?.data ?? products?.products ?? products?.brand?.product ?? [];
