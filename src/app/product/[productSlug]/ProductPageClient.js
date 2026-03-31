@@ -10,6 +10,8 @@ import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/component/Loading";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 /** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
 const productImagePath = (path) => {
@@ -34,8 +36,6 @@ export default function ProductPageClient({ params }) {
   const [mainImg, setMainImg] = useState("");
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [buyNowLoading, setBuyNowLoading] = useState(false);
-  const [addToCartMessage, setAddToCartMessage] = useState(null);
-  const [addToWishlistMessage, setAddToWishlistMessage] = useState(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
 
   useEffect(() => {
@@ -154,7 +154,6 @@ export default function ProductPageClient({ params }) {
 
   const handleAddToCart = () => {
     if (!product || !inStock) return;
-    setAddToCartMessage(null);
     setAddToCartLoading(true);
     try {
       const slug = product?.slug || productSlug;
@@ -183,9 +182,9 @@ export default function ProductPageClient({ params }) {
           )
         : [...cart, newItem];
       setCart(nextCart);
-      setAddToCartMessage("Added to cart");
+      toast.success("Added to cart");
     } catch (err) {
-      setAddToCartMessage("Could not add to cart");
+      toast.error("Could not add to cart");
     } finally {
       setAddToCartLoading(false);
     }
@@ -193,11 +192,10 @@ export default function ProductPageClient({ params }) {
 
   const handleAddToWishlist = () => {
     if (!product) return;
-    setAddToWishlistMessage(null);
     try {
       const wishlist = getWishlist();
       if (wishlist.some((item) => item.id === product.id)) {
-        setAddToWishlistMessage("Already in wishlist");
+        toast.info("Already in wishlist");
         return;
       }
       const slug = product?.slug || productSlug;
@@ -223,9 +221,9 @@ export default function ProductPageClient({ params }) {
       };
       setWishlist([...wishlist, newItem]);
       setIsInWishlist(true);
-      setAddToWishlistMessage("Added to wishlist");
+      toast.success("Added to wishlist");
     } catch (err) {
-      setAddToWishlistMessage("Could not add to wishlist");
+      toast.error("Could not add to wishlist");
     }
   };
 
@@ -515,16 +513,6 @@ export default function ProductPageClient({ params }) {
             >
               {buyNowLoading ? "Processing..." : "Buy Now"}
             </button>
-            {addToCartMessage && (
-              <span className={`text-sm ${addToCartMessage === "Added to cart" ? "text-green-600" : "text-red-600"}`}>
-                {addToCartMessage}
-              </span>
-            )}
-            {addToWishlistMessage && (
-              <span className={`text-sm ${addToWishlistMessage === "Added to wishlist" ? "text-green-600" : "text-red-600"}`}>
-                {addToWishlistMessage}
-              </span>
-            )}
           </div>
 
           {/* <ul className="space-y-1.5 text-sm text-gray-700">
@@ -865,6 +853,7 @@ export default function ProductPageClient({ params }) {
           ))}
         </div>
       </div>
+      <ToastContainer position="top-right" autoClose={2500} newestOnTop />
     </div>
   );
 }
