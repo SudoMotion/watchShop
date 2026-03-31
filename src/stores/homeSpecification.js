@@ -1,4 +1,5 @@
 import { getHome } from './HomeAPI';
+import useHomeStore from './useHomeStore';
 
 export const getHomeData = async () => {
   const data = await getHome();
@@ -77,7 +78,14 @@ export const getTrustContents = async () => {
 
 export const getTwoBanners = async () => {
   const data = await getHome();
-  return data?.two_banners || [];
+  const twoBanners = data?.two_banners || [];
+  if (typeof window !== 'undefined') {
+    useHomeStore.getState().setTwoBanners(twoBanners);
+    // #region agent log
+    fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'homeSpecification.js:getTwoBanners',message:'stored two banners in zustand',data:{count:twoBanners.length},timestamp:Date.now(),hypothesisId:'H-Z1'})}).catch(()=>{});
+    // #endregion
+  }
+  return twoBanners;
 };
 
 export const getBlogs = async () => {
