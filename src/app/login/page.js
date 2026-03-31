@@ -5,17 +5,17 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLoginMutation } from "@/stores/AuthAPI";
 import { isLoggedIn } from "@/lib/auth";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function LoginPage() {
   const router = useRouter();
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState({ type: "", text: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setMessage({ type: "", text: "" });
     setLoading(true);
     const response = await useLoginMutation({
       phone: phone.trim(),
@@ -30,14 +30,14 @@ export default function LoginPage() {
           document.cookie = "watchshop_logged_in=1; path=/; max-age=2592000";
         } catch (_) {}
       }
-      setMessage({ type: "success", text: "Signed in successfully." });
+      toast.success("Signed in successfully.");
       setPhone("");
       setPassword("");
       router.push("/account");
     } else {
       const errorMsg =
         response?.data?.message || response?.data?.error || "Invalid phone or password. Please try again.";
-      setMessage({ type: "error", text: errorMsg });
+      toast.error(errorMsg);
     }
   };
 
@@ -48,16 +48,6 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h1>
           <p className="text-gray-600">Sign in to your account</p>
         </div>
-
-        {message.text && (
-          <div
-            className={`mb-4 p-3 rounded-lg text-sm ${
-              message.type === "success" ? "bg-green-50 text-green-800" : "bg-red-50 text-red-800"
-            }`}
-          >
-            {message.text}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
@@ -137,6 +127,7 @@ export default function LoginPage() {
           </div>
         </div>
       </div>
+      <ToastContainer position="top-right" autoClose={2500} newestOnTop />
     </div>
   );
 }
