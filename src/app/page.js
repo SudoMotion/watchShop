@@ -14,7 +14,7 @@ import Link from 'next/link';
 import React from 'react';
 
 export default async function page() {
-  const home = (await getHome()) || {};
+  const home = await getHome() || {};
   // #region agent log
   fetch('http://127.0.0.1:7242/ingest/d1c02dd7-cbd9-4eee-9fc7-69ffe71fb03e',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({location:'app/page.js:page',message:'home page',data:{homeWasNull:Object.keys(home).length===0},timestamp:Date.now(),hypothesisId:'H2'})}).catch(()=>{});
   // #endregion
