@@ -8,6 +8,7 @@ import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Loading from "@/component/Loading";
 
 /** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
@@ -26,11 +27,13 @@ const getProductMainImage = (p) => {
 };
 
 export default function ProductPageClient({ params }) {
+  const router = useRouter();
   const productSlug = params?.productSlug ?? "";
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [mainImg, setMainImg] = useState("");
   const [addToCartLoading, setAddToCartLoading] = useState(false);
+  const [buyNowLoading, setBuyNowLoading] = useState(false);
   const [addToCartMessage, setAddToCartMessage] = useState(null);
   const [addToWishlistMessage, setAddToWishlistMessage] = useState(null);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -223,6 +226,42 @@ export default function ProductPageClient({ params }) {
       setAddToWishlistMessage("Added to wishlist");
     } catch (err) {
       setAddToWishlistMessage("Could not add to wishlist");
+    }
+  };
+
+  const handleBuyNow = () => {
+    if (!product || !inStock || buyNowLoading) return;
+    setBuyNowLoading(true);
+    try {
+      const slug = product?.slug || productSlug;
+      const image = imgUrl(getProductMainImage(product));
+      const priceStr = `৳${sellingPriceNum.toLocaleString("en-BD")}`;
+      const originalPriceStr = `৳${originalPriceNum.toLocaleString("en-BD")}`;
+      const stock = Number(product?.quantity || 0);
+      const newItem = {
+        id: product.id,
+        image,
+        title: product?.name || product?.meta_title || "Product",
+        slug,
+        brand: product?.brand?.name || "",
+        price: priceStr,
+        originalPrice: originalPriceStr,
+        quantity: 1,
+        stock: Math.max(1, stock),
+      };
+      const cart = getCart();
+      const existing = cart.find((item) => item.id === product.id);
+      const nextCart = existing
+        ? cart.map((item) =>
+            item.id === product.id
+              ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
+              : item
+          )
+        : [...cart, newItem];
+      setCart(nextCart);
+      router.push("/checkout");
+    } finally {
+      setBuyNowLoading(false);
     }
   };
 
@@ -445,33 +484,37 @@ export default function ProductPageClient({ params }) {
               type="button"
               onClick={handleAddToCart}
               disabled={!inStock || addToCartLoading}
-              className="px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2"
             >
-              {addToCartLoading ? "Adding…" : "Add to Cart"}
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+              </svg>
+              <span>{addToCartLoading ? "Adding..." : "Add to Cart"}</span>
             </button>
             <button
               type="button"
               onClick={handleAddToWishlist}
-              className={`px-5 py-2.5 border font-semibold rounded-lg transition-colors ${
+              className={`px-5 py-2.5 border font-semibold rounded-lg transition-colors inline-flex items-center gap-2 ${
                 isInWishlist
                   ? "border-red-500 text-red-600 bg-red-50"
                   : "border-gray-300 hover:bg-gray-50"
               }`}
             >
-              {isInWishlist ? "In Wishlist" : "Add to Wishlist"}
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
+              </svg>
+              <span>{isInWishlist ? "In Wishlist" : "Add to Wishlist"}</span>
             </button>
-            <Link
-              href="/cart"
-              className="px-5 py-2.5 border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={!inStock || buyNowLoading}
+              className="px-5 py-2.5 bg-sky-400 text-white font-semibold rounded-lg hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              View Cart
-            </Link>
-            <Link
-              href="/wishlist"
-              className="px-5 py-2.5 border border-gray-300 font-semibold rounded-lg hover:bg-gray-50 transition-colors"
-            >
-              View Wishlist
-            </Link>
+              {buyNowLoading ? "Processing..." : "Buy Now"}
+            </button>
             {addToCartMessage && (
               <span className={`text-sm ${addToCartMessage === "Added to cart" ? "text-green-600" : "text-red-600"}`}>
                 {addToCartMessage}
