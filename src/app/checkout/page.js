@@ -7,6 +7,8 @@ import { getAuthToken, getCustomer, isLoggedIn } from "@/lib/auth";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { couponApply } from "@/stores/CartAPI";
 import { getCheckoutData, getShipAmount, checkoutStore } from "@/stores/CustomerAPI";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const cartImageUrl = (path) => {
   if (!path) return "";
@@ -114,6 +116,7 @@ export default function CheckoutPage() {
     const code = couponCode.trim();
     if (!code) {
       setCouponMessage("Enter a coupon code");
+      toast.error("Enter a coupon code");
       return;
     }
     setCouponMessage("");
@@ -125,15 +128,19 @@ export default function CheckoutPage() {
         setCouponDiscount(discount);
         setCouponApplied(true);
         setCouponMessage(data?.message || "Coupon applied.");
+        toast.success(data?.message || "Coupon applied.");
       } else {
         setCouponDiscount(0);
         setCouponApplied(false);
-        setCouponMessage(data?.error || data?.message || "Invalid coupon.");
+        const msg = data?.error || data?.message || "Invalid coupon.";
+        setCouponMessage(msg);
+        toast.error(msg);
       }
     } catch {
       setCouponDiscount(0);
       setCouponApplied(false);
       setCouponMessage("Could not apply coupon.");
+      toast.error("Could not apply coupon.");
     }
   };
 
@@ -141,7 +148,9 @@ export default function CheckoutPage() {
     e.preventDefault();
     setError(null);
     if (cartItems.length === 0) {
-      setError("Your cart is empty.");
+      const msg = "Your cart is empty.";
+      setError(msg);
+      toast.error(msg);
       return;
     }
     const district = districts.find((d) => String(d.id) === String(districtId));
@@ -188,8 +197,11 @@ export default function CheckoutPage() {
         (res?.status === 422 ? "Invalid form data." : null) ||
         "Could not place order.";
       setError(msg);
+      toast.error(msg);
     } catch (err) {
-      setError("Could not place order. Please try again.");
+      const msg = "Could not place order. Please try again.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }
@@ -510,6 +522,7 @@ export default function CheckoutPage() {
           </div>
         </form>
       </div>
+      <ToastContainer position="top-right" autoClose={2500} newestOnTop />
     </div>
   );
 }
