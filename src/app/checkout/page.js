@@ -374,7 +374,7 @@ export default function CheckoutPage() {
                       onChange={handleInputChange}
                       className="w-4 h-4 text-black focus:ring-black"
                     />
-                    <span className="ml-3 font-medium">bKash</span>
+                    <span className="ml-3 font-medium">Online Payment (SSL Commerz)</span>
                   </label>
                 </div>
               </div>
