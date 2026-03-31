@@ -6,6 +6,7 @@ import ProductCard from '@/component/ProductCard';
 import ProductSection from '@/component/ProductSection';
 import RecomendedProducts from '@/component/Recomended-Products';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
+import TwoBanners from '@/component/TwoBanners';
 import { Backend_Base_Url } from '@/config';
 import { getHome } from '@/stores/HomeAPI';
 import { getTopBrands } from '@/stores/homeSpecification';
@@ -78,7 +79,7 @@ export default async function page() {
         <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
       </div>
       <ProductSection products={new_arrival} title="New Arrival"/>
-      <div className='max-w-7xl mx-auto my-10 px-2'>
+      {/* <div className='max-w-7xl mx-auto my-10 px-2'>
         <h1 className='title'>Trending Now</h1>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
           {
@@ -87,7 +88,8 @@ export default async function page() {
             ))
           }
         </div>
-      </div>
+      </div> */}
+      <TwoBanners/>
       <ProductSection products={mens_products} title="MEN'S BEST SELLER"/>
       <div className='max-w-7xl mx-auto my-10 px-2'>
         <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
