@@ -39,12 +39,13 @@ export default function HeroSlider() {
   }
 
   const desktopSlides = sliders;
-  const phoneSlides = mobileSliders.length ? mobileSliders : sliders;
+  // const phoneSlides = mobileSliders.length ? mobileSliders : sliders;
+  const phoneSlides = sliders;
 
   return (
-    <section className="relative w-full h-[60vh] md:h-screen overflow-hidden">
+    <section className="relative w-full overflow-hidden">
       {/* Desktop / large screens */}
-      <div className="hidden md:block h-full">
+      <div className="hidden md:block h-[80vh]">
         <Swiper
           modules={[Autoplay, Pagination]}
           slidesPerView={1}
@@ -93,7 +94,7 @@ export default function HeroSlider() {
       </div>
 
       {/* Mobile / small screens */}
-      <div className="block md:hidden h-full">
+      <div className="block md:hidden h-[20vh]">
         <Swiper
           modules={[Autoplay, Pagination]}
           slidesPerView={1}
@@ -115,7 +116,7 @@ export default function HeroSlider() {
             <SwiperSlide key={index} className="w-full h-full">
               <div className="relative w-full h-full overflow-hidden">
                 <div
-                  className="hero-bg absolute inset-0 bg-cover bg-center"
+                  className="hero-bg absolute inset-0 bg-cover bg-no-repeat bg-center"
                   style={{ backgroundImage: `url(${NEXT_PUBLIC_API_URL}/${slide.image})` }}
                 />
                 <div className="absolute inset-0 bg-black/30" />
