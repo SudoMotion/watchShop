@@ -70,6 +70,16 @@ export const getCheckoutData = async (params = {}, token = null) => {
   return apiRequest('/api/products/checkout', 'GET', null, params, headers);
 };
 
+/** Pathao location cascade (when enabled on checkout). */
+export const getPathaoCities = async (params = {}) =>
+  apiRequest('/api/pathao/locations/cities', 'GET', null, params);
+
+export const getPathaoZones = async (cityId, params = {}) =>
+  apiRequest(`/api/pathao/locations/zones/${cityId}`, 'GET', null, params);
+
+export const getPathaoAreas = async (zoneId, params = {}) =>
+  apiRequest(`/api/pathao/locations/areas/${zoneId}`, 'GET', null, params);
+
 export const wishlistDelete = async (id, params = {}) =>
   apiRequest(`/api/wishlist-delete/${id}`, 'GET', null, params);
 
