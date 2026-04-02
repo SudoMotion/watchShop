@@ -27,8 +27,6 @@ axiosInstance.interceptors.request.use((config) => {
   if (token && !existing) {
     config.headers = config.headers ?? {};
     config.headers.Authorization = `Bearer ${token}`;
-    // Debug: remove before production if you log sensitive data
-    console.log('[apiSlice] Bearer token (debug):', token);
   }
   return config;
 });
