@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { NEXT_PUBLIC_API_URL } from '@/config';
+import { getAuthToken } from '@/lib/auth';
 
 /**
  * API Slice - Simple API function
@@ -16,6 +17,20 @@ const axiosInstance = axios.create({
   },
   // CORS configuration
   crossDomain: true,
+});
+
+axiosInstance.interceptors.request.use((config) => {
+  const existing =
+    config.headers?.Authorization ??
+    config.headers?.authorization;
+  const token = getAuthToken();
+  if (token && !existing) {
+    config.headers = config.headers ?? {};
+    config.headers.Authorization = `Bearer ${token}`;
+    // Debug: remove before production if you log sensitive data
+    console.log('[apiSlice] Bearer token (debug):', token);
+  }
+  return config;
 });
 
 /**
