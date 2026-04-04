@@ -7,6 +7,7 @@ import { Pagination } from '@/component/Pagination';
 import { BlogListSkeleton } from '@/component/BlogListSkeleton';
 import { NEXT_PUBLIC_API_URL } from '@/config';
 import { useGetBlogList } from '@/hooks/useGetBlogList';
+import { htmlToPlainText } from '@/lib/htmlToPlainText';
 
 export default function BlogPage() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,11 +16,30 @@ export default function BlogPage() {
   return (
     <div className="min-h-screen bg-white">
       <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-        <nav className="mb-6">
-          <Link href="/" className="text-gray-600 hover:text-gray-900">
+        <nav className="mb-6 flex items-center">
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 text-gray-600 hover:text-gray-900"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="shrink-0"
+              aria-hidden
+            >
+              <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+              <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+            </svg>
             Home
           </Link>
-          <span className="mx-2 text-gray-600">//</span>
+          <span className="mx-2 text-gray-600">/</span>
           <span className="text-gray-900">Blog</span>
         </nav>
 
@@ -57,12 +77,9 @@ export default function BlogPage() {
                       <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
                         {post.title}
                       </h2>
-                      <div
-                        className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 flex-1 line-clamp-3 [&_a]:text-blue-600 [&_a]:underline [&_a]:hover:text-blue-800"
-                        dangerouslySetInnerHTML={{
-                          __html: post.excerpt || post.description || '',
-                        }}
-                      />
+                      <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 line-clamp-3 min-h-0">
+                        {htmlToPlainText(post.excerpt || post.description || '')}
+                      </p>
                       <div className="text-xs text-gray-500 mt-auto">
                         {date
                           ? new Date(date).toLocaleDateString('en-US', {
