@@ -1,3 +1,4 @@
+"use client";
 export const Pagination = ({ currentPage, lastPage, onPageChange, activeitems }) => {
   if (lastPage == null || lastPage <= 1) return null;
 
