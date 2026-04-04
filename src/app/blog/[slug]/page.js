@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import { notFound } from 'next/navigation';
 import { getBlogDetails } from '@/stores/blogAPI';
 import { NEXT_PUBLIC_API_URL } from '@/config';
@@ -31,7 +30,7 @@ export default async function BlogDetailPage({ params }) {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+      <div className="max-w-7xl mx-auto px-4 pt-8 md:pt-12">
         <nav className="mb-6 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm md:text-base">
           <Link
             href="/"
@@ -64,18 +63,21 @@ export default async function BlogDetailPage({ params }) {
             {post.title || 'Article'}
           </span>
         </nav>
+      </div>
 
-        <div className="relative w-full h-64 md:h-80 mb-8 bg-gray-100 overflow-hidden rounded-lg">
-          <Image
-            src={heroSrc}
-            alt={post.title || 'Blog post'}
-            fill
-            className="object-cover"
-            // sizes="(max-width: 1280px) 100vw, 1280px"
-            priority
-          />
-        </div>
+      <figure className="w-full mb-8 bg-gray-100">
+        {/* Native img: full viewport width + natural height (no crop / fixed box) */}
+        <img
+          src={heroSrc}
+          alt={post.title || 'Blog post'}
+          className="block w-full max-w-none h-auto"
+          loading="eager"
+          decoding="async"
+          fetchPriority="high"
+        />
+      </figure>
 
+      <div className="max-w-7xl mx-auto px-4 pb-8 md:pb-12">
         {post.tag ? (
           <p className="text-sm font-medium text-gray-500 mb-2">{post.tag}</p>
         ) : null}
