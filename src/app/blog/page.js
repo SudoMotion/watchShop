@@ -2,16 +2,41 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { Suspense, useCallback } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Pagination } from '@/component/Pagination';
 import { BlogListSkeleton } from '@/component/BlogListSkeleton';
 import { NEXT_PUBLIC_API_URL } from '@/config';
 import { useGetBlogList } from '@/hooks/useGetBlogList';
 import { htmlToPlainText } from '@/lib/htmlToPlainText';
 
-export default function BlogPage() {
-  const [currentPage, setCurrentPage] = useState(1);
+function parsePageParam(value) {
+  const n = parseInt(value ?? '', 10);
+  if (Number.isFinite(n) && n >= 1) return n;
+  return 1;
+}
+
+function BlogPageContent() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const currentPage = parsePageParam(searchParams.get('page'));
+
   const { blogs, lastPage, isLoading } = useGetBlogList(currentPage);
+
+  const onPageChange = useCallback(
+    (nextRaw) => {
+      const next = Math.max(1, Number(nextRaw));
+      const params = new URLSearchParams(searchParams.toString());
+      if (next <= 1) {
+        params.delete('page');
+      } else {
+        params.set('page', String(next));
+      }
+      const qs = params.toString();
+      router.push(qs ? `/blog?${qs}` : '/blog', { scroll: false });
+    },
+    [router, searchParams]
+  );
 
   return (
     <div className="min-h-screen bg-white">
@@ -100,10 +125,25 @@ export default function BlogPage() {
           <Pagination
             currentPage={currentPage}
             lastPage={lastPage}
-            onPageChange={setCurrentPage}
+            onPageChange={onPageChange}
           />
         </div>
       </div>
     </div>
+  );
+}
+
+export default function BlogPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-white">
+        <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
+          <BlogListSkeleton count={6} />
+        </div>
+      </div>
+    }
+    >
+      <BlogPageContent />
+    </Suspense>
   );
 }
