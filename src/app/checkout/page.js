@@ -79,6 +79,7 @@ export default function CheckoutPage() {
     district: "",
     order_note: "",
     payment_type: "cod",
+    customer_pickup: false,
     b_name: "",
     b_email: "",
     b_phone: "",
@@ -245,9 +246,10 @@ export default function CheckoutPage() {
     "bg-gray-50 text-gray-800 cursor-not-allowed border-gray-200";
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, type, checked, value } = e.target;
     if (apiReadOnly[name]) return;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const next = type === "checkbox" ? checked : value;
+    setFormData((prev) => ({ ...prev, [name]: next }));
     setError(null);
   };
 
@@ -317,6 +319,7 @@ export default function CheckoutPage() {
       payment_type: formData.payment_type || "cod",
       ship_charge: Number(shipCharge) || 0,
       email: formData.email?.trim() || undefined,
+      customer_pickup: Boolean(formData.customer_pickup),
     };
 
     if (couponDiscount > 0) {
@@ -616,6 +619,22 @@ export default function CheckoutPage() {
                     )}
                   </div>
 
+                  <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input
+                      type="checkbox"
+                      name="customer_pickup"
+                      checked={!!formData.customer_pickup}
+                      onChange={handleInputChange}
+                      className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
+                    <span className="text-sm text-gray-800">
+                      <span className="font-medium">Customer pickup</span>
+                      <span className="block text-gray-600 mt-0.5">
+                        I will collect my order from the store (not home delivery).
+                      </span>
+                    </span>
+                  </label>
+
                   {pathaoEnabled && (
                     <div className="pt-2 border-t border-gray-200">
                       <p className="text-sm font-medium text-gray-800 mb-1">
@@ -780,6 +799,12 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-gray-700">
                     <span>Subtotal</span>
                     <span className="font-medium">৳{orderTotal.toLocaleString("en-BD")}</span>
+                  </div>
+                  <div className="flex justify-between text-gray-700 text-sm">
+                    <span>Customer pickup</span>
+                    <span className="font-medium">
+                      {formData.customer_pickup ? "Yes" : "No"}
+                    </span>
                   </div>
                   {shipCharge > 0 && (
                     <div className="flex justify-between text-gray-700">
