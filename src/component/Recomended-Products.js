@@ -7,7 +7,7 @@ import ProductCard from './ProductCard';
 export default async function RecomendedProducts() {
     const result = await getDiscountProducts();
     const {products, brands, categories    } = result || {};
-    const items = (products?.data ?? (Array.isArray(products) ? products : [])).slice(0, 9);
+    const items = (products?.data ?? (Array.isArray(products) ? products : [])).slice(0, 6);
   return (
     <div className='text-center p-5'>
         <h1 className='title'>recomended Products</h1>
