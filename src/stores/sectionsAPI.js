@@ -1,6 +1,5 @@
 import { apiRequest } from './apiSlice';
 
-
 export const getSections = async () => {
   try {
     const response = await apiRequest('/api/product-sections');

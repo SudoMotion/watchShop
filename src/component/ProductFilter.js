@@ -85,7 +85,6 @@ export default function ProductFilter({
     >
       <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
 
-      {/* Available quantity (min) */}
       <div className="border border-gray-200 p-3 rounded-md">
         <button
           type="button"
@@ -120,7 +119,6 @@ export default function ProductFilter({
         )}
       </div>
 
-      {/* Movement */}
       <div className="border border-gray-200 p-3 rounded-md">
         <button
           type="button"
@@ -157,7 +155,6 @@ export default function ProductFilter({
         )}
       </div>
 
-      {/* Band type */}
       <div className="border border-gray-200 p-3 rounded-md">
         <button
           type="button"
@@ -194,7 +191,6 @@ export default function ProductFilter({
         )}
       </div>
 
-      {/* Brands (slug[]) */}
       <div className="border border-gray-200 p-3 rounded-md">
         <button
           type="button"

@@ -30,7 +30,6 @@ const getNumericPrice = (priceStr) => {
   return parseInt(String(priceStr).replace(/[৳,]/g, ""), 10) || 0;
 };
 
-/** Normalize Pathao location API list shapes (id + label). */
 function strFilled(v) {
   return v != null && String(v).trim() !== "";
 }
@@ -103,7 +102,6 @@ export default function CheckoutPage() {
   const [pathaoZoneId, setPathaoZoneId] = useState("");
   const [pathaoAreaId, setPathaoAreaId] = useState("");
   const [pathaoLoading, setPathaoLoading] = useState(false);
-  /** Fields populated from GET /api/products/checkout → `customer` are read-only */
   const [apiReadOnly, setApiReadOnly] = useState({
     name: false,
     phone: false,

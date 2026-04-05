@@ -66,7 +66,6 @@ export default async function BlogDetailPage({ params }) {
       </div>
 
       <figure className="max-w-7xl mx-auto px-2 md:px-0 rounded-lg overflow-hidden mb-8 bg-gray-100">
-        {/* Native img: full viewport width + natural height (no crop / fixed box) */}
         <img
           src={heroSrc}
           alt={post.title || 'Blog post'}

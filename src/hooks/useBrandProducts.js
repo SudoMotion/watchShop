@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { getProductsByBrand } from '@/stores/ProductAPI';
 
-/** Matches Laravel: $request->get('sortBy') */
 export const BRAND_SORT_VALUES = new Set([
   'priceLowtoHigh',
   'priceHightoLow',
@@ -9,12 +8,6 @@ export const BRAND_SORT_VALUES = new Set([
   'nameZtoA',
 ]);
 
-/**
- * Maps UI filter state → GET query params for /api/products/brand/:brand
- * - quantity: min available quantity (string/number)
- * - movement, band_type: comma-separated from checkbox maps
- * - brands: comma-separated slugs (backend can explode to array)
- */
 export function buildBrandFilterParams(filters) {
   const out = {};
   if (!filters || typeof filters !== 'object') return out;
@@ -49,11 +42,6 @@ function normalizeBrandProductsResponse(products) {
   return Array.isArray(productItems) ? productItems : [];
 }
 
-/**
- * @param {string} brandId
- * @param {object} filters — { quantity, movement, band_type, brands }
- * @param {string} [sortBy]
- */
 export function useBrandProducts(brandId, filters, sortBy = '') {
   const filtersKey = JSON.stringify(filters ?? {});
 

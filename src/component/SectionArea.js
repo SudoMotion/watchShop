@@ -5,7 +5,6 @@ import Link from 'next/link';
 
 export default async function SectionArea() {
     const {sections :sections} = await getSections();
-    console.log('sections', sections);
   return (
     <div className='max-w-7xl mx-auto px-2 md:px-0 flex flex-col gap-y-16 md:gap-y-20 py-10 md:py-16'>
         {
