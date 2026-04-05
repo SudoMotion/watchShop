@@ -6,6 +6,7 @@ import ProductCard from '@/component/ProductCard';
 import ProductSection from '@/component/ProductSection';
 import RecomendedProducts from '@/component/Recomended-Products';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
+import SectionArea from '@/component/SectionArea';
 import TwoBanners from '@/component/TwoBanners';
 import { Backend_Base_Url } from '@/config';
 import { getHome } from '@/stores/HomeAPI';
@@ -25,6 +26,7 @@ export default async function page() {
   return (
     <div>
       <HeroSlider/>
+      <SectionArea/>
       <div className='py-10 bg-gray-50 px-2'>
         <div className='max-w-7xl mx-auto'>
           <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
