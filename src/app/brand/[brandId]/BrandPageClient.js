@@ -2,6 +2,8 @@
 
 import ProductCard2 from '@/component/ProductCard2';
 import ProductFilter from '@/component/ProductFilter';
+import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
+import { EmptyProducts } from '@/component/EmptyProducts';
 import { useBrandProducts } from '@/hooks/useBrandProducts';
 import { useState } from 'react';
 
@@ -51,9 +53,16 @@ export default function BrandPageClient({ brandId }) {
           {error && (
             <p className="text-sm text-red-600 mb-3">{error}</p>
           )}
-          {isLoading ? (
-            <p className="text-gray-500 text-sm">Loading products…</p>
-          ) : (
+          {isLoading && <ProductGridSkeleton />}
+          {!isLoading && !error && products.length === 0 && (
+            <EmptyProducts
+              title="No products found"
+              description="Try adjusting filters or sort. You can also explore other brands from the home page."
+              actionLabel="Continue shopping"
+              actionHref="/"
+            />
+          )}
+          {!isLoading && products.length > 0 && (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
               {products.map((product, index) => (
                 <ProductCard2 item={product} key={product?.id ?? index} />
