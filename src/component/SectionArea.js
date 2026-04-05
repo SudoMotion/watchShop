@@ -9,7 +9,7 @@ export default async function SectionArea() {
   return (
     <div className='max-w-7xl mx-auto px-2 md:px-0 flex flex-col gap-y-16 md:gap-y-20 py-10 md:py-16'>
         {
-            sections.map((section) => (
+            sections?.map((section) => (
                 <div key={section.id}>
                     <h1 className='title font-semibold md:mb-5'>{section.name}</h1>
                     <div className='grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-x-5 gap-y-10'>
