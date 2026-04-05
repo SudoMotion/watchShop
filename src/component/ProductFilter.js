@@ -1,32 +1,82 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { getBrands } from "@/stores/homeSpecification";
 
-/** Merge checkbox into { [type]: { [value]: true } } for lifted state in parent */
-function patchFilters(prev, type, value, checked) {
+function patchMap(prev, key, value, checked) {
   const next = { ...prev };
-  const bucket = { ...(next[type] || {}) };
+  const bucket = { ...(next[key] || {}) };
   if (checked) bucket[value] = true;
   else delete bucket[value];
-  if (Object.keys(bucket).length === 0) delete next[type];
-  else next[type] = bucket;
+  if (Object.keys(bucket).length === 0) delete next[key];
+  else next[key] = bucket;
   return next;
 }
+
+function toggleBrandSlug(brands, slug) {
+  const arr = Array.isArray(brands) ? [...brands] : [];
+  const i = arr.indexOf(slug);
+  if (i >= 0) arr.splice(i, 1);
+  else arr.push(slug);
+  return arr;
+}
+
+const MOVEMENT_OPTIONS = [
+  ["automatic", "Automatic"],
+  ["quartz", "Quartz"],
+  ["solar", "Solar"],
+  ["mechanical", "Mechanical"],
+];
+
+const BAND_TYPE_OPTIONS = [
+  ["stainless_steel", "Stainless steel"],
+  ["leather", "Leather"],
+  ["rubber", "Rubber"],
+  ["silicone", "Silicone"],
+  ["nylon", "Nylon"],
+  ["canvas", "Canvas"],
+  ["calfskin", "Calfskin"],
+];
 
 export default function ProductFilter({
   brandId,
   filters: filtersProp,
   setFilters: setFiltersProp,
 }) {
-  const [open, setOpen] = useState("gender");
-  const [localFilters, setLocalFilters] = useState({});
+  const [open, setOpen] = useState("quantity");
+  const [localFilters, setLocalFilters] = useState({
+    quantity: "",
+    movement: {},
+    band_type: {},
+    brands: [],
+  });
+  const [brandList, setBrandList] = useState([]);
+
   const isLifted = typeof setFiltersProp === "function";
-  const filters = isLifted ? filtersProp ?? {} : localFilters;
+  const filters = isLifted ? mergeDefaults(filtersProp) : localFilters;
   const setFilters = isLifted ? setFiltersProp : setLocalFilters;
+
+  useEffect(() => {
+    let cancelled = false;
+    getBrands()
+      .then((list) => {
+        if (cancelled || !Array.isArray(list)) return;
+        setBrandList(list);
+      })
+      .catch(() => setBrandList([]));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const toggle = (key) => {
     setOpen((prev) => (prev === key ? null : key));
   };
+
+  const brandSlug = (b) =>
+    b?.slug ?? b?.brand_slug ?? b?.id ?? String(b?.name ?? "");
+
+  const brandLabel = (b) => b?.name ?? brandSlug(b);
 
   return (
     <div
@@ -35,93 +85,37 @@ export default function ProductFilter({
     >
       <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
 
-      {/* Gender */}
+      {/* Available quantity (min) */}
       <div className="border border-gray-200 p-3 rounded-md">
         <button
           type="button"
           className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "gender" ? "border-b border-gray-300" : ""
+            open === "quantity" ? "border-b border-gray-300" : ""
           }`}
-          onClick={() => toggle("gender")}
+          onClick={() => toggle("quantity")}
         >
-          <span>Gender</span>
-          <span className="text-gray-500">{open === "gender" ? "-" : "+"}</span>
+          <span>Available quantity</span>
+          <span className="text-gray-500">{open === "quantity" ? "-" : "+"}</span>
         </button>
-
-        {open === "gender" && (
-          <div className="mt-2 ml-4 flex flex-col gap-y-2">
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.gender?.mens}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(prev, "gender", "mens", e.target.checked)
-                  )
-                }
-              />
-              <span>Mens Watch</span>
+        {open === "quantity" && (
+          <div className="mt-3 ml-1">
+            <label className="block text-sm text-gray-600 mb-1">
+              Minimum quantity in stock
             </label>
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.gender?.ladies}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(prev, "gender", "ladies", e.target.checked)
-                  )
-                }
-              />
-              <span>Ladies Watch</span>
-            </label>
-          </div>
-        )}
-      </div>
-
-      {/* Available Product */}
-      <div className="border border-gray-200 p-3 rounded-md">
-        <button
-          type="button"
-          className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "available" ? "border-b border-gray-300" : ""
-          }`}
-          onClick={() => toggle("available")}
-        >
-          <span>Available Product</span>
-          <span className="text-gray-500">{open === "available" ? "-" : "+"}</span>
-        </button>
-
-        {open === "available" && (
-          <div className="mt-2 ml-4 flex flex-col gap-y-2">
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.availability?.in_stock}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(prev, "availability", "in_stock", e.target.checked)
-                  )
-                }
-              />
-              <span>In Stock</span>
-            </label>
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.availability?.out_of_stock}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(
-                      prev,
-                      "availability",
-                      "out_of_stock",
-                      e.target.checked
-                    )
-                  )
-                }
-              />
-              <span>Out of Stock</span>
-            </label>
+            <input
+              type="number"
+              min={0}
+              step={1}
+              placeholder="e.g. 1"
+              value={filters.quantity ?? ""}
+              onChange={(e) =>
+                setFilters((prev) => ({
+                  ...mergeDefaults(prev),
+                  quantity: e.target.value,
+                }))
+              }
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+            />
           </div>
         )}
       </div>
@@ -138,81 +132,21 @@ export default function ProductFilter({
           <span>Movement</span>
           <span className="text-gray-500">{open === "movement" ? "-" : "+"}</span>
         </button>
-
         {open === "movement" && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.movement?.automatic}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(prev, "movement", "automatic", e.target.checked)
-                  )
-                }
-              />
-              <span>Automatic</span>
-            </label>
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.movement?.quartz}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(prev, "movement", "quartz", e.target.checked)
-                  )
-                }
-              />
-              <span>Quartz</span>
-            </label>
-            <label className="flex items-center gap-x-1">
-              <input
-                type="checkbox"
-                checked={!!filters?.movement?.solar}
-                onChange={(e) =>
-                  setFilters((prev) =>
-                    patchFilters(prev, "movement", "solar", e.target.checked)
-                  )
-                }
-              />
-              <span>Solar</span>
-            </label>
-          </div>
-        )}
-      </div>
-
-      {/* Band Type */}
-      <div className="border border-gray-200 p-3 rounded-md">
-        <button
-          type="button"
-          className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "band" ? "border-b border-gray-300" : ""
-          }`}
-          onClick={() => toggle("band")}
-        >
-          <span>Band Type</span>
-          <span className="text-gray-500">{open === "band" ? "-" : "+"}</span>
-        </button>
-
-        {open === "band" && (
-          <div className="mt-2 ml-4 flex flex-col gap-y-2">
-            {[
-              ["stainless_steel", "Stainless Steel"],
-              ["leather", "Leather"],
-              ["rubber", "Rubber"],
-              ["calfskin", "Calfskin"],
-              ["nylon", "Nylon"],
-              ["silicone", "Silicone"],
-              ["canvas", "Canvas"],
-              ["calfskin_silicone", "Calfskin + Silicone"],
-            ].map(([value, label]) => (
-              <label key={value} className="flex items-center gap-x-1">
+            {MOVEMENT_OPTIONS.map(([value, label]) => (
+              <label key={value} className="flex items-center gap-x-2">
                 <input
                   type="checkbox"
-                  checked={!!filters?.band?.[value]}
+                  checked={!!filters?.movement?.[value]}
                   onChange={(e) =>
                     setFilters((prev) =>
-                      patchFilters(prev, "band", value, e.target.checked)
+                      patchMap(
+                        mergeDefaults(prev),
+                        "movement",
+                        value,
+                        e.target.checked
+                      )
                     )
                   }
                 />
@@ -222,6 +156,94 @@ export default function ProductFilter({
           </div>
         )}
       </div>
+
+      {/* Band type */}
+      <div className="border border-gray-200 p-3 rounded-md">
+        <button
+          type="button"
+          className={`text-xl flex items-center justify-between w-full text-left ${
+            open === "band_type" ? "border-b border-gray-300" : ""
+          }`}
+          onClick={() => toggle("band_type")}
+        >
+          <span>Band type</span>
+          <span className="text-gray-500">{open === "band_type" ? "-" : "+"}</span>
+        </button>
+        {open === "band_type" && (
+          <div className="mt-2 ml-4 flex flex-col gap-y-2">
+            {BAND_TYPE_OPTIONS.map(([value, label]) => (
+              <label key={value} className="flex items-center gap-x-2">
+                <input
+                  type="checkbox"
+                  checked={!!filters?.band_type?.[value]}
+                  onChange={(e) =>
+                    setFilters((prev) =>
+                      patchMap(
+                        mergeDefaults(prev),
+                        "band_type",
+                        value,
+                        e.target.checked
+                      )
+                    )
+                  }
+                />
+                <span>{label}</span>
+              </label>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Brands (slug[]) */}
+      <div className="border border-gray-200 p-3 rounded-md">
+        <button
+          type="button"
+          className={`text-xl flex items-center justify-between w-full text-left ${
+            open === "brands" ? "border-b border-gray-300" : ""
+          }`}
+          onClick={() => toggle("brands")}
+        >
+          <span>Brands</span>
+          <span className="text-gray-500">{open === "brands" ? "-" : "+"}</span>
+        </button>
+        {open === "brands" && (
+          <div className="mt-2 ml-1 max-h-56 overflow-y-auto flex flex-col gap-y-2">
+            {brandList.length === 0 ? (
+              <p className="text-sm text-gray-500">Loading brands…</p>
+            ) : (
+              brandList.map((b) => {
+                const slug = brandSlug(b);
+                if (!slug) return null;
+                return (
+                  <label key={slug} className="flex items-center gap-x-2">
+                    <input
+                      type="checkbox"
+                      checked={Array.isArray(filters.brands) && filters.brands.includes(slug)}
+                      onChange={() =>
+                        setFilters((prev) => ({
+                          ...mergeDefaults(prev),
+                          brands: toggleBrandSlug(prev.brands, slug),
+                        }))
+                      }
+                    />
+                    <span className="text-sm">{brandLabel(b)}</span>
+                  </label>
+                );
+              })
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
+}
+
+function mergeDefaults(f) {
+  const x = f && typeof f === "object" ? f : {};
+  return {
+    quantity: x.quantity ?? "",
+    movement: x.movement && typeof x.movement === "object" ? x.movement : {},
+    band_type: x.band_type && typeof x.band_type === "object" ? x.band_type : {},
+    brands: Array.isArray(x.brands) ? x.brands : [],
+  };
 }

@@ -9,15 +9,36 @@ export const BRAND_SORT_VALUES = new Set([
   'nameZtoA',
 ]);
 
-/** Turn ProductFilter nested state into GET query params for /api/products/brand/:brand */
-function buildBrandFilterParams(filters) {
+/**
+ * Maps UI filter state → GET query params for /api/products/brand/:brand
+ * - quantity: min available quantity (string/number)
+ * - movement, band_type: comma-separated from checkbox maps
+ * - brands: comma-separated slugs (backend can explode to array)
+ */
+export function buildBrandFilterParams(filters) {
   const out = {};
   if (!filters || typeof filters !== 'object') return out;
-  for (const [group, map] of Object.entries(filters)) {
-    if (!map || typeof map !== 'object') continue;
-    const keys = Object.keys(map).filter((k) => map[k]);
-    if (keys.length) out[group] = keys.join(',');
+
+  const q = filters.quantity;
+  if (q != null && String(q).trim() !== '') {
+    const n = Number(String(q).trim());
+    if (Number.isFinite(n) && n >= 0) out.quantity = String(n);
   }
+
+  if (filters.movement && typeof filters.movement === 'object') {
+    const keys = Object.keys(filters.movement).filter((k) => filters.movement[k]);
+    if (keys.length) out.movement = keys.join(',');
+  }
+
+  if (filters.band_type && typeof filters.band_type === 'object') {
+    const keys = Object.keys(filters.band_type).filter((k) => filters.band_type[k]);
+    if (keys.length) out.band_type = keys.join(',');
+  }
+
+  if (Array.isArray(filters.brands) && filters.brands.length) {
+    out.brands = filters.brands.join(',');
+  }
+
   return out;
 }
 
@@ -30,8 +51,8 @@ function normalizeBrandProductsResponse(products) {
 
 /**
  * @param {string} brandId
- * @param {Record<string, Record<string, boolean>>} filters — from ProductFilter
- * @param {string} [sortBy] — '' = backend default (quantity DESC, id DESC). Else one of BRAND_SORT_VALUES.
+ * @param {object} filters — { quantity, movement, band_type, brands }
+ * @param {string} [sortBy]
  */
 export function useBrandProducts(brandId, filters, sortBy = '') {
   const filtersKey = JSON.stringify(filters ?? {});
