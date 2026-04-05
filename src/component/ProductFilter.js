@@ -9,7 +9,7 @@ export default function ProductFilter({ brandId }) {
   };
 
   return (
-    <div className='border border-gray-200 p-5 rounded-xl shadow-md flex flex-col gap-y-4 max-h-screen overflow-y-auto'>
+    <div className='border border-gray-200 p-5 rounded-xl shadow-md flex flex-col gap-y-4 max-h-screen overflow-y-auto sticky top-0'>
       <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
 
       {/* Gender */}
