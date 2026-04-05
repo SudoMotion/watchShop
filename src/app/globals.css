@@ -60,7 +60,7 @@ body {
   transform: scale(1.4);
 }
 .title {
-  @apply text-3xl md:text-4xl pb-5 capitalize;
+  @apply text-2xl md:text-4xl pb-5 capitalize;
 }
 @layer components {
   .border {
