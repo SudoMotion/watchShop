@@ -5,9 +5,18 @@ import ProductFilter from '@/component/ProductFilter';
 import { useBrandProducts } from '@/hooks/useBrandProducts';
 import { useState } from 'react';
 
+const SORT_OPTIONS = [
+  { value: '', label: 'Default (newest / stock first)' },
+  { value: 'priceLowtoHigh', label: 'Price: Low to High' },
+  { value: 'priceHightoLow', label: 'Price: High to Low' },
+  { value: 'nameAtoZ', label: 'Name: A → Z' },
+  { value: 'nameZtoA', label: 'Name: Z → A' },
+];
+
 export default function BrandPageClient({ brandId }) {
   const [filters, setFilters] = useState({});
-  const { products, isLoading, error } = useBrandProducts(brandId, filters);
+  const [sortBy, setSortBy] = useState('');
+  const { products, isLoading, error } = useBrandProducts(brandId, filters, sortBy);
 
   return (
     <div>
@@ -22,6 +31,23 @@ export default function BrandPageClient({ brandId }) {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:mt-4 px-2 mt-2">
         <ProductFilter brandId={brandId} filters={filters} setFilters={setFilters} />
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mb-4">
+            <label htmlFor="brand-sort" className="text-sm font-medium text-gray-700 shrink-0">
+              Sort by
+            </label>
+            <select
+              id="brand-sort"
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-black focus:border-transparent"
+            >
+              {SORT_OPTIONS.map((opt) => (
+                <option key={opt.value || 'default'} value={opt.value}>
+                  {opt.label}
+                </option>
+              ))}
+            </select>
+          </div>
           {error && (
             <p className="text-sm text-red-600 mb-3">{error}</p>
           )}

@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { getProductsByBrand } from '@/stores/ProductAPI';
 
+/** Matches Laravel: $request->get('sortBy') */
+export const BRAND_SORT_VALUES = new Set([
+  'priceLowtoHigh',
+  'priceHightoLow',
+  'nameAtoZ',
+  'nameZtoA',
+]);
+
 /** Turn ProductFilter nested state into GET query params for /api/products/brand/:brand */
 function buildBrandFilterParams(filters) {
   const out = {};
@@ -23,8 +31,9 @@ function normalizeBrandProductsResponse(products) {
 /**
  * @param {string} brandId
  * @param {Record<string, Record<string, boolean>>} filters — from ProductFilter
+ * @param {string} [sortBy] — '' = backend default (quantity DESC, id DESC). Else one of BRAND_SORT_VALUES.
  */
-export function useBrandProducts(brandId, filters) {
+export function useBrandProducts(brandId, filters, sortBy = '') {
   const filtersKey = JSON.stringify(filters ?? {});
 
   const [products, setProducts] = useState([]);
@@ -48,6 +57,9 @@ export function useBrandProducts(brandId, filters) {
       parsedFilters = {};
     }
     const params = buildBrandFilterParams(parsedFilters);
+    if (sortBy && BRAND_SORT_VALUES.has(sortBy)) {
+      params.sortBy = sortBy;
+    }
 
     (async () => {
       const raw = await getProductsByBrand(brandId, params);
@@ -65,7 +77,7 @@ export function useBrandProducts(brandId, filters) {
     return () => {
       cancelled = true;
     };
-  }, [brandId, filtersKey]);
+  }, [brandId, filtersKey, sortBy]);
 
   return { products, isLoading, error };
 }
