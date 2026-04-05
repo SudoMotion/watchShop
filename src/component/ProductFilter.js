@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getBrands } from "@/stores/homeSpecification";
+import { getMovements, normalizeMovementsList } from "@/stores/ProductAPI";
 
 function patchMap(prev, key, value, checked) {
   const next = { ...prev };
@@ -20,13 +21,6 @@ function toggleBrandSlug(brands, slug) {
   else arr.push(slug);
   return arr;
 }
-
-const MOVEMENT_OPTIONS = [
-  ["automatic", "Automatic"],
-  ["quartz", "Quartz"],
-  ["solar", "Solar"],
-  ["mechanical", "Mechanical"],
-];
 
 const BAND_TYPE_OPTIONS = [
   ["stainless_steel", "Stainless steel"],
@@ -51,6 +45,7 @@ export default function ProductFilter({
     brands: [],
   });
   const [brandList, setBrandList] = useState([]);
+  const [movementOptions, setMovementOptions] = useState([]);
 
   const isLifted = typeof setFiltersProp === "function";
   const filters = isLifted ? mergeDefaults(filtersProp) : localFilters;
@@ -64,6 +59,19 @@ export default function ProductFilter({
         setBrandList(list);
       })
       .catch(() => setBrandList([]));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    getMovements({})
+      .then((res) => {
+        if (cancelled) return;
+        setMovementOptions(normalizeMovementsList(res));
+      })
+      .catch(() => setMovementOptions([]));
     return () => {
       cancelled = true;
     };
@@ -132,25 +140,29 @@ export default function ProductFilter({
         </button>
         {open === "movement" && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
-            {MOVEMENT_OPTIONS.map(([value, label]) => (
-              <label key={value} className="flex items-center gap-x-2">
-                <input
-                  type="checkbox"
-                  checked={!!filters?.movement?.[value]}
-                  onChange={(e) =>
-                    setFilters((prev) =>
-                      patchMap(
-                        mergeDefaults(prev),
-                        "movement",
-                        value,
-                        e.target.checked
+            {movementOptions.length === 0 ? (
+              <p className="text-sm text-gray-500">Loading movements…</p>
+            ) : (
+              movementOptions.map(({ value, label }) => (
+                <label key={value} className="flex items-center gap-x-2">
+                  <input
+                    type="checkbox"
+                    checked={!!filters?.movement?.[value]}
+                    onChange={(e) =>
+                      setFilters((prev) =>
+                        patchMap(
+                          mergeDefaults(prev),
+                          "movement",
+                          value,
+                          e.target.checked
+                        )
                       )
-                    )
-                  }
-                />
-                <span>{label}</span>
-              </label>
-            ))}
+                    }
+                  />
+                  <span>{label}</span>
+                </label>
+              ))
+            )}
           </div>
         )}
       </div>

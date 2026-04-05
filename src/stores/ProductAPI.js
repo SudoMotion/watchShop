@@ -97,6 +97,33 @@ export const getProductsByBrand = async (brand, params = {}) => {
   }
 };
 
+export const getMovements = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/get-movements', 'POST', body);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching movements:', error);
+    return null;
+  }
+};
+
+export function normalizeMovementsList(res) {
+  if (res == null) return [];
+  const raw = Array.isArray(res) ? res : res?.data ?? res?.movements ?? [];
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      if (typeof item === 'string') {
+        const s = item.trim();
+        return s ? { value: s, label: s } : null;
+      }
+      const value = String(item.slug ?? item.value ?? item.id ?? '').trim();
+      const label = String(item.name ?? item.title ?? item.label ?? value).trim();
+      return value ? { value, label } : null;
+    })
+    .filter(Boolean);
+}
+
 /**
  * Category products
  * @param {string} cat - Category slug
@@ -245,6 +272,7 @@ export default {
   getCategories,
   getProductsByCategory,
   getProductsByBrand,
+  getMovements,
   getProductsByCat,
   getDiscountProducts,
   getTrendingProducts,
