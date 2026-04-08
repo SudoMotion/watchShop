@@ -57,7 +57,7 @@ export default async function page() {
           <Image src="/images/beside-video.avif" alt="beside-video" width={500} height={500} className='w-full'/>
         </div>
       </div>
-      <div className='py-10 bg-black text-white px-2'>
+      <div className='py-5 bg-black text-white px-2'>
         <div className='max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between'>
           <p>Important</p>
           <div>
@@ -131,8 +131,10 @@ export default async function page() {
           </div>
         </div>
       </div>
-      <div className='max-w-7xl mx-auto aspect-video mb-10 px-2'>
-        <iframe className='w-full h-full' src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+      <div className='max-w-7xl mx-auto mb-10 px-2'>
+        <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-[21/9]">
+          <iframe className="absolute inset-0 h-full w-full" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
+        </div>
       </div>
       <div className='max-w-7xl mx-auto px-2'>
         <Image src="/images/payment-method.png" alt="payment-method" width={3000} height={800}/>
