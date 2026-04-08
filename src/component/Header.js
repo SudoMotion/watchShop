@@ -91,17 +91,27 @@ export default function Header() {
         // Build navigation items from real category data
         if (Array.isArray(data)) {
           const navItems = data
-            .filter((cat) => cat && cat.parent_id === 0) // top-level categories
-            .map((cat) => ({
-              label: cat.name || '',
-              href: `/category/${cat.slug}`,
-              submenu: Array.isArray(cat.brands)
-                ? cat.brands.map((brand) => ({
-                    label: brand.name || '',
-                    href: `/brand/${brand.slug}`,
-                  }))
-                : [],
-            }));
+            .filter((cat) => cat && cat.parent_id === 0)
+            .map((cat) => {
+              const slug = String(cat.slug || '').toLowerCase();
+              const name = String(cat.name || '').toLowerCase().trim();
+              const isLimitedEditionBrand =
+                slug === 'limited-edition' || name === 'limited edition';
+
+              return {
+                label: cat.name || '',
+                href: isLimitedEditionBrand
+                  ? `/brand/${cat.slug}`
+                  : `/category/${cat.slug}`,
+                submenu:
+                  isLimitedEditionBrand || !Array.isArray(cat.brands)
+                    ? []
+                    : cat.brands.map((brand) => ({
+                        label: brand.name || '',
+                        href: `/brand/${brand.slug}`,
+                      })),
+              };
+            });
 
           setNavigationItems([
             ...navItems,
