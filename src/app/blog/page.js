@@ -4,10 +4,11 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { Suspense, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import BlogFeaturedCard from '@/component/BlogFeaturedCard';
 import { Pagination } from '@/component/Pagination';
 import { BlogListSkeleton } from '@/component/BlogListSkeleton';
 import { NEXT_PUBLIC_API_URL } from '@/config';
-import { useGetBlogList } from '@/hooks/useGetBlogList';
+import { BLOG_LIST_PER_PAGE, useGetBlogList } from '@/hooks/useGetBlogList';
 import { htmlToPlainText } from '@/lib/htmlToPlainText';
 
 function parsePageParam(value) {
@@ -73,53 +74,60 @@ function BlogPageContent() {
         </h1>
 
         {isLoading ? (
-          <BlogListSkeleton count={6} />
+          <BlogListSkeleton count={BLOG_LIST_PER_PAGE} />
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-            {(blogs || []).map((post) => {
-              const imageSrc = post.image?.startsWith('http')
-                ? post.image
-                : `${NEXT_PUBLIC_API_URL}/${post.image || ''}`;
-              const slug = post.slug || post.id;
-              const date = post.date || post.created_at;
-              return (
-                <Link
-                  key={post.id}
-                  href={`/blog/${slug}`}
-                  className="group block"
-                >
-                  <article className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-200 overflow-hidden h-full flex flex-col">
-                    <div className="relative w-full h-48 md:h-56 bg-gray-100 overflow-hidden">
-                      <Image
-                        src={imageSrc || '/images/placeholder.jpg'}
-                        alt={post.title || 'Blog post'}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-200"
-                      />
-                    </div>
+          <>
+            {blogs?.[0] ? <BlogFeaturedCard post={blogs[0]} /> : null}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+              {(blogs || []).slice(1).map(
+                (post) => {
+                  const imageSrc = post.image?.startsWith('http')
+                    ? post.image
+                    : `${NEXT_PUBLIC_API_URL}/${post.image || ''}`;
+                  const slug = post.slug || post.id;
+                  const date = post.date || post.created_at;
+                  return (
+                    <Link
+                      key={post.id}
+                      href={`/blog/${slug}`}
+                      className="group block"
+                    >
+                      <article className="bg-white border border-gray-200 hover:shadow-lg transition-shadow duration-200 overflow-hidden h-full flex flex-col">
+                        <div className="relative w-full h-48 md:h-56 bg-gray-100 overflow-hidden">
+                          <Image
+                            src={imageSrc || '/images/placeholder.jpg'}
+                            alt={post.title || 'Blog post'}
+                            fill
+                            className="object-cover group-hover:scale-105 transition-transform duration-200"
+                          />
+                        </div>
 
-                    <div className="p-4 md:p-6 flex-1 flex flex-col">
-                      <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
-                        {post.title}
-                      </h2>
-                      <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 line-clamp-3 min-h-0">
-                        {htmlToPlainText(post.excerpt || post.description || '')}
-                      </p>
-                      <div className="text-xs text-gray-500 mt-auto">
-                        {date
-                          ? new Date(date).toLocaleDateString('en-US', {
-                              year: 'numeric',
-                              month: 'long',
-                              day: 'numeric',
-                            })
-                          : null}
-                      </div>
-                    </div>
-                  </article>
-                </Link>
-              );
-            })}
-          </div>
+                        <div className="p-4 md:p-6 flex-1 flex flex-col">
+                          <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 group-hover:text-gray-700 transition-colors line-clamp-2">
+                            {post.title}
+                          </h2>
+                          <p className="text-gray-600 text-sm md:text-base leading-relaxed mb-4 line-clamp-3 min-h-0">
+                            {htmlToPlainText(
+                              post.excerpt || post.description || ''
+                            )}
+                          </p>
+                          <div className="text-xs text-gray-500 mt-auto">
+                            {date
+                              ? new Date(date).toLocaleDateString('en-US', {
+                                  year: 'numeric',
+                                  month: 'long',
+                                  day: 'numeric',
+                                })
+                              : null}
+                          </div>
+                        </div>
+                      </article>
+                    </Link>
+                  );
+                }
+              )}
+            </div>
+          </>
         )}
         <div>
           <Pagination
@@ -138,7 +146,7 @@ export default function BlogPage() {
     <Suspense fallback={
       <div className="min-h-screen bg-white">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
-          <BlogListSkeleton count={6} />
+          <BlogListSkeleton count={BLOG_LIST_PER_PAGE} />
         </div>
       </div>
     }

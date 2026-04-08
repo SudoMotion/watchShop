@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { getBlogList } from '@/stores/blogAPI';
 
+/** Items per page sent to `/api/blog` (first item is featured layout; grid shows the rest). */
+export const BLOG_LIST_PER_PAGE = 7;
+
 function normalizeBlogListResult(result) {
   if (!result || typeof result !== 'object') {
     return { blogs: [], lastPage: 1 };
@@ -25,7 +28,10 @@ export function useGetBlogList(currentPage) {
     let cancelled = false;
     setIsLoading(true);
     (async () => {
-      const payload = await getBlogList({ page });
+      const payload = await getBlogList({
+        page,
+        per_page: BLOG_LIST_PER_PAGE,
+      });
       if (cancelled) return;
       const normalized = normalizeBlogListResult(payload);
       setBlogs(normalized.blogs);
