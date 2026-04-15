@@ -15,11 +15,13 @@ const SORT_OPTIONS = [
   { value: 'nameAtoZ', label: 'Name: A → Z' },
   { value: 'nameZtoA', label: 'Name: Z → A' },
 ];
+const FALLBACK_BANNER_URL = '/images/brand-banner.webp';
 
 export default function BrandPageClient({ brandId }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const [bannerLoaded, setBannerLoaded] = useState(false);
+  const [displayBannerUrl, setDisplayBannerUrl] = useState('');
   const { products, banner_img, isLoading, error } = useBrandProducts(
     brandId,
     filters,
@@ -32,34 +34,52 @@ export default function BrandPageClient({ brandId }) {
     : '';
 
   useEffect(() => {
-    if (!bannerUrl) {
-      setBannerLoaded(true);
-      return;
-    }
-
     let active = true;
-    setBannerLoaded(false);
 
-    const img = new window.Image();
-    img.onload = () => {
-      if (active) setBannerLoaded(true);
+    const preload = (url, allowFallback) => {
+      if (!url) {
+        setDisplayBannerUrl('');
+        setBannerLoaded(true);
+        return;
+      }
+      setDisplayBannerUrl(url);
+      setBannerLoaded(false);
+
+      const img = new window.Image();
+      img.onload = () => {
+        if (active) setBannerLoaded(true);
+      };
+      img.onerror = () => {
+        if (!active) return;
+        if (allowFallback) {
+          preload(FALLBACK_BANNER_URL, false);
+          return;
+        }
+        setBannerLoaded(true);
+      };
+      img.src = url;
     };
-    img.onerror = () => {
-      if (active) setBannerLoaded(true);
-    };
-    img.src = bannerUrl;
+
+    if (bannerUrl) {
+      preload(bannerUrl, true);
+    } else if (!isLoading) {
+      preload(FALLBACK_BANNER_URL, false);
+    } else {
+      setDisplayBannerUrl('');
+      setBannerLoaded(true);
+    }
 
     return () => {
       active = false;
     };
-  }, [bannerUrl]);
+  }, [bannerUrl, isLoading]);
 
   return (
     <div>
       <div
         className="relative py-16 flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: bannerUrl ? `url('${bannerUrl}')` : 'none',
+          backgroundImage: displayBannerUrl ? `url('${displayBannerUrl}')` : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
