@@ -42,16 +42,31 @@ function normalizeBrandProductsResponse(products) {
   return Array.isArray(productItems) ? productItems : [];
 }
 
+function extractBrandBannerImage(raw) {
+  if (!raw || typeof raw !== 'object') return '';
+  return (
+    raw.banner_img ??
+    raw.data?.banner_img ??
+    raw.brand?.banner_img ??
+    raw.data?.brand?.banner_img ??
+    ''
+  );
+}
+
 export function useBrandProducts(brandId, filters, sortBy = '') {
   const filtersKey = JSON.stringify(filters ?? {});
 
   const [products, setProducts] = useState([]);
+  const [response, setResponse] = useState(null);
+  const [banner_img, setBannerImage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!brandId) {
       setProducts([]);
+      setResponse(null);
+      setBannerImage('');
       setIsLoading(false);
       return;
     }
@@ -75,10 +90,14 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
       if (cancelled) return;
       if (raw == null) {
         setProducts([]);
+        setResponse(null);
+        setBannerImage('');
         setError('Could not load products.');
         setIsLoading(false);
         return;
       }
+      setResponse(raw);
+      setBannerImage(extractBrandBannerImage(raw));
       setProducts(normalizeBrandProductsResponse(raw));
       setIsLoading(false);
     })();
@@ -88,5 +107,5 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
     };
   }, [brandId, filtersKey, sortBy]);
 
-  return { products, isLoading, error };
+  return { products, response, banner_img, isLoading, error };
 }

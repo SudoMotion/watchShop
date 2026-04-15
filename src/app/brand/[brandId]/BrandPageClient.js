@@ -5,6 +5,7 @@ import ProductFilter from '@/component/ProductFilter';
 import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
 import { EmptyProducts } from '@/component/EmptyProducts';
 import { useBrandProducts } from '@/hooks/useBrandProducts';
+import { NEXT_PUBLIC_API_URL } from '@/config';
 import { useState } from 'react';
 
 const SORT_OPTIONS = [
@@ -18,13 +19,26 @@ const SORT_OPTIONS = [
 export default function BrandPageClient({ brandId }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
-  const { products, isLoading, error } = useBrandProducts(brandId, filters, sortBy);
+  const { products, banner_img, isLoading, error } = useBrandProducts(
+    brandId,
+    filters,
+    sortBy
+  );
+  const bannerUrl = banner_img
+    ? banner_img.startsWith('http')
+      ? banner_img
+      : `${NEXT_PUBLIC_API_URL}/${String(banner_img).replace(/^\//, '')}`
+    : '/images/brand-banner.webp';
 
   return (
     <div>
       <div
         className="py-16 flex items-center justify-center"
-        style={{ backgroundImage: "url('/images/brand-banner.webp')" }}
+        style={{
+          backgroundImage: `url('${bannerUrl}')`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
       >
         <div className="text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
           <span className="capitalize">{brandId}</span>
