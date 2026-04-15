@@ -6,7 +6,7 @@ import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
 import { EmptyProducts } from '@/component/EmptyProducts';
 import { useBrandProducts } from '@/hooks/useBrandProducts';
 import { NEXT_PUBLIC_API_URL } from '@/config';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Default (newest / stock first)' },
@@ -19,6 +19,7 @@ const SORT_OPTIONS = [
 export default function BrandPageClient({ brandId }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
+  const [bannerLoaded, setBannerLoaded] = useState(false);
   const { products, banner_img, isLoading, error } = useBrandProducts(
     brandId,
     filters,
@@ -28,19 +29,45 @@ export default function BrandPageClient({ brandId }) {
     ? banner_img.startsWith('http')
       ? banner_img
       : `${NEXT_PUBLIC_API_URL}/${String(banner_img).replace(/^\//, '')}`
-    : '/images/brand-banner.webp';
+    : '';
+
+  useEffect(() => {
+    if (!bannerUrl) {
+      setBannerLoaded(true);
+      return;
+    }
+
+    let active = true;
+    setBannerLoaded(false);
+
+    const img = new window.Image();
+    img.onload = () => {
+      if (active) setBannerLoaded(true);
+    };
+    img.onerror = () => {
+      if (active) setBannerLoaded(true);
+    };
+    img.src = bannerUrl;
+
+    return () => {
+      active = false;
+    };
+  }, [bannerUrl]);
 
   return (
     <div>
       <div
-        className="py-16 flex items-center justify-center"
+        className="relative py-16 flex items-center justify-center overflow-hidden"
         style={{
-          backgroundImage: `url('${bannerUrl}')`,
+          backgroundImage: bannerUrl ? `url('${bannerUrl}')` : 'none',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
         }}
       >
-        <div className="text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
+        {!bannerLoaded && (
+          <div className="absolute inset-0 animate-pulse bg-gray-200" />
+        )}
+        <div className="relative z-10 text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
           <span className="capitalize">{brandId}</span>
         </div>
       </div>
