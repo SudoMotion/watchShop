@@ -11,3 +11,7 @@ export const useRegisterMutation = async (body) => {
 export const useSendOtpMutation = async (body) => {
   return apiRequest('/api/otp/send', 'POST', body);
 };
+
+export const useVerifyOtpMutation = async (body) => {
+  return apiRequest('/api/otp/verify', 'POST', body);
+};

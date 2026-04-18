@@ -6,7 +6,7 @@ import { getCart, setCart } from "@/lib/cartStorage";
 import { getAuthToken, getCustomer, isLoggedIn } from "@/lib/auth";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { couponApply } from "@/stores/CartAPI";
-import { useSendOtpMutation } from "@/stores/AuthAPI";
+import { useSendOtpMutation, useVerifyOtpMutation } from "@/stores/AuthAPI";
 import {
   getCheckoutData,
   checkoutStore,
@@ -116,6 +116,11 @@ export default function CheckoutPage() {
   const [existingCustomerMode, setExistingCustomerMode] = useState(false);
   const [otpSending, setOtpSending] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
+  const [otpVerified, setOtpVerified] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [otpVerifying, setOtpVerifying] = useState(false);
+  /** User chose to enter a code without requesting a new OTP via SMS. */
+  const [hasExistingCode, setHasExistingCode] = useState(false);
   const [apiReadOnly, setApiReadOnly] = useState({
     name: false,
     phone: false,
@@ -267,9 +272,30 @@ export default function CheckoutPage() {
 
   const handleExistingCustomerToggle = (checked) => {
     setExistingCustomerMode(checked);
-    if (checked) {
-      setOtpSent(false);
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtpCode("");
+    setHasExistingCode(false);
+    setError(null);
+  };
+
+  const handleOtpBackToPhone = () => {
+    setOtpSent(false);
+    setOtpCode("");
+    setHasExistingCode(false);
+    setError(null);
+  };
+
+  const handleHaveExistingCode = () => {
+    const phone = String(formData.phone || "").replace(/\D/g, "");
+    if (phone.length !== 11) {
+      toast.error("Enter a valid 11-digit mobile number first.");
+      return;
     }
+    setFormData((prev) => ({ ...prev, phone }));
+    setHasExistingCode(true);
+    setOtpSent(true);
+    setOtpCode("");
     setError(null);
   };
 
@@ -284,12 +310,13 @@ export default function CheckoutPage() {
       const response = await useSendOtpMutation({ phone });
       if (response?.status >= 200 && response?.status < 300) {
         setFormData((prev) => ({ ...prev, phone }));
+        setHasExistingCode(false);
         setOtpSent(true);
         const msg = response?.data?.message;
         toast.success(
           typeof msg === "string" && msg.trim()
             ? msg
-            : "OTP sent. Complete your delivery details below."
+            : "OTP sent. Enter the code below to verify."
         );
       } else {
         const errMsg =
@@ -302,6 +329,56 @@ export default function CheckoutPage() {
       toast.error("Could not send OTP. Try again.");
     } finally {
       setOtpSending(false);
+    }
+  };
+
+  const handleVerifyOtp = async () => {
+    const phone = String(formData.phone || "").replace(/\D/g, "");
+    const otp = String(otpCode || "").trim();
+    if (phone.length !== 11) {
+      toast.error("Invalid phone number. Go back and enter your number.");
+      return;
+    }
+    if (!otp) {
+      toast.error("Enter the OTP code.");
+      return;
+    }
+    setOtpVerifying(true);
+    try {
+      const response = await useVerifyOtpMutation({ phone, otp });
+      if (response?.status >= 200 && response?.status < 300) {
+        setOtpVerified(true);
+        setOtpCode("");
+        const msg = response?.data?.message;
+        toast.success(
+          typeof msg === "string" && msg.trim()
+            ? msg
+            : "OTP verified. Complete your delivery details below."
+        );
+        const data = response?.data;
+        const token = data?.token ?? data?.access_token;
+        const customer = data?.customer ?? data?.user;
+        if (token != null && customer && typeof window !== "undefined") {
+          try {
+            localStorage.setItem(
+              "watchshop_auth",
+              JSON.stringify({ token, customer })
+            );
+            document.cookie =
+              "watchshop_logged_in=1; path=/; max-age=2592000";
+          } catch (_) {}
+        }
+      } else {
+        const errMsg =
+          response?.data?.message ||
+          response?.data?.error ||
+          "Invalid OTP. Try again.";
+        toast.error(typeof errMsg === "string" ? errMsg : "Invalid OTP.");
+      }
+    } catch {
+      toast.error("Could not verify OTP. Try again.");
+    } finally {
+      setOtpVerifying(false);
     }
   };
 
@@ -346,8 +423,10 @@ export default function CheckoutPage() {
       toast.error(msg);
       return;
     }
-    if (existingCustomerMode && !otpSent) {
-      const msg = "Send OTP to verify your phone first.";
+    if (existingCustomerMode && !otpVerified) {
+      const msg = !otpSent
+        ? "Send OTP to your phone first."
+        : "Enter and verify the OTP code first.";
       setError(msg);
       toast.error(msg);
       return;
@@ -553,7 +632,7 @@ export default function CheckoutPage() {
   }
 
   const showFullCheckoutFields =
-    !existingCustomerMode || (existingCustomerMode && otpSent);
+    !existingCustomerMode || (existingCustomerMode && otpVerified);
 
   return (
     <div className="bg-gray-50 py-4">
@@ -883,7 +962,9 @@ export default function CheckoutPage() {
                     <input
                       type="checkbox"
                       checked={existingCustomerMode}
-                      onChange={(e) => handleExistingCustomerToggle(e.target.checked)}
+                      onChange={(e) =>
+                        handleExistingCustomerToggle(e.target.checked)
+                      }
                       className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
                     />
                     <span className="text-sm font-semibold text-gray-900">
@@ -912,21 +993,92 @@ export default function CheckoutPage() {
                           }`}
                         />
                       </div>
-                      <button
-                        type="button"
-                        onClick={handleSendOtp}
-                        disabled={otpSending}
-                        className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {otpSending ? "Sending…" : "Send OTP"}
-                      </button>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap sm:items-center">
+                        <button
+                          type="button"
+                          onClick={handleSendOtp}
+                          disabled={otpSending}
+                          className="w-full rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                        >
+                          {otpSending ? "Sending…" : "Send OTP"}
+                        </button>
+                        <span className="hidden text-gray-400 sm:inline sm:px-1" aria-hidden>
+                          |
+                        </span>
+                        <button
+                          type="button"
+                          onClick={handleHaveExistingCode}
+                          disabled={otpSending}
+                          className="w-full rounded-lg border border-gray-300 bg-white px-6 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
+                        >
+                          I already have a code
+                        </button>
+                      </div>
+                      <p className="text-xs text-gray-500">
+                        Choose <span className="font-medium">Send OTP</span> to get a new code by SMS, or{" "}
+                        <span className="font-medium">I already have a code</span> if you already received one.
+                      </p>
                     </div>
                   )}
 
-                  {existingCustomerMode && otpSent && (
-                    <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
-                      OTP sent. Complete your delivery details below.
-                    </p>
+                  {existingCustomerMode && otpSent && !otpVerified && (
+                    <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
+                      <p className="text-sm text-gray-600">
+                        {hasExistingCode ? (
+                          <>
+                            Enter the code you received for{" "}
+                            <span className="font-medium text-gray-900">
+                              {formData.phone || "your number"}
+                            </span>
+                            .
+                          </>
+                        ) : (
+                          <>
+                            Enter the OTP sent to{" "}
+                            <span className="font-medium text-gray-900">
+                              {formData.phone || "your number"}
+                            </span>
+                            .
+                          </>
+                        )}
+                      </p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          OTP code <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          value={otpCode}
+                          onChange={(e) => {
+                            setOtpCode(e.target.value);
+                            setError(null);
+                          }}
+                          placeholder="Enter 6-digit code"
+                          maxLength={12}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent tracking-widest"
+                        />
+                      </div>
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={handleVerifyOtp}
+                          disabled={otpVerifying}
+                          className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {otpVerifying ? "Verifying…" : "Confirm OTP"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={handleOtpBackToPhone}
+                          disabled={otpVerifying}
+                          className="text-sm font-medium text-gray-600 underline hover:text-gray-900"
+                        >
+                          ← Change phone number
+                        </button>
+                      </div>
+                    </div>
                   )}
 
                   {showFullCheckoutFields && (
@@ -1502,7 +1654,7 @@ export default function CheckoutPage() {
 
                 <button
                   type="submit"
-                  disabled={submitting || (existingCustomerMode && !otpSent)}
+                  disabled={submitting || (existingCustomerMode && !otpVerified)}
                   className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                 >
                   {submitting ? "Placing order…" : "Place Order"}
