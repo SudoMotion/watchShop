@@ -152,6 +152,16 @@ export default function CheckoutPage() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (!isLoggedIn()) return;
+    setExistingCustomerMode(false);
+    setOtpSent(false);
+    setOtpVerified(false);
+    setOtpCode("");
+    setHasExistingCode(false);
+  }, []);
+
+  useEffect(() => {
     if (cartItems.length === 0) return;
     getCheckoutData({}, getAuthToken())
       .then((res) => {
@@ -466,7 +476,7 @@ export default function CheckoutPage() {
       toast.error(msg);
       return;
     }
-    if (existingCustomerMode && !otpVerified) {
+    if (!isLoggedIn() && existingCustomerMode && !otpVerified) {
       const msg = !otpSent
         ? "Send OTP to your phone first."
         : "Enter and verify the OTP code first.";
@@ -531,6 +541,10 @@ export default function CheckoutPage() {
       deliveryDistrict = (formData.s_district || shippingAreaName || "").trim();
     }
 
+    const productIds = cartItems
+      .map((item) => item.id ?? item.product_id)
+      .filter((id) => id != null && id !== "");
+
     const payload = {
       name: formData.name.trim(),
       phone: formData.phone.trim(),
@@ -545,6 +559,7 @@ export default function CheckoutPage() {
       email: formData.email?.trim() || undefined,
       customer_pickup: Boolean(formData.customer_pickup),
       shipping_method: shippingMethod,
+      product_ids: productIds,
     };
 
     if (formData.ship_to_different_address) {
@@ -675,7 +690,9 @@ export default function CheckoutPage() {
   }
 
   const showFullCheckoutFields =
-    !existingCustomerMode || (existingCustomerMode && otpVerified);
+    isLoggedIn() ||
+    !existingCustomerMode ||
+    (existingCustomerMode && otpVerified);
 
   return (
     <div className="bg-gray-50 py-4">
@@ -1001,6 +1018,7 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Billing Address For New Customer</h2>
                 <div className="space-y-4">
+                  {!isLoggedIn() && (
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
@@ -1014,8 +1032,9 @@ export default function CheckoutPage() {
                       Click Only For Existing/Old Customer
                     </span>
                   </label>
+                  )}
 
-                  {existingCustomerMode && !otpSent && (
+                  {!isLoggedIn() && existingCustomerMode && !otpSent && (
                     <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
                       <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -1064,7 +1083,7 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {existingCustomerMode && otpSent && !otpVerified && (
+                  {!isLoggedIn() && existingCustomerMode && otpSent && !otpVerified && (
                     <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
                       <p className="text-sm text-gray-600">
                         {hasExistingCode ? (
@@ -1697,7 +1716,10 @@ export default function CheckoutPage() {
 
                 <button
                   type="submit"
-                  disabled={submitting || (existingCustomerMode && !otpVerified)}
+                  disabled={
+                    submitting ||
+                    (!isLoggedIn() && existingCustomerMode && !otpVerified)
+                  }
                   className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                 >
                   {submitting ? "Placing order…" : "Place Order"}
