@@ -31,15 +31,15 @@ export default function DynamicSection() {
       {data.map((item) => (
         <article
           key={item.id}
-          className="group/card [perspective:1200px]"
+          tabIndex={0}
+          className="group/card rounded-2xl [perspective:1200px] outline-none transition-shadow focus-visible:ring-2 focus-visible:ring-amber-400/50 focus-visible:ring-offset-2 focus-visible:ring-offset-gray-50"
         >
           <div
-            className="relative aspect-[3/4] w-full origin-center transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-transform [transform-style:preserve-3d] group-hover/card:[transform:rotateY(180deg)] group-hover/card:shadow-2xl"
+            className="relative aspect-[3/4] w-full origin-center transition-[transform,box-shadow] duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)] will-change-transform [transform-style:preserve-3d] group-hover/card:[transform:rotateY(180deg)] group-focus-within/card:[transform:rotateY(180deg)] group-hover/card:shadow-2xl group-focus-within/card:shadow-2xl"
           >
             {/* Front */}
             <div
-              className="absolute inset-0 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md [backface-visibility:hidden] [transform:translate3d(0,0,1px)]"
-              style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+              className="absolute inset-0 overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-md [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:translate3d(0,0,1px)]"
             >
               <div className="relative h-full w-full bg-gray-100">
                 <Image
@@ -62,8 +62,7 @@ export default function DynamicSection() {
 
             {/* Back */}
             <div
-              className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-neutral-700 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-950 px-6 py-8 text-center shadow-inner [backface-visibility:hidden] [transform:rotateY(180deg)_translate3d(0,0,1px)]"
-              style={{ backfaceVisibility: "hidden", WebkitBackfaceVisibility: "hidden" }}
+              className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-neutral-700 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-950 px-6 py-8 text-center shadow-inner [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translate3d(0,0,1px)]"
             >
               <span className="mb-3 text-[0.65rem] font-semibold uppercase tracking-[0.35em] text-amber-200/90">
                 Collection
