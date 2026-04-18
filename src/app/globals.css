@@ -34,6 +34,15 @@ body {
   height: 100%;
 }
 
+/* Natural-height hero (autoHeight) — don’t force slides to fill a fixed box */
+.swiper-autoheight,
+.swiper-autoheight .swiper-wrapper {
+  height: auto;
+}
+.swiper-autoheight .swiper-slide {
+  height: auto;
+}
+
 /* Zoom animation */
 .hero-bg {
   transform: scale(1);

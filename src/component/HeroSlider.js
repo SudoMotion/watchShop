@@ -6,20 +6,44 @@ import { Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import { getHome } from "@/stores/HomeAPI";
 import { getMobileSliders, getSliders } from "@/stores/homeSpecification";
 import { NEXT_PUBLIC_API_URL } from "@/config";
+
+function slideImageSrc(path) {
+  if (path == null || path === "") return "";
+  const p = String(path).trim();
+  if (!p) return "";
+  if (p.startsWith("http")) return p;
+  const base = (NEXT_PUBLIC_API_URL || "").replace(/\/$/, "");
+  return `${base}/${p.replace(/^\//, "")}`;
+}
+
+const swiperBase = {
+  modules: [Autoplay, Pagination],
+  slidesPerView: 1,
+  loop: true,
+  speed: 1200,
+  autoHeight: true,
+  autoplay: {
+    delay: 5000,
+    disableOnInteraction: false,
+    pauseOnMouseEnter: false,
+  },
+  pagination: {
+    clickable: true,
+    bulletClass: "hero-bullet",
+    bulletActiveClass: "hero-bullet-active",
+  },
+};
 
 export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
   const [sliders, setSliders] = useState([]);
   const [mobileSliders, setMobileSliders] = useState([]);
-  // 🔑 Prevent Swiper from initializing during hydration
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Fetch sliders data
   useEffect(() => {
     const fetchSliders = async () => {
       try {
@@ -28,121 +52,99 @@ export default function HeroSlider() {
         setSliders(data);
         setMobileSliders(mobileData);
       } catch (error) {
-        console.error('Failed to fetch sliders:', error);
+        console.error("Failed to fetch sliders:", error);
       }
     };
     fetchSliders();
   }, []);
 
   if (!mounted) {
-    return <section className="relative w-full h-[60vh] md:h-screen bg-black" />;
+    return <section className="relative w-full min-h-[12rem] bg-neutral-100 md:min-h-[16rem]" />;
   }
 
   const desktopSlides = sliders;
-  // const phoneSlides = mobileSliders.length ? mobileSliders : sliders;
-  const phoneSlides = sliders;
+  const phoneSlides = mobileSliders.length ? mobileSliders : sliders;
+
+  const slideShell = (slide, index, isMobile) => (
+    <div className="relative w-full overflow-hidden">
+      <img
+        src={slideImageSrc(slide.image)}
+        alt={slide.title ? String(slide.title) : ""}
+        className="hero-bg block h-auto w-full max-w-full origin-center will-change-transform"
+        width={undefined}
+        height={undefined}
+        loading={index === 0 ? "eager" : "lazy"}
+        decoding="async"
+        sizes="100vw"
+      />
+      <div
+        className="pointer-events-none absolute inset-0 bg-black/30"
+        aria-hidden
+      />
+      <div
+        className={`absolute inset-0 z-10 flex items-center ${
+          isMobile ? "px-6" : "px-6 md:px-24"
+        }`}
+      >
+        <div
+          className={`text-white ${isMobile ? "max-w-md" : "max-w-xl"} pointer-events-auto`}
+        >
+          <h1
+            className={`font-light tracking-wide text-white ${
+              isMobile
+                ? "mb-3 text-3xl"
+                : "mb-4 text-4xl md:mb-4 md:text-6xl"
+            }`}
+          >
+            {slide.title}
+          </h1>
+          <p
+            className={`tracking-widest uppercase text-white ${
+              isMobile
+                ? "mb-6 text-xs"
+                : "mb-8 text-sm md:text-base"
+            }`}
+          >
+            {slide.subtitle}
+          </p>
+          <a
+            href={slide.link}
+            className={`inline-block border border-white text-white transition hover:bg-white hover:text-black ${
+              isMobile
+                ? "px-6 py-2 text-[11px] tracking-widest uppercase"
+                : "px-8 py-3 text-xs tracking-widest uppercase"
+            }`}
+          >
+            Discover
+          </a>
+        </div>
+      </div>
+    </div>
+  );
 
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Desktop / large screens */}
-      <div className="hidden md:block h-[80vh]">
-        <Swiper
-          modules={[Autoplay, Pagination]}
-          slidesPerView={1}
-          loop
-          speed={1200}
-          autoplay={{
-            delay: 5000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false,
-          }}
-          pagination={{
-            clickable: true,
-            bulletClass: "hero-bullet",
-            bulletActiveClass: "hero-bullet-active",
-          }}
-          className="h-full w-full"
-        >
+      <div className="hidden md:block w-full">
+        <Swiper {...swiperBase} className="w-full">
           {desktopSlides.map((slide, index) => (
-            <SwiperSlide key={index} className="w-full h-full">
-              <div className="relative w-full h-full overflow-hidden">
-                <div
-                  className="hero-bg absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${NEXT_PUBLIC_API_URL}/${slide.image})` }}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex h-full items-center px-6 md:px-24">
-                  <div className="text-white max-w-xl">
-                    <h1 className="text-4xl md:text-6xl font-light tracking-wide mb-4">
-                      {slide.title}
-                    </h1>
-                    <p className="text-sm md:text-base tracking-widest uppercase mb-8">
-                      {slide.subtitle}
-                    </p>
-                    <a
-                      href={slide.link}
-                      className="inline-block border border-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-white hover:text-black transition"
-                    >
-                      Discover
-                    </a>
-                  </div>
-                </div>
-              </div>
+            <SwiperSlide key={index} className="!h-auto">
+              {slideShell(slide, index, false)}
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
 
-      {/* Mobile / small screens */}
-      <div className="block md:hidden h-[20vh]">
-        <Swiper
-          modules={[Autoplay, Pagination]}
-          slidesPerView={1}
-          loop
-          speed={1200}
-          autoplay={{
-            delay: 5000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false,
-          }}
-          pagination={{
-            clickable: true,
-            bulletClass: "hero-bullet",
-            bulletActiveClass: "hero-bullet-active",
-          }}
-          className="h-full w-full"
-        >
+      <div className="block md:hidden w-full">
+        <Swiper {...swiperBase} className="w-full">
           {phoneSlides.map((slide, index) => (
-            <SwiperSlide key={index} className="w-full h-full">
-              <div className="relative w-full h-full overflow-hidden">
-                <div
-                  className="hero-bg absolute inset-0 bg-cover bg-no-repeat bg-center"
-                  style={{ backgroundImage: `url(${NEXT_PUBLIC_API_URL}/${slide.image})` }}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex h-full items-center px-6">
-                  <div className="text-white max-w-md">
-                    <h1 className="text-3xl font-light tracking-wide mb-3">
-                      {slide.title}
-                    </h1>
-                    <p className="text-xs tracking-widest uppercase mb-6">
-                      {slide.subtitle}
-                    </p>
-                    <a
-                      href={slide.link}
-                      className="inline-block border border-white px-6 py-2 text-[11px] tracking-widest uppercase hover:bg-white hover:text-black transition"
-                    >
-                      Discover
-                    </a>
-                  </div>
-                </div>
-              </div>
+            <SwiperSlide key={index} className="!h-auto">
+              {slideShell(slide, index, true)}
             </SwiperSlide>
           ))}
         </Swiper>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+      <div className="absolute bottom-10 left-1/2 z-20 -translate-x-1/2">
         <div className="swiper-pagination" />
       </div>
     </section>
