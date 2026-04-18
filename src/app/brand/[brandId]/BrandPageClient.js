@@ -76,14 +76,16 @@ export default function BrandPageClient({ brandId }) {
 
   return (
     <div>
-      <div
-        className="relative py-16 flex items-center justify-center overflow-hidden"
-        style={{
-          backgroundImage: displayBannerUrl ? `url('${displayBannerUrl}')` : 'none',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
+      <div className="relative h-44 md:h-56 flex items-center justify-center overflow-hidden bg-gray-100">
+        {displayBannerUrl && (
+          <img
+            src={displayBannerUrl}
+            alt={`${brandId} banner`}
+            className="absolute inset-0 h-full w-full object-contain"
+            loading="eager"
+            decoding="async"
+          />
+        )}
         {!bannerLoaded && (
           <div className="absolute inset-0 animate-pulse bg-gray-200" />
         )}
