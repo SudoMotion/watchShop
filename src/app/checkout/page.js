@@ -346,35 +346,78 @@ export default function CheckoutPage() {
     setOtpVerifying(true);
     try {
       const response = await useVerifyOtpMutation({ phone, otp });
-      if (response?.status >= 200 && response?.status < 300) {
-        setOtpVerified(true);
-        setOtpCode("");
-        const msg = response?.data?.message;
-        toast.success(
-          typeof msg === "string" && msg.trim()
-            ? msg
-            : "OTP verified. Complete your delivery details below."
-        );
-        const data = response?.data;
-        const token = data?.token ?? data?.access_token;
-        const customer = data?.customer ?? data?.user;
-        if (token != null && customer && typeof window !== "undefined") {
-          try {
-            localStorage.setItem(
-              "watchshop_auth",
-              JSON.stringify({ token, customer })
-            );
-            document.cookie =
-              "watchshop_logged_in=1; path=/; max-age=2592000";
-          } catch (_) {}
-        }
-      } else {
+      const status = response?.status ?? 0;
+      if (status < 200 || status >= 300) {
         const errMsg =
           response?.data?.message ||
           response?.data?.error ||
           "Invalid OTP. Try again.";
         toast.error(typeof errMsg === "string" ? errMsg : "Invalid OTP.");
+        return;
       }
+
+      const raw = response?.data ?? {};
+      const payload =
+        raw?.data &&
+        typeof raw.data === "object" &&
+        !Array.isArray(raw.data) &&
+        (raw.data.token != null ||
+          raw.data.access_token != null ||
+          raw.data.customer != null ||
+          raw.data.user != null)
+          ? raw.data
+          : raw;
+
+      if (payload?.success === false) {
+        const failMsg = payload?.message;
+        toast.error(
+          typeof failMsg === "string" && failMsg.trim()
+            ? failMsg
+            : "Verification failed."
+        );
+        return;
+      }
+
+      const token = payload?.token ?? payload?.access_token;
+      const customer = payload?.customer ?? payload?.user;
+      const token_type = payload?.token_type ?? "Bearer";
+
+      if (token == null || !customer) {
+        toast.error("Could not complete sign-in. Missing token or profile.");
+        return;
+      }
+
+      try {
+        localStorage.setItem(
+          "watchshop_auth",
+          JSON.stringify({ token, customer, token_type })
+        );
+        document.cookie =
+          "watchshop_logged_in=1; path=/; max-age=2592000";
+      } catch (_) {
+        toast.error("Could not save your session. Check browser storage.");
+        return;
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        name: customer.name ?? prev.name,
+        phone:
+          String(customer.phone ?? prev.phone)
+            .replace(/\D/g, "")
+            .slice(0, 11) || prev.phone,
+        email: customer.email ?? prev.email,
+        address: customer.address ?? prev.address,
+      }));
+
+      setOtpVerified(true);
+      setOtpCode("");
+      const msg = payload?.message ?? raw?.message;
+      toast.success(
+        typeof msg === "string" && msg.trim()
+          ? msg
+          : "Signed in. Complete your delivery details below."
+      );
     } catch {
       toast.error("Could not verify OTP. Try again.");
     } finally {
