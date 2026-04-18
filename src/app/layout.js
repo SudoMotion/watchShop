@@ -2,6 +2,7 @@ import { Jost } from "next/font/google";
 import "./globals.css";
 import Header from "@/component/Header";
 import Footer from "@/component/Footer";
+import Popup from "@/component/Popup";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -21,6 +22,7 @@ export default function RootLayout({ children }) {
       <body className="font-sans antialiased">
         <div className="flex flex-col justify-between min-h-screen text-xs md:text-sm">
           <Header />
+          <Popup/>
           <div className="flex-1 w-full">
             {children}
           </div>
