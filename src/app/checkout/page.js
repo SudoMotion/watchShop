@@ -8,7 +8,6 @@ import { NEXT_PUBLIC_API_URL } from "@/config";
 import { couponApply } from "@/stores/CartAPI";
 import {
   getCheckoutData,
-  getShipAmount,
   checkoutStore,
   getPathaoCities,
   getPathaoZones,
@@ -33,6 +32,9 @@ const getNumericPrice = (priceStr) => {
 function strFilled(v) {
   return v != null && String(v).trim() !== "";
 }
+
+const SHIPPING_INSIDE_DHAKA = 70;
+const SHIPPING_OUTSIDE_DHAKA = 130;
 
 function normalizePathaoList(res) {
   const raw = res?.data;
@@ -79,6 +81,12 @@ export default function CheckoutPage() {
     order_note: "",
     payment_type: "cod",
     customer_pickup: false,
+    ship_to_different_address: false,
+    s_name: "",
+    s_phone: "",
+    s_address: "",
+    s_area: "",
+    s_district: "",
     b_name: "",
     b_email: "",
     b_phone: "",
@@ -87,7 +95,9 @@ export default function CheckoutPage() {
   });
 
   const [districtId, setDistrictId] = useState("");
-  const [shipCharge, setShipCharge] = useState(0);
+  const [shippingDistrictId, setShippingDistrictId] = useState("");
+  const [shippingMethod, setShippingMethod] = useState("inside_dhaka");
+  const [shipCharge, setShipCharge] = useState(SHIPPING_INSIDE_DHAKA);
   const [couponCode, setCouponCode] = useState("");
   const [couponDiscount, setCouponDiscount] = useState(0);
   const [couponMessage, setCouponMessage] = useState("");
@@ -227,18 +237,18 @@ export default function CheckoutPage() {
   }, [pathaoZoneId]);
 
   useEffect(() => {
-    if (!districtId) {
+    if (formData.customer_pickup) {
       setShipCharge(0);
       return;
     }
-    getShipAmount(districtId)
-      .then((res) => {
-        const data = res?.data;
-        if (data?.amount != null) setShipCharge(Number(data.amount));
-        else setShipCharge(0);
-      })
-      .catch(() => setShipCharge(0));
-  }, [districtId]);
+    if (shippingMethod === "inside_dhaka") {
+      setShipCharge(SHIPPING_INSIDE_DHAKA);
+    } else if (shippingMethod === "outside_dhaka") {
+      setShipCharge(SHIPPING_OUTSIDE_DHAKA);
+    } else {
+      setShipCharge(0);
+    }
+  }, [shippingMethod, formData.customer_pickup]);
 
   const readOnlyInputClass =
     "bg-gray-50 text-gray-800 cursor-not-allowed border-gray-200";
@@ -302,23 +312,75 @@ export default function CheckoutPage() {
       toast.error(msg);
       return;
     }
-    const district = districts.find((d) => String(d.id) === String(districtId));
-    const area = district?.name || formData.area || formData.district || "";
+    if (formData.ship_to_different_address) {
+      if (
+        !String(formData.s_name || "").trim() ||
+        !String(formData.s_phone || "").trim() ||
+        !String(formData.s_address || "").trim()
+      ) {
+        const msg = "Please complete the shipping address (name, phone, and address).";
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
+      if (districts.length > 0) {
+        if (!shippingDistrictId) {
+          const msg = "Please select a shipping district.";
+          setError(msg);
+          toast.error(msg);
+          return;
+        }
+      } else if (!String(formData.s_area || "").trim()) {
+        const msg = "Please enter the shipping district or area.";
+        setError(msg);
+        toast.error(msg);
+        return;
+      }
+    }
+
+    const billingDistrict = districts.find((d) => String(d.id) === String(districtId));
+    const billingAreaName =
+      billingDistrict?.name || formData.area || formData.district || "";
+
+    const shippingDistrict = districts.find(
+      (d) => String(d.id) === String(shippingDistrictId)
+    );
+    const shippingAreaName = shippingDistrict
+      ? shippingDistrict.name
+      : String(formData.s_area || formData.s_district || "").trim();
+
+    let deliveryAddress = formData.address.trim();
+    let deliveryArea = billingAreaName;
+    let deliveryDistrict = (formData.district || billingAreaName || "").trim();
+
+    if (formData.ship_to_different_address) {
+      deliveryAddress = String(formData.s_address || "").trim();
+      deliveryArea = String(shippingAreaName);
+      deliveryDistrict = (formData.s_district || shippingAreaName || "").trim();
+    }
 
     const payload = {
       name: formData.name.trim(),
       phone: formData.phone.trim(),
-      address: formData.address.trim(),
+      address: deliveryAddress,
       order_total: Number(orderTotal),
       total_amount: Number(totalAmount),
-      area: String(area),
-      district: (formData.district || area || "").trim(),
+      area: String(deliveryArea),
+      district: deliveryDistrict,
       order_note: formData.order_note?.trim() || undefined,
       payment_type: formData.payment_type || "cod",
       ship_charge: Number(shipCharge) || 0,
       email: formData.email?.trim() || undefined,
       customer_pickup: Boolean(formData.customer_pickup),
+      shipping_method: shippingMethod,
     };
+
+    if (formData.ship_to_different_address) {
+      payload.shipping_name = String(formData.s_name || "").trim();
+      payload.shipping_phone = String(formData.s_phone || "").trim();
+      payload.b_address = formData.address.trim();
+      payload.b_district = (formData.district || billingAreaName || "").trim();
+    }
 
     if (couponDiscount > 0) {
       payload.couponDiscount = Number(couponDiscount);
@@ -338,8 +400,10 @@ export default function CheckoutPage() {
     if (bName) payload.b_name = bName;
     if (bEmail) payload.b_email = bEmail;
     if (bPhone) payload.b_phone = bPhone;
-    if (bDistrict) payload.b_district = bDistrict;
-    if (bAddress) payload.b_address = bAddress;
+    if (!formData.ship_to_different_address) {
+      if (bDistrict) payload.b_district = bDistrict;
+      if (bAddress) payload.b_address = bAddress;
+    }
 
     setSubmitting(true);
     try {
@@ -455,7 +519,7 @@ export default function CheckoutPage() {
 
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-6">
+            {/* <div className="lg:col-span-2 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Contact &amp; Delivery</h2>
                 <div className="space-y-4">
@@ -756,6 +820,480 @@ export default function CheckoutPage() {
                     </Link>
                   </span>
                 </label>
+              </div>
+            </div> */}
+            <div className="lg:col-span-2 space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+                <h2 className="text-xl font-semibold mb-4">Billing Address For New Customer</h2>
+                <div className="space-y-4">
+                  {/* name */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Name <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      readOnly={apiReadOnly.name}
+                      required
+                      maxLength={60}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
+                        apiReadOnly.name ? readOnlyInputClass : ""
+                      }`}
+                    />
+                  </div>
+                  {/* phone */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Phone (11 digits) <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="tel"
+                      name="phone"
+                      value={formData.phone}
+                      onChange={handleInputChange}
+                      readOnly={apiReadOnly.phone}
+                      required
+                      placeholder="01XXXXXXXXX"
+                      maxLength={11}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
+                        apiReadOnly.phone ? readOnlyInputClass : ""
+                      }`}
+                    />
+                  </div>
+                  {/* email */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleInputChange}
+                      readOnly={apiReadOnly.email}
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
+                        apiReadOnly.email ? readOnlyInputClass : ""
+                      }`}
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-2 font-semibold">
+                    <input type="checkbox" name="" id="" />
+                    <span>Click Only For Existing/Old Customer</span>
+                  </label>
+
+                  {/* address */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Address <span className="text-red-600">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      name="address"
+                      value={formData.address}
+                      onChange={handleInputChange}
+                      readOnly={apiReadOnly.address}
+                      required
+                      maxLength={191}
+                      placeholder="House/Flat, Road, Area"
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
+                        apiReadOnly.address ? readOnlyInputClass : ""
+                      }`}
+                    />
+                  </div>
+                  {/* <div className="pt-2 border-t border-gray-100">
+                    <p className="text-sm font-medium text-gray-800 mb-3">Billing address (optional)</p>
+                    <div className="space-y-3">
+                      <input
+                        type="text"
+                        name="b_name"
+                        value={formData.b_name}
+                        onChange={handleInputChange}
+                        placeholder="Billing name"
+                        maxLength={60}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                      <input
+                        type="email"
+                        name="b_email"
+                        value={formData.b_email}
+                        onChange={handleInputChange}
+                        placeholder="Billing email"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                      <input
+                        type="tel"
+                        name="b_phone"
+                        value={formData.b_phone}
+                        onChange={handleInputChange}
+                        placeholder="Billing phone"
+                        maxLength={11}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                      <input
+                        type="text"
+                        name="b_district"
+                        value={formData.b_district}
+                        onChange={handleInputChange}
+                        placeholder="Billing district"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                      <input
+                        type="text"
+                        name="b_address"
+                        value={formData.b_address}
+                        onChange={handleInputChange}
+                        placeholder="Billing address"
+                        maxLength={191}
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                    </div>
+                  </div> */}
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      District / Area <span className="text-red-600">*</span>
+                    </label>
+                    {districts.length > 0 ? (
+                      <select
+                        name="area"
+                        value={districtId}
+                        onChange={(e) => {
+                          setDistrictId(e.target.value);
+                          const d = districts.find(
+                            (x) => String(x.id) === String(e.target.value)
+                          );
+                          setFormData((f) => ({
+                            ...f,
+                            area: d?.name || "",
+                            district: d?.name || "",
+                          }));
+                        }}
+                        required
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      >
+                        <option value="">Select district</option>
+                        {districts.map((d) => (
+                          <option key={d.id} value={d.id}>
+                            {d.name} {d.amount != null ? `(৳${d.amount})` : ""}
+                          </option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        name="area"
+                        value={formData.area}
+                        onChange={handleInputChange}
+                        required
+                        placeholder="e.g. Dhaka"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                    )}
+                  </div>
+
+                  {/* <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
+                    <input
+                      type="checkbox"
+                      name="customer_pickup"
+                      checked={!!formData.customer_pickup}
+                      onChange={handleInputChange}
+                      className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
+                    <span className="text-sm text-gray-800">
+                      <span className="font-medium">Customer pickup</span>
+                      <span className="block text-gray-600 mt-0.5">
+                        I will collect my order from the store (not home delivery).
+                      </span>
+                    </span>
+                  </label> */}
+                  
+                  <div>
+                    <p className="text-base font-bold text-gray-900 mb-3">Shipping method</p>
+                    <div className="space-y-2">
+                      <label
+                        className={`flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 px-4 py-3.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-2 ${
+                          shippingMethod === "inside_dhaka"
+                            ? "border-blue-500 bg-sky-50"
+                            : "border-gray-200 bg-white hover:bg-gray-50/80"
+                        }`}
+                      >
+                        <span className="flex min-w-0 flex-1 items-center gap-3">
+                          <input
+                            type="radio"
+                            name="shipping_method"
+                            value="inside_dhaka"
+                            checked={shippingMethod === "inside_dhaka"}
+                            onChange={() => setShippingMethod("inside_dhaka")}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                              shippingMethod === "inside_dhaka"
+                                ? "border-blue-500 bg-blue-500"
+                                : "border-gray-300 bg-white"
+                            }`}
+                            aria-hidden
+                          >
+                            {shippingMethod === "inside_dhaka" ? (
+                              <span className="h-2 w-2 rounded-full bg-white" />
+                            ) : null}
+                          </span>
+                          <span className="text-sm font-medium text-gray-900">
+                            Inside Dhaka City
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-sm font-medium text-gray-900 tabular-nums">
+                          ৳70.00
+                        </span>
+                      </label>
+                      <label
+                        className={`flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 px-4 py-3.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-2 ${
+                          shippingMethod === "outside_dhaka"
+                            ? "border-blue-500 bg-sky-50"
+                            : "border-gray-200 bg-white hover:bg-gray-50/80"
+                        }`}
+                      >
+                        <span className="flex min-w-0 flex-1 items-center gap-3">
+                          <input
+                            type="radio"
+                            name="shipping_method"
+                            value="outside_dhaka"
+                            checked={shippingMethod === "outside_dhaka"}
+                            onChange={() => setShippingMethod("outside_dhaka")}
+                            className="sr-only"
+                          />
+                          <span
+                            className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-full border-2 ${
+                              shippingMethod === "outside_dhaka"
+                                ? "border-blue-500 bg-blue-500"
+                                : "border-gray-300 bg-white"
+                            }`}
+                            aria-hidden
+                          >
+                            {shippingMethod === "outside_dhaka" ? (
+                              <span className="h-2 w-2 rounded-full bg-white" />
+                            ) : null}
+                          </span>
+                          <span className="text-sm font-medium text-gray-900">
+                            Outside Dhaka City
+                          </span>
+                        </span>
+                        <span className="shrink-0 text-sm font-medium text-gray-900 tabular-nums">
+                          ৳130.00
+                        </span>
+                      </label>
+                    </div>
+                  </div>
+
+                  {pathaoEnabled && (
+                    <div className="pt-2 border-t border-gray-200">
+                      <p className="text-sm font-medium text-gray-800 mb-1">
+                        Pathao delivery location
+                        {pathaoLocationsRequired && (
+                          <span className="text-red-600"> *</span>
+                        )}
+                      </p>
+                      <p className="text-xs text-gray-500 mb-3">
+                        Select city, zone, and area for courier delivery.
+                      </p>
+                      <div className="space-y-3">
+                        <select
+                          value={pathaoCityId}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setPathaoCityId(v);
+                            setPathaoZoneId("");
+                            setPathaoAreaId("");
+                          }}
+                          required={pathaoLocationsRequired}
+                          disabled={pathaoLoading && pathaoCities.length === 0}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        >
+                          <option value="">Select city</option>
+                          {pathaoCities.map((c) => (
+                            <option key={c.id} value={c.id}>
+                              {c.name}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={pathaoZoneId}
+                          onChange={(e) => {
+                            setPathaoZoneId(e.target.value);
+                            setPathaoAreaId("");
+                          }}
+                          required={pathaoLocationsRequired}
+                          disabled={!pathaoCityId}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        >
+                          <option value="">Select zone</option>
+                          {pathaoZones.map((z) => (
+                            <option key={z.id} value={z.id}>
+                              {z.name}
+                            </option>
+                          ))}
+                        </select>
+                        <select
+                          value={pathaoAreaId}
+                          onChange={(e) => setPathaoAreaId(e.target.value)}
+                          required={pathaoLocationsRequired}
+                          disabled={!pathaoZoneId}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        >
+                          <option value="">Select area</option>
+                          {pathaoAreas.map((a) => (
+                            <option key={a.id} value={a.id}>
+                              {a.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* note */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Order note
+                    </label>
+                    <textarea
+                      name="order_note"
+                      value={formData.order_note}
+                      onChange={handleInputChange}
+                      rows={2}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                    />
+                  </div>
+
+                  <label className="flex items-center gap-2 font-semibold cursor-pointer">
+                    <input
+                      type="checkbox"
+                      name="ship_to_different_address"
+                      checked={!!formData.ship_to_different_address}
+                      onChange={(e) => {
+                        const checked = e.target.checked;
+                        if (!checked) {
+                          setShippingDistrictId("");
+                        }
+                        setFormData((prev) => ({
+                          ...prev,
+                          ship_to_different_address: checked,
+                          ...(!checked
+                            ? {
+                                s_name: "",
+                                s_phone: "",
+                                s_address: "",
+                                s_area: "",
+                                s_district: "",
+                              }
+                            : {}),
+                        }));
+                        setError(null);
+                      }}
+                      className="w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
+                    <span>Ship to a different address</span>
+                  </label>
+
+                  {formData.ship_to_different_address && (
+                    <div className="pt-4 border-t border-gray-200 space-y-4">
+                      <p className="text-sm font-medium text-gray-800">
+                        Shipping address
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        Your details above are the billing address. Enter where we should deliver below.
+                      </p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Shipping name <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="s_name"
+                          value={formData.s_name}
+                          onChange={handleInputChange}
+                          required={formData.ship_to_different_address}
+                          maxLength={60}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Shipping phone (11 digits) <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          name="s_phone"
+                          value={formData.s_phone}
+                          onChange={handleInputChange}
+                          required={formData.ship_to_different_address}
+                          placeholder="01XXXXXXXXX"
+                          maxLength={11}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Shipping address <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="s_address"
+                          value={formData.s_address}
+                          onChange={handleInputChange}
+                          required={formData.ship_to_different_address}
+                          maxLength={191}
+                          placeholder="House/Flat, Road, Area"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Shipping district / area <span className="text-red-600">*</span>
+                        </label>
+                        {districts.length > 0 ? (
+                          <select
+                            value={shippingDistrictId}
+                            onChange={(e) => {
+                              setShippingDistrictId(e.target.value);
+                              const d = districts.find(
+                                (x) => String(x.id) === String(e.target.value)
+                              );
+                              setFormData((f) => ({
+                                ...f,
+                                s_area: d?.name || "",
+                                s_district: d?.name || "",
+                              }));
+                            }}
+                            required={formData.ship_to_different_address}
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                          >
+                            <option value="">Select district</option>
+                            {districts.map((d) => (
+                              <option key={d.id} value={d.id}>
+                                {d.name}{" "}
+                                {d.amount != null ? `(৳${d.amount})` : ""}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <input
+                            type="text"
+                            name="s_area"
+                            value={formData.s_area}
+                            onChange={handleInputChange}
+                            required={formData.ship_to_different_address}
+                            placeholder="e.g. Dhaka"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
               </div>
             </div>
 
