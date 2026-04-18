@@ -6,6 +6,7 @@ import { getCart, setCart } from "@/lib/cartStorage";
 import { getAuthToken, getCustomer, isLoggedIn } from "@/lib/auth";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { couponApply } from "@/stores/CartAPI";
+import { useSendOtpMutation } from "@/stores/AuthAPI";
 import {
   getCheckoutData,
   checkoutStore,
@@ -112,6 +113,9 @@ export default function CheckoutPage() {
   const [pathaoZoneId, setPathaoZoneId] = useState("");
   const [pathaoAreaId, setPathaoAreaId] = useState("");
   const [pathaoLoading, setPathaoLoading] = useState(false);
+  const [existingCustomerMode, setExistingCustomerMode] = useState(false);
+  const [otpSending, setOtpSending] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
   const [apiReadOnly, setApiReadOnly] = useState({
     name: false,
     phone: false,
@@ -261,6 +265,46 @@ export default function CheckoutPage() {
     setError(null);
   };
 
+  const handleExistingCustomerToggle = (checked) => {
+    setExistingCustomerMode(checked);
+    if (checked) {
+      setOtpSent(false);
+    }
+    setError(null);
+  };
+
+  const handleSendOtp = async () => {
+    const phone = String(formData.phone || "").replace(/\D/g, "");
+    if (phone.length !== 11) {
+      toast.error("Enter a valid 11-digit mobile number.");
+      return;
+    }
+    setOtpSending(true);
+    try {
+      const response = await useSendOtpMutation({ phone });
+      if (response?.status >= 200 && response?.status < 300) {
+        setFormData((prev) => ({ ...prev, phone }));
+        setOtpSent(true);
+        const msg = response?.data?.message;
+        toast.success(
+          typeof msg === "string" && msg.trim()
+            ? msg
+            : "OTP sent. Complete your delivery details below."
+        );
+      } else {
+        const errMsg =
+          response?.data?.message ||
+          response?.data?.error ||
+          "Could not send OTP. Try again.";
+        toast.error(typeof errMsg === "string" ? errMsg : "Could not send OTP.");
+      }
+    } catch {
+      toast.error("Could not send OTP. Try again.");
+    } finally {
+      setOtpSending(false);
+    }
+  };
+
   const handleApplyCoupon = async () => {
     const code = couponCode.trim();
     if (!code) {
@@ -298,6 +342,12 @@ export default function CheckoutPage() {
     setError(null);
     if (cartItems.length === 0) {
       const msg = "Your cart is empty.";
+      setError(msg);
+      toast.error(msg);
+      return;
+    }
+    if (existingCustomerMode && !otpSent) {
+      const msg = "Send OTP to verify your phone first.";
       setError(msg);
       toast.error(msg);
       return;
@@ -501,6 +551,9 @@ export default function CheckoutPage() {
       </div>
     );
   }
+
+  const showFullCheckoutFields =
+    !existingCustomerMode || (existingCustomerMode && otpSent);
 
   return (
     <div className="bg-gray-50 py-4">
@@ -826,6 +879,58 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">Billing Address For New Customer</h2>
                 <div className="space-y-4">
+                  <label className="flex items-start gap-3 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={existingCustomerMode}
+                      onChange={(e) => handleExistingCustomerToggle(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+                    />
+                    <span className="text-sm font-semibold text-gray-900">
+                      Click Only For Existing/Old Customer
+                    </span>
+                  </label>
+
+                  {existingCustomerMode && !otpSent && (
+                    <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          inputMode="numeric"
+                          autoComplete="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          readOnly={apiReadOnly.phone}
+                          placeholder="01XXXXXXXXX"
+                          maxLength={11}
+                          className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
+                            apiReadOnly.phone ? readOnlyInputClass : ""
+                          }`}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleSendOtp}
+                        disabled={otpSending}
+                        className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {otpSending ? "Sending…" : "Send OTP"}
+                      </button>
+                    </div>
+                  )}
+
+                  {existingCustomerMode && otpSent && (
+                    <p className="rounded-lg border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800">
+                      OTP sent. Complete your delivery details below.
+                    </p>
+                  )}
+
+                  {showFullCheckoutFields && (
+                    <>
                   {/* name */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -877,11 +982,6 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
-
-                  <label className="flex items-center gap-2 font-semibold">
-                    <input type="checkbox" name="" id="" />
-                    <span>Click Only For Existing/Old Customer</span>
-                  </label>
 
                   {/* address */}
                   <div>
@@ -1292,6 +1392,8 @@ export default function CheckoutPage() {
                       </div>
                     </div>
                   )}
+                    </>
+                  )}
 
                 </div>
               </div>
@@ -1400,7 +1502,7 @@ export default function CheckoutPage() {
 
                 <button
                   type="submit"
-                  disabled={submitting}
+                  disabled={submitting || (existingCustomerMode && !otpSent)}
                   className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                 >
                   {submitting ? "Placing order…" : "Place Order"}
