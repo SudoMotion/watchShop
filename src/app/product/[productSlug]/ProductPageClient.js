@@ -37,6 +37,29 @@ export default function ProductPageClient({ params }) {
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [buyNowLoading, setBuyNowLoading] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
+  /** Show fixed CTA only after scrolling down (keeps inline buttons visible at top). */
+  const [showFloatingCta, setShowFloatingCta] = useState(false);
+
+  useEffect(() => {
+    const getScrollThreshold = () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 768px)").matches
+        ? 800
+        : 400;
+
+    const updateFloatingCta = () => {
+      if (typeof window === "undefined") return;
+      setShowFloatingCta(window.scrollY >= getScrollThreshold());
+    };
+
+    updateFloatingCta();
+    window.addEventListener("scroll", updateFloatingCta, { passive: true });
+    window.addEventListener("resize", updateFloatingCta);
+    return () => {
+      window.removeEventListener("scroll", updateFloatingCta);
+      window.removeEventListener("resize", updateFloatingCta);
+    };
+  }, []);
 
   useEffect(() => {
     if (!productSlug) return;
@@ -309,7 +332,11 @@ export default function ProductPageClient({ params }) {
     );
   }
   return (
-    <div className="w-full bg-white text-gray-800">
+    <div
+      className={`w-full bg-white text-gray-800 ${
+        showFloatingCta ? "pb-14 sm:pb-16" : ""
+      }`}
+    >
 
       {/* CONTAINER */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
@@ -527,13 +554,13 @@ export default function ProductPageClient({ params }) {
             )}
           </div>
 
-          {/* Add to Cart & Buy now */}
+          {/* Inline Add to Cart & Buy Now — fixed bar appears after 500px scroll */}
           <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
             <button
               type="button"
               onClick={handleAddToCart}
               disabled={!inStock || addToCartLoading}
-              className="px-5 py-2.5 bg-black text-white font-semibold rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors inline-flex items-center gap-2"
+              className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 <circle cx="8" cy="21" r="1" />
@@ -546,7 +573,7 @@ export default function ProductPageClient({ params }) {
               type="button"
               onClick={handleBuyNow}
               disabled={!inStock || buyNowLoading}
-              className="px-5 py-2.5 bg-sky-400 text-white font-semibold rounded-lg hover:bg-sky-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="rounded-lg bg-sky-400 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
             >
               {buyNowLoading ? "Processing..." : "Buy Now"}
             </button>
@@ -890,6 +917,36 @@ export default function ProductPageClient({ params }) {
           ))}
         </div>
       </div>
+
+      {/* Fixed CTA — only after scrolling 500px (inline buttons stay at top) */}
+      {showFloatingCta && (
+        <div className="fixed inset-x-0 bottom-10 z-40 flex justify-center px-3 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none">
+          <div className="pointer-events-auto flex w-full max-w-[min(100%,20rem)] gap-1 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm sm:max-w-[22rem]">
+            <button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={!inStock || addToCartLoading}
+              className="inline-flex min-w-0 flex-1 items-center justify-center gap-1 rounded-lg bg-black px-2 py-1.5 text-[11px] font-medium leading-tight text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50 sm:text-xs"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true" className="shrink-0">
+                <circle cx="8" cy="21" r="1" />
+                <circle cx="19" cy="21" r="1" />
+                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+              </svg>
+              <span className="truncate">{addToCartLoading ? "Adding..." : "Add to Cart"}</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleBuyNow}
+              disabled={!inStock || buyNowLoading}
+              className="min-w-0 flex-1 rounded-lg bg-sky-500 px-2 py-1.5 text-[11px] font-medium leading-tight text-white transition-colors hover:bg-sky-600 disabled:cursor-not-allowed disabled:opacity-50 sm:text-xs"
+            >
+              <span className="truncate">{buyNowLoading ? "Processing..." : "Buy Now"}</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       <ToastContainer position="top-right" autoClose={2500} newestOnTop />
     </div>
   );
