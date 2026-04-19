@@ -330,7 +330,7 @@ export default function ProductPageClient({ params }) {
             /
             <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
           </div>
-          <div className="border rounded-xl p-3 sm:p-4 md:p-5 flex justify-center min-h-[200px] bg-gray-50">
+          <div className="border rounded-xl flex justify-center min-h-[200px] bg-gray-50">
             {(mainImg || displayImages[0]) ? (
               <Image
                 src={mainImg || displayImages[0]}
