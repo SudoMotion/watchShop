@@ -190,12 +190,14 @@ export default function ProductPageClient({ params }) {
     }
   };
 
-  const handleAddToWishlist = () => {
+  const handleWishlistToggle = () => {
     if (!product) return;
     try {
       const wishlist = getWishlist();
       if (wishlist.some((item) => item.id === product.id)) {
-        toast.info("Already in wishlist");
+        setWishlist(wishlist.filter((item) => item.id !== product.id));
+        setIsInWishlist(false);
+        toast.info("Removed from wishlist");
         return;
       }
       const slug = product?.slug || productSlug;
@@ -330,16 +332,69 @@ export default function ProductPageClient({ params }) {
             /
             <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
           </div>
-          <div className="border rounded-xl flex justify-center min-h-[200px] bg-gray-50">
+          <div className="relative border rounded-xl flex justify-center min-h-[200px] bg-gray-50 overflow-hidden">
             {(mainImg || displayImages[0]) ? (
-              <Image
-                src={mainImg || displayImages[0]}
-                width={400}
-                height={400}
-                alt="Watch"
-                className="object-contain w-full h-auto max-w-full sm:max-w-md md:max-w-lg"
-                unoptimized
-              />
+              <>
+                <Image
+                  src={mainImg || displayImages[0]}
+                  width={400}
+                  height={400}
+                  alt="Watch"
+                  className="object-contain w-full h-auto max-w-full sm:max-w-md md:max-w-lg"
+                  unoptimized
+                />
+                {!inStock ? (
+                  <div className="pointer-events-none absolute inset-x-0 top-3 z-10 flex justify-center px-3">
+                    <span className="rounded-full bg-red-600 px-4 py-2 text-center text-xs font-bold uppercase tracking-wider text-white shadow-lg">
+                      Out of stock
+                    </span>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleWishlistToggle}
+                    className={`absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full shadow-md ring-1 ring-black/10 transition hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 ${
+                      isInWishlist
+                        ? "bg-red-50 text-red-600"
+                        : "bg-white/95 text-gray-700 hover:bg-white"
+                    }`}
+                    aria-label={
+                      isInWishlist ? "Remove from wishlist" : "Add to wishlist"
+                    }
+                    title={
+                      isInWishlist ? "Remove from wishlist" : "Add to wishlist"
+                    }
+                  >
+                    {isInWishlist ? (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="h-6 w-6"
+                        aria-hidden
+                      >
+                        <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.004-.003.001a.75.75 0 01-.704 0l-.003-.001z" />
+                      </svg>
+                    ) : (
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        strokeWidth={1.75}
+                        stroke="currentColor"
+                        className="h-6 w-6"
+                        aria-hidden
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"
+                        />
+                      </svg>
+                    )}
+                  </button>
+                )}
+              </>
             ) : (
               <div className="w-full max-w-md h-64 flex items-center justify-center text-gray-400">No image</div>
             )}
@@ -472,11 +527,7 @@ export default function ProductPageClient({ params }) {
             )}
           </div>
 
-          {!inStock && (
-            <p className="mt-2 text-xs sm:text-sm font-medium text-red-500">OUT OF STOCK</p>
-          )}
-
-          {/* Add to Cart & Wishlist */}
+          {/* Add to Cart & Buy now */}
           <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
             <button
               type="button"
@@ -490,20 +541,6 @@ export default function ProductPageClient({ params }) {
                 <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
               </svg>
               <span>{addToCartLoading ? "Adding..." : "Add to Cart"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleAddToWishlist}
-              className={`px-5 py-2.5 border font-semibold rounded-lg transition-colors inline-flex items-center gap-2 ${
-                isInWishlist
-                  ? "border-red-500 text-red-600 bg-red-50"
-                  : "border-gray-300 hover:bg-gray-50"
-              }`}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M2 9.5a5.5 5.5 0 0 1 9.591-3.676.56.56 0 0 0 .818 0A5.49 5.49 0 0 1 22 9.5c0 2.29-1.5 4-3 5.5l-5.492 5.313a2 2 0 0 1-3 .019L5 15c-1.5-1.5-3-3.2-3-5.5" />
-              </svg>
-              <span>{isInWishlist ? "In Wishlist" : "Add to Wishlist"}</span>
             </button>
             <button
               type="button"
