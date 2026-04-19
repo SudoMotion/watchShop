@@ -7,7 +7,7 @@ import { getCart, setCart } from "@/lib/cartStorage";
 import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/component/Loading";
 import { ToastContainer, toast } from "react-toastify";
@@ -39,6 +39,34 @@ export default function ProductPageClient({ params }) {
   const [isInWishlist, setIsInWishlist] = useState(false);
   /** Show fixed CTA only after scrolling down (keeps inline buttons visible at top). */
   const [showFloatingCta, setShowFloatingCta] = useState(false);
+
+  const [reviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewOrderId, setReviewOrderId] = useState("");
+  const [reviewText, setReviewText] = useState("");
+  const [reviewStars, setReviewStars] = useState(0);
+  const [reviewHoverStar, setReviewHoverStar] = useState(0);
+
+  const closeReviewModal = useCallback(() => {
+    setReviewModalOpen(false);
+    setReviewOrderId("");
+    setReviewText("");
+    setReviewStars(0);
+    setReviewHoverStar(0);
+  }, []);
+
+  useEffect(() => {
+    if (!reviewModalOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") closeReviewModal();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [reviewModalOpen, closeReviewModal]);
 
   useEffect(() => {
     const getScrollThreshold = () =>
@@ -286,6 +314,27 @@ export default function ProductPageClient({ params }) {
     } finally {
       setBuyNowLoading(false);
     }
+  };
+
+  const handleReviewSubmit = (e) => {
+    e.preventDefault();
+    const order = String(reviewOrderId || "").trim();
+    const text = String(reviewText || "").trim();
+    if (!order) {
+      toast.error("Please enter your order ID.");
+      return;
+    }
+    if (reviewStars < 1 || reviewStars > 5) {
+      toast.error("Please select a star rating.");
+      return;
+    }
+    if (!text) {
+      toast.error("Please write your review.");
+      return;
+    }
+    // TODO: POST to your API when endpoint exists (order id, rating, text, product slug)
+    toast.success("Thank you! Your review has been submitted.");
+    closeReviewModal();
   };
 
   // Detect which section is in view
@@ -891,8 +940,8 @@ export default function ProductPageClient({ params }) {
       </div>
 
       {/* REVIEWS */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10 mb-8 sm:mb-12 md:mb-16">
-        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 text-center">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10">
+        <h3 className="mb-4 text-center text-base sm:mb-5 sm:text-lg md:text-xl font-semibold">
           Customer Reviews
         </h3>
         <div className="space-y-4 sm:space-y-5">
@@ -915,6 +964,15 @@ export default function ProductPageClient({ params }) {
               <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{review.comment}</p>
             </div>
           ))}
+        </div>
+        <div className="mt-8 flex justify-center sm:mt-10">
+          <button
+            type="button"
+            onClick={() => setReviewModalOpen(true)}
+            className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+          >
+            Write a review
+          </button>
         </div>
       </div>
 
@@ -943,6 +1001,133 @@ export default function ProductPageClient({ params }) {
             >
               <span className="truncate">{buyNowLoading ? "Processing..." : "Buy Now"}</span>
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Write a review modal */}
+      {reviewModalOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="review-modal-title"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+            onClick={closeReviewModal}
+            aria-label="Close review form"
+          />
+          <div
+            className="relative z-10 w-full max-w-lg rounded-2xl border border-gray-200 bg-white p-5 shadow-xl sm:p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mb-4 flex items-start justify-between gap-3">
+              <h4
+                id="review-modal-title"
+                className="text-lg font-semibold text-gray-900 sm:text-xl"
+              >
+                Write a review
+              </h4>
+              <button
+                type="button"
+                onClick={closeReviewModal}
+                className="rounded-full p-1.5 text-gray-500 transition hover:bg-gray-100 hover:text-gray-900"
+                aria-label="Close"
+              >
+                <span className="text-2xl leading-none" aria-hidden>
+                  ×
+                </span>
+              </button>
+            </div>
+            <form onSubmit={handleReviewSubmit} className="space-y-4">
+              <div>
+                <label
+                  htmlFor="review-order-id"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Order ID <span className="text-red-500">*</span>
+                </label>
+                <input
+                  id="review-order-id"
+                  type="text"
+                  name="orderId"
+                  autoComplete="off"
+                  placeholder="e.g. 12345"
+                  value={reviewOrderId}
+                  onChange={(e) => setReviewOrderId(e.target.value)}
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/20"
+                />
+              </div>
+              <div>
+                <span className="mb-1 block text-sm font-medium text-gray-700">
+                  Your rating <span className="text-red-500">*</span>
+                </span>
+                <div
+                  className="flex flex-wrap items-center gap-1"
+                  role="radiogroup"
+                  aria-label="Star rating"
+                >
+                  {[1, 2, 3, 4, 5].map((n) => {
+                    const active =
+                      n <=
+                      (reviewHoverStar > 0 ? reviewHoverStar : reviewStars);
+                    return (
+                      <button
+                        key={n}
+                        type="button"
+                        onClick={() => setReviewStars(n)}
+                        onMouseEnter={() => setReviewHoverStar(n)}
+                        onMouseLeave={() => setReviewHoverStar(0)}
+                        className="rounded p-0.5 text-2xl leading-none text-amber-400 transition hover:scale-110 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1"
+                        aria-label={`${n} star${n > 1 ? "s" : ""}`}
+                        aria-pressed={reviewStars === n}
+                      >
+                        {active ? "★" : "☆"}
+                      </button>
+                    );
+                  })}
+                  {reviewStars > 0 && (
+                    <span className="ml-1 text-sm text-gray-600">
+                      ({reviewStars}/5)
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div>
+                <label
+                  htmlFor="review-text"
+                  className="mb-1 block text-sm font-medium text-gray-700"
+                >
+                  Your review <span className="text-red-500">*</span>
+                </label>
+                <textarea
+                  id="review-text"
+                  name="review"
+                  rows={4}
+                  placeholder="Share your experience with this product..."
+                  value={reviewText}
+                  onChange={(e) => setReviewText(e.target.value)}
+                  className="w-full resize-y rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/20"
+                />
+              </div>
+              <div className="flex flex-col-reverse gap-2 pt-2 sm:flex-row sm:justify-end">
+                <button
+                  type="button"
+                  onClick={closeReviewModal}
+                  className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+                >
+                  Submit review
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
