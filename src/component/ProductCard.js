@@ -31,7 +31,7 @@ export default function ProductCard({ item }) {
         />
       </div>
       <Link href={`/product/${item.slug}`}>
-        <h3 className="font-medium">{item.name}</h3>
+        <h3 className="font-medium line-clamp-2">{item.name}</h3>
       </Link>
       <p className="text-sm text-gray-500">{item.brand?.name}</p>
       <p className="font-semibold">{item.price}</p>
