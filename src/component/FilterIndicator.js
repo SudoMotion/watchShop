@@ -132,17 +132,18 @@ export default function FilterIndicator({ filters, setFilters }) {
       chips.push({
         key: "band_type",
         id: `band_type:${key}`,
-        text: `Band: ${lab}`,
-        aria: `Band type ${lab}`,
+        text: `Band type: ${lab}`,
+        aria: `Remove band type filter ${lab}`,
       });
     });
 
   (f.brands || []).forEach((slug) => {
+    const name = brandNameBySlug(slug);
     chips.push({
       key: "brand",
       id: `brand:${slug}`,
-      text: `Brand: ${brandNameBySlug(slug)}`,
-      aria: `Brand ${brandNameBySlug(slug)}`,
+      text: `Watch brand: ${name}`,
+      aria: `Remove watch brand filter ${name}`,
     });
   });
 
