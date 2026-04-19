@@ -1,6 +1,7 @@
 'use client';
 
 import ProductCard2 from '@/component/ProductCard2';
+import FilterIndicator, { getActiveFilterChipCount } from '@/component/FilterIndicator';
 import ProductFilter from '@/component/ProductFilter';
 import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
 import { EmptyProducts } from '@/component/EmptyProducts';
@@ -27,6 +28,7 @@ export default function BrandPageClient({ brandId }) {
     filters,
     sortBy
   );
+  const activeFilterCount = getActiveFilterChipCount(filters);
   const bannerUrl = banner_img
     ? banner_img.startsWith('http')
       ? banner_img
@@ -96,22 +98,29 @@ export default function BrandPageClient({ brandId }) {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:mt-4 px-2 mt-2">
         <ProductFilter brandId={brandId} filters={filters} setFilters={setFilters} />
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mb-4">
-            <label htmlFor="brand-sort" className="text-sm font-medium text-gray-700 shrink-0">
-              Sort by
-            </label>
-            <select
-              id="brand-sort"
-              value={sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="w-full sm:w-64 px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-black focus:border-transparent"
-            >
-              {SORT_OPTIONS.map((opt) => (
-                <option key={opt.value || 'default'} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+          <div
+            className={`mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${
+              activeFilterCount > 0 ? 'sm:justify-between' : 'sm:justify-end'
+            }`}
+          >
+            <FilterIndicator filters={filters} setFilters={setFilters} />
+            <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[14rem] sm:shrink-0 sm:flex-row sm:items-center">
+              <label htmlFor="brand-sort" className="text-sm font-medium text-gray-700 shrink-0">
+                Sort by
+              </label>
+              <select
+                id="brand-sort"
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm bg-white focus:ring-2 focus:ring-black focus:border-transparent sm:w-64"
+              >
+                {SORT_OPTIONS.map((opt) => (
+                  <option key={opt.value || 'default'} value={opt.value}>
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
           {error && (
             <p className="text-sm text-red-600 mb-3">{error}</p>
