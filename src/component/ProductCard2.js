@@ -1,6 +1,7 @@
 import { Backend_Base_Url } from "@/config";
 import Image from "next/image";
 import Link from "next/link";
+import ProductCardWishlistOverlay from "@/component/ProductCardWishlistOverlay";
 
 // Base64 encoded SVG for blur placeholder
 const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
@@ -27,34 +28,61 @@ export default function ProductCard2({ item }) {
   const hoverImage = item.image2 || item.otherimage || item.image || "";
   const mainImageSrc = mainImage.startsWith("http") ? mainImage : Backend_Base_Url + "/" + productImagePath(mainImage);
   const hoverImageSrc = hoverImage.startsWith("http") ? hoverImage : Backend_Base_Url + "/" + productImagePath(hoverImage);
+  const hasHoverSwap = Boolean(hoverImage && hoverImage !== mainImage);
 
   return (
     <div className="flex flex-col gap-y-2 items-center text-center">
-      <Link href={`/product/${item.slug}`} className="group relative rounded-md overflow-hidden bg-white w-full aspect-square min-h-64">
-        {item.discount && <div className="absolute top-0 right-0 bg-red-500 text-white px-2 py-1 rounded-br-md z-10">{item.discount}</div>}
+      <div className="group relative w-full aspect-square min-h-64 overflow-hidden rounded-md bg-white">
+        <Link
+          href={`/product/${item.slug}`}
+          className="absolute inset-0 z-0 block"
+          aria-label={item.name || item.meta_title || "View product"}
+        >
+          {mainImage && (
+            <Image
+              src={mainImageSrc}
+              alt={item.meta_title || item.name || "Product"}
+              fill
+              className={
+                hasHoverSwap
+                  ? "absolute inset-0 scale-100 object-cover transition-all duration-300 group-hover:scale-105 group-hover:opacity-0"
+                  : "absolute inset-0 scale-100 object-cover transition-all duration-300 group-hover:scale-105"
+              }
+              placeholder="blur"
+              blurDataURL={blurSvg}
+              sizes="(max-width: 768px) 50vw, 33vw"
+            />
+          )}
+          {hasHoverSwap && (
+            <Image
+              src={hoverImageSrc}
+              alt={item.meta_title || item.name || "Product"}
+              fill
+              className="absolute inset-0 scale-100 object-cover opacity-0 transition-all duration-1000 group-hover:scale-105 group-hover:opacity-100"
+              placeholder="blur"
+              blurDataURL={blurSvg}
+              sizes="(max-width: 768px) 50vw, 33vw"
+            />
+          )}
+          {!mainImage && (
+            <div className="flex h-full min-h-[200px] w-full items-center justify-center bg-gray-100 text-xs text-gray-400">
+              No image
+            </div>
+          )}
+        </Link>
+        {item.discount && (
+          <div className="absolute left-2 top-2 z-[5] rounded-md bg-red-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
+            {item.discount}% Off
+          </div>
+        )}
         {mainImage && (
-          <Image
-            src={mainImageSrc}
-            alt={item.meta_title || item.name || "Product"}
-            fill
-            className="object-cover scale-100 group-hover:scale-105 transition-all duration-300 group-hover:hidden absolute inset-0"
-            placeholder="blur"
-            blurDataURL={blurSvg}
-            sizes="(max-width: 768px) 50vw, 33vw"
+          <ProductCardWishlistOverlay
+            item={item}
+            mainImageUrl={mainImageSrc}
+            hoverImageUrl={hoverImageSrc}
           />
         )}
-        {hoverImage && hoverImage !== mainImage && (
-          <Image
-            src={hoverImageSrc}
-            alt={item.meta_title || item.name || "Product"}
-            fill
-            className="object-cover scale-100 group-hover:scale-105 transition-all duration-[1000ms] group-hover:opacity-100 opacity-0 absolute inset-0"
-            placeholder="blur"
-            blurDataURL={blurSvg}
-            sizes="(max-width: 768px) 50vw, 33vw"
-          />
-        )}
-      </Link>
+      </div>
       <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg line-clamp-2">{item.name}</Link>
       <div className="flex items-center justify-center gap-x-2 text-base md:text-lg font-semibold">
       <p className="line-through text-gray-500">{item.price}</p>
