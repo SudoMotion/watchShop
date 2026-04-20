@@ -45,6 +45,7 @@ export default function ProductPageClient({ params }) {
   const [reviewText, setReviewText] = useState("");
   const [reviewStars, setReviewStars] = useState(0);
   const [reviewHoverStar, setReviewHoverStar] = useState(0);
+  const [showAllReviews, setShowAllReviews] = useState(false);
 
   const closeReviewModal = useCallback(() => {
     setReviewModalOpen(false);
@@ -157,6 +158,8 @@ export default function ProductPageClient({ params }) {
     totalReviews > 0
       ? mockReviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
       : 0;
+  const visibleReviews = showAllReviews ? mockReviews : mockReviews.slice(0, 3);
+  const hasMoreReviews = mockReviews.length > 3;
   const productItem = productData?.productItem || product?.productItem || [];
   const brand = product?.brand || null;
   const category = product?.category || null;
@@ -945,7 +948,7 @@ export default function ProductPageClient({ params }) {
           Customer Reviews
         </h3>
         <div className="space-y-4 sm:space-y-5">
-          {mockReviews.map((review) => (
+          {visibleReviews.map((review) => (
             <div
               key={review.id}
               className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 shadow-sm"
@@ -965,6 +968,17 @@ export default function ProductPageClient({ params }) {
             </div>
           ))}
         </div>
+        {!showAllReviews && hasMoreReviews && (
+          <div className="mt-6 flex justify-center">
+            <button
+              type="button"
+              onClick={() => setShowAllReviews(true)}
+              className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
+            >
+              Show more reviews
+            </button>
+          </div>
+        )}
         <div className="mt-8 flex justify-center sm:mt-10">
           <button
             type="button"
