@@ -38,7 +38,7 @@ export default function SecoundaryProductSlider() {
 
   if (!mounted) {
     return (
-      <section className="relative w-full h-screen bg-black" />
+      <section className="relative w-full h-screen lg:h-[120vh] bg-black" />
     );
   }
 
