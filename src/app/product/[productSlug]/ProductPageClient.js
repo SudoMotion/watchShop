@@ -594,45 +594,38 @@ export default function ProductPageClient({ params }) {
           )}
 
           {/* EMI Section */}
-          <div className="mt-3 sm:mt-4 border rounded-xl p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-            {isEmiAvailable ? (
-              <>
-                <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                  <span className="font-semibold text-xs sm:text-sm text-gray-800">EMI Available</span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2 sm:mt-3">
-                  {/* 3 Months EMI */}
-                  <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
-                    <div className="text-xs text-gray-600 mb-1">3 Months EMI</div>
-                    <div className="text-base sm:text-lg font-bold text-indigo-600">
-                      ৳{emi3Months.toLocaleString('en-US')}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">per month</div>
-                  </div>
-
-                  {/* 6 Months EMI */}
-                  <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
-                    <div className="text-xs text-gray-600 mb-1">6 Months EMI</div>
-                    <div className="text-base sm:text-lg font-bold text-indigo-600">
-                      ৳{emi6Months.toLocaleString('en-US')}
-                    </div>
-                    <div className="text-xs text-gray-500 mt-1">per month</div>
-                  </div>
-                </div>
-
-                <p className="text-xs text-gray-600 mt-2 sm:mt-3 text-center">
-                  Interest rate: 0% | Terms & conditions apply
-                </p>
-              </>
-            ) : (
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                <span className="font-semibold text-xs sm:text-sm text-gray-600">EMI Not Available</span>
+          {isEmiAvailable && (
+            <div className="mt-3 sm:mt-4 border rounded-xl p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
+              <div className="flex items-center gap-2 mb-2 sm:mb-3">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="font-semibold text-xs sm:text-sm text-gray-800">EMI Available</span>
               </div>
-            )}
-          </div>
+
+              <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2 sm:mt-3">
+                {/* 3 Months EMI */}
+                <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="text-xs text-gray-600 mb-1">3 Months EMI</div>
+                  <div className="text-base sm:text-lg font-bold text-indigo-600">
+                    ৳{emi3Months.toLocaleString('en-US')}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">per month</div>
+                </div>
+
+                {/* 6 Months EMI */}
+                <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
+                  <div className="text-xs text-gray-600 mb-1">6 Months EMI</div>
+                  <div className="text-base sm:text-lg font-bold text-indigo-600">
+                    ৳{emi6Months.toLocaleString('en-US')}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">per month</div>
+                </div>
+              </div>
+
+              <p className="text-xs text-gray-600 mt-2 sm:mt-3 text-center">
+                Interest rate: 0% | Terms & conditions apply
+              </p>
+            </div>
+          )}
 
           {/* Inline Add to Cart & Buy Now — fixed bar appears after 500px scroll */}
           <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
