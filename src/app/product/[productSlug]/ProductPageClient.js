@@ -116,10 +116,32 @@ export default function ProductPageClient({ params }) {
   const movementRef = useRef(null);
 
   const product = productData?.product ?? null;
-  const sellingPriceNum = Number(
-    product?.selling_price || product?.discount_price || product?.price || 0
-  );
-  const originalPriceNum = Number(product?.price || sellingPriceNum);
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  const originalPriceNum = toNum(product?.price);
+  const discountPriceNum = toNum(product?.discount_price || product?.after_discount_price);
+  const sellingPriceRaw = toNum(product?.selling_price);
+  const sellingPriceNum =
+    discountPriceNum > 0
+      ? discountPriceNum
+      : sellingPriceRaw > 0
+      ? sellingPriceRaw
+      : originalPriceNum;
+  const apiDiscountPercent = toNum(product?.discount);
+  const discountPercent =
+    apiDiscountPercent > 0
+      ? apiDiscountPercent
+      : originalPriceNum > sellingPriceNum && originalPriceNum > 0
+      ? ((originalPriceNum - sellingPriceNum) / originalPriceNum) * 100
+      : 0;
+  const discountPercentText =
+    discountPercent > 0
+      ? Number.isInteger(discountPercent)
+        ? String(discountPercent)
+        : discountPercent.toFixed(2)
+      : "0";
   const isEmiAvailable = product?.is_emi_available === "1";
   const inStock = Number(product?.quantity || 0) > 0;
 
@@ -530,39 +552,45 @@ export default function ProductPageClient({ params }) {
             {product?.name || product?.meta_title || "Product"}
           </h1>
 
-          <div className="mt-2 sm:mt-3 flex items-baseline gap-2 sm:gap-3">
-            {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
-              <span className="line-through text-xs sm:text-sm text-gray-500">
-                ৳{originalPriceNum.toLocaleString("en-BD")}
-              </span>
-            )}
-            {sellingPriceNum > 0 && (
-              <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl">
-                ৳{sellingPriceNum.toLocaleString("en-BD")}
-              </span>
+          <div className="mt-2 sm:mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
+              {sellingPriceNum > 0 && (
+                <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl">
+                  BDT {sellingPriceNum.toLocaleString("en-BD")}
+                </span>
+              )}
+              {discountPercent > 0 && (
+                <span className="text-xs sm:text-sm font-medium text-red-700">
+                  {discountPercentText}% off
+                </span>
+              )}
+              {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
+                <del className="text-xs sm:text-sm text-gray-500">
+                  BDT {originalPriceNum.toLocaleString("en-BD")}
+                </del>
+              )}
+            </div>
+            {totalReviews > 0 && (
+              <div className="flex items-center gap-2 sm:justify-end">
+                <div className="flex items-center text-amber-500 text-sm">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <span
+                      key={star}
+                      className={star <= Math.round(averageRating) ? "text-amber-500" : "text-gray-300"}
+                    >
+                      ★
+                    </span>
+                  ))}
+                </div>
+                <span className="text-xs sm:text-sm text-gray-600">
+                  {averageRating.toFixed(1)} ({totalReviews} reviews)
+                </span>
+              </div>
             )}
           </div>
 
           {modelText && (
             <p className="text-xs sm:text-sm mt-1">Model: {modelText}</p>
-          )}
-
-          {totalReviews > 0 && (
-            <div className="flex items-center gap-2 mt-2">
-              <div className="flex items-center text-amber-500 text-sm">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <span
-                    key={star}
-                    className={star <= Math.round(averageRating) ? "text-amber-500" : "text-gray-300"}
-                  >
-                    ★
-                  </span>
-                ))}
-              </div>
-              <span className="text-xs sm:text-sm text-gray-600">
-                {averageRating.toFixed(1)} ({totalReviews} reviews)
-              </span>
-            </div>
           )}
 
           {/* EMI Section */}
