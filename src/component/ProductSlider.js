@@ -17,7 +17,6 @@ export default function ProductSlider({
     640: { slidesPerView: 2, spaceBetween: 16 },
     768: { slidesPerView: 3, spaceBetween: 16 },
     1024: { slidesPerView: 4, spaceBetween: 24 },
-    1280: { slidesPerView: 5, spaceBetween: 24 },
   },
   showNavigation = true,
 }) {
