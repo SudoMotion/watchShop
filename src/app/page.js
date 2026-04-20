@@ -28,7 +28,6 @@ export default async function page() {
     <div>
       <HeroSlider/>
       <DynamicSection/>
-      <SectionArea/>
       <div className='py-10 bg-gray-50 px-2'>
         <div className='max-w-7xl mx-auto'>
           <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
@@ -71,6 +70,7 @@ export default async function page() {
           <a href="#">More</a>
         </div>
       </div>
+      <SectionArea/>
       <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
         <SecoundaryProductSlider/>
         <RecomendedProducts/>
