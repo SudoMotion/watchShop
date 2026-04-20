@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useEffect, useId, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import ProductCard2 from "@/component/ProductCard2";
@@ -20,11 +20,32 @@ export default function ProductSlider({
   },
   showNavigation = true,
 }) {
+  const [isMounted, setIsMounted] = useState(false);
   const id = sliderId ?? useId().replace(/:/g, "");
   const prevEl = `${id}-prev`;
   const nextEl = `${id}-next`;
 
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
   if (!items?.length) return null;
+  if (!isMounted) {
+    return (
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={`${id}-skeleton-${index}`}
+            className="rounded-xl border border-gray-200 bg-white p-3"
+          >
+            <div className="aspect-square w-full rounded-lg bg-gray-200 animate-pulse" />
+            <div className="mt-3 h-4 w-3/4 rounded bg-gray-200 animate-pulse" />
+            <div className="mt-2 h-4 w-1/2 rounded bg-gray-200 animate-pulse" />
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <>
