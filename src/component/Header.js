@@ -11,6 +11,7 @@ export default function Header() {
   
   const [open, setOpen] = useState(false); // search modal
   const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -129,16 +130,36 @@ export default function Header() {
 
   useEffect(() => {
     const search = String(searchQuery || '').trim();
-    if (!search) return;
+    if (!search) {
+      setSearchResults([]);
+      return;
+    }
+    let cancelled = false;
     const fetchSearch = async () => {
       try {
         const response = await postSearchProducts({ search });
         console.log('Search response realtime:', response.data);
+        const products = Array.isArray(response?.data)
+          ? response.data
+          : Array.isArray(response)
+            ? response
+            : Array.isArray(response?.products)
+              ? response.products
+              : [];
+        if (!cancelled) {
+          setSearchResults(products);
+        }
       } catch (error) {
         console.log('Search response realtime error:', error);
+        if (!cancelled) {
+          setSearchResults([]);
+        }
       }
     };
     fetchSearch();
+    return () => {
+      cancelled = true;
+    };
   }, [searchQuery]);
 
   return (
@@ -310,6 +331,8 @@ export default function Header() {
               searchRef={searchRef}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
+              searchResults={searchResults}
+              onResultClick={() => setOpen(false)}
             />
 
             {/* Mobile search toggle (first icon on mobile) */}
