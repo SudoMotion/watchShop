@@ -264,6 +264,15 @@ export const getAllProductSlugs = async (slug) => {
 
   return slugs;
 };
+export const postSearchProducts = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/product/get', 'POST', body);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
 
 export default {
   getMensProducts,
@@ -281,4 +290,5 @@ export default {
   getNewArrivalProducts,
   getProductBySlug,
   getAllProductSlugs,
+  postSearchProducts,
 };
