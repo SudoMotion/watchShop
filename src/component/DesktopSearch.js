@@ -1,6 +1,13 @@
 import React from "react";
 
-export default function DesktopSearch({ open, setOpen, onTransparent, searchRef }) {
+export default function DesktopSearch({
+  open,
+  setOpen,
+  onTransparent,
+  searchRef,
+  searchQuery,
+  setSearchQuery,
+}) {
   return (
     <div className="relative" ref={searchRef}>
       {!open && (
@@ -26,8 +33,17 @@ export default function DesktopSearch({ open, setOpen, onTransparent, searchRef 
         </button>
       )}
       {open && (
-        <form className="mt-1 rounded-md border border-gray-200 bg-white p-2 z-50 flex items-center gap-x-2 min-w-[200px]">
-          <input type="text" name="" id="" placeholder="Search for products" className="w-full outline-none text-gray-900" />
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className="mt-1 rounded-md border border-gray-200 bg-white p-2 z-50 flex items-center gap-x-2 min-w-[200px]"
+        >
+          <input
+            type="text"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search for products"
+            className="w-full outline-none text-gray-900"
+          />
           <svg
             className="w-5 h-5 shrink-0 text-gray-500"
             fill="none"

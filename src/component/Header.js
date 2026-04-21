@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 import { isLoggedIn } from '@/lib/auth';
-import { getCategories } from '@/stores/ProductAPI';
+import { getCategories, postSearchProducts } from '@/stores/ProductAPI';
 import DesktopSearch from './DesktopSearch';
 
 export default function Header() {
@@ -127,11 +127,19 @@ export default function Header() {
     fetchCategories();
   }, []);
 
-  const handleSearch = (e) => {
-    e.preventDefault();
-    // Handle search functionality
-    console.log('Searching for:', searchQuery);
-  };
+  useEffect(() => {
+    const search = String(searchQuery || '').trim();
+    if (!search) return;
+    const fetchSearch = async () => {
+      try {
+        const response = await postSearchProducts({ search });
+        console.log('Search response realtime:', response.data);
+      } catch (error) {
+        console.log('Search response realtime error:', error);
+      }
+    };
+    fetchSearch();
+  }, [searchQuery]);
 
   return (
   <header ref={headerRef} className={`${isHome ? 'md:fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
@@ -300,6 +308,8 @@ export default function Header() {
               setOpen={setOpen}
               onTransparent={onTransparent}
               searchRef={searchRef}
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
             />
 
             {/* Mobile search toggle (first icon on mobile) */}
