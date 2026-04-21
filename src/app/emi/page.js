@@ -1,4 +1,5 @@
 import Link from "next/link";
+import EmiCalculator from "@/component/EmiCalculator";
 
 export const metadata = {
   title: "EMI Plan",
@@ -102,6 +103,8 @@ export default function EmiPage() {
             </ul>
           </InfoCard>
         </div>
+
+        <EmiCalculator />
 
         <div className="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-5 sm:p-6">
           <h2 className="text-lg font-semibold text-gray-900">
