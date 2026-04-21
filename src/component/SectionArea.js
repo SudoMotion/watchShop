@@ -7,7 +7,7 @@ import ProductSlider from './ProductSlider';
 export default async function SectionArea() {
     const response = await getSections();
     const sections = response?.sections ?? [];
-
+    
     const isSliderEnabled = (section) => {
         const flag = section?.is_slider ?? section?.is_slide;
         if (typeof flag === "boolean") return flag;
@@ -15,6 +15,7 @@ export default async function SectionArea() {
         const normalized = String(flag ?? "").trim().toLowerCase();
         return normalized === "yes" || normalized === "true" || normalized === "1";
     };
+    if (sections.length === 0) return null;
   return (
     <div className='max-w-7xl mx-auto px-2 md:px-0 flex flex-col gap-y-16 md:gap-y-20 py-10 md:py-16'>
         {
