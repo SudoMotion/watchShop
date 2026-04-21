@@ -78,12 +78,12 @@ export default function BrandPageClient({ brandId }) {
 
   return (
     <div>
-      <div className="relative h-44 md:h-56 flex items-center justify-center overflow-hidden bg-gray-100">
+      <div className="relative flex items-center justify-center overflow-hidden bg-gray-100">
         {displayBannerUrl && (
           <img
             src={displayBannerUrl}
             alt={`${brandId} banner`}
-            className="absolute inset-0 h-full w-full object-contain"
+            className="inset-0 h-full w-full object-contain"
             loading="eager"
             decoding="async"
           />
@@ -91,7 +91,7 @@ export default function BrandPageClient({ brandId }) {
         {!bannerLoaded && (
           <div className="absolute inset-0 animate-pulse bg-gray-200" />
         )}
-        <div className="relative z-10 text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
+        <div className="absolute z-10 text-3xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
           <span className="capitalize">{brandId}</span>
         </div>
       </div>
