@@ -8,6 +8,20 @@ import { NEXT_PUBLIC_API_URL } from "@/config";
 
 const STORAGE_KEY = "watchshop_popup_dismissed";
 
+function getSessionDismissed() {
+  if (typeof document === "undefined") return false;
+  return document.cookie
+    .split(";")
+    .map((c) => c.trim())
+    .some((c) => c === `${STORAGE_KEY}=1`);
+}
+
+function setSessionDismissed() {
+  if (typeof document === "undefined") return;
+  // Session cookie: cleared when browser session ends.
+  document.cookie = `${STORAGE_KEY}=1; path=/; SameSite=Lax`;
+}
+
 function popupImageSrc(path) {
   if (!path || typeof path !== "string") return "";
   const t = path.trim();
@@ -39,7 +53,7 @@ export default function Popup() {
 
   const dismiss = useCallback(() => {
     try {
-      sessionStorage.setItem(STORAGE_KEY, "1");
+      setSessionDismissed();
     } catch (_) {}
     setOpen(false);
   }, []);
@@ -48,7 +62,7 @@ export default function Popup() {
     let cancelled = false;
     (async () => {
       try {
-        if (sessionStorage.getItem(STORAGE_KEY) === "1") return;
+        if (getSessionDismissed()) return;
         const data = await getPopup();
         if (cancelled || !data) return;
         if (data.active === false || data.enabled === false || data.status === false) return;
