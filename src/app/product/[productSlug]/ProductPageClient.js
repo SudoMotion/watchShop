@@ -595,35 +595,19 @@ export default function ProductPageClient({ params }) {
 
           {/* EMI Section */}
           {isEmiAvailable && (
-            <div className="mt-3 sm:mt-4 border rounded-xl p-3 sm:p-4 bg-gradient-to-br from-blue-50 to-indigo-50">
-              <div className="flex items-center gap-2 mb-2 sm:mb-3">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="font-semibold text-xs sm:text-sm text-gray-800">EMI Available</span>
+            <div className="mt-3 sm:mt-4 flex items-center justify-between gap-3 rounded-xl border bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-4">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                  EMI Available
+                </span>
               </div>
-
-              <div className="grid grid-cols-2 gap-2 sm:gap-3 mt-2 sm:mt-3">
-                {/* 3 Months EMI */}
-                <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-xs text-gray-600 mb-1">3 Months EMI</div>
-                  <div className="text-base sm:text-lg font-bold text-indigo-600">
-                    ৳{emi3Months.toLocaleString('en-US')}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">per month</div>
-                </div>
-
-                {/* 6 Months EMI */}
-                <div className="bg-white rounded-lg p-2 sm:p-3 border border-gray-200 hover:shadow-md transition-shadow">
-                  <div className="text-xs text-gray-600 mb-1">6 Months EMI</div>
-                  <div className="text-base sm:text-lg font-bold text-indigo-600">
-                    ৳{emi6Months.toLocaleString('en-US')}
-                  </div>
-                  <div className="text-xs text-gray-500 mt-1">per month</div>
-                </div>
-              </div>
-
-              <p className="text-xs text-gray-600 mt-2 sm:mt-3 text-center">
-                Interest rate: 0% | Terms & conditions apply
-              </p>
+              <Link
+                href="/emi"
+                className="text-xs sm:text-sm font-semibold text-indigo-700 underline underline-offset-2 hover:text-indigo-900"
+              >
+                View plan
+              </Link>
             </div>
           )}
 
