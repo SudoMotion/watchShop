@@ -5,6 +5,8 @@ import { NEXT_PUBLIC_API_URL } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
 import { getCart, setCart } from "@/lib/cartStorage";
 import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
+import { getCustomer, isLoggedIn } from "@/lib/auth";
+import { submitReview } from "@/stores/ReviewsAPI";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect, useCallback } from "react";
@@ -41,15 +43,15 @@ export default function ProductPageClient({ params }) {
   const [showFloatingCta, setShowFloatingCta] = useState(false);
 
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
-  const [reviewOrderId, setReviewOrderId] = useState("");
   const [reviewText, setReviewText] = useState("");
   const [reviewStars, setReviewStars] = useState(0);
   const [reviewHoverStar, setReviewHoverStar] = useState(0);
+  const [reviewSubmitting, setReviewSubmitting] = useState(false);
+  const [reviewLoginPromptOpen, setReviewLoginPromptOpen] = useState(false);
   const [showAllReviews, setShowAllReviews] = useState(false);
 
   const closeReviewModal = useCallback(() => {
     setReviewModalOpen(false);
-    setReviewOrderId("");
     setReviewText("");
     setReviewStars(0);
     setReviewHoverStar(0);
@@ -341,14 +343,15 @@ export default function ProductPageClient({ params }) {
     }
   };
 
-  const handleReviewSubmit = (e) => {
+  const handleReviewSubmit = async (e) => {
     e.preventDefault();
-    const order = String(reviewOrderId || "").trim();
-    const text = String(reviewText || "").trim();
-    if (!order) {
-      toast.error("Please enter your order ID.");
+    if (reviewSubmitting) return;
+    if (!isLoggedIn()) {
+      setReviewModalOpen(false);
+      setReviewLoginPromptOpen(true);
       return;
     }
+    const text = String(reviewText || "").trim();
     if (reviewStars < 1 || reviewStars > 5) {
       toast.error("Please select a star rating.");
       return;
@@ -357,9 +360,47 @@ export default function ProductPageClient({ params }) {
       toast.error("Please write your review.");
       return;
     }
-    // TODO: POST to your API when endpoint exists (order id, rating, text, product slug)
-    toast.success("Thank you! Your review has been submitted.");
-    closeReviewModal();
+    const customer = getCustomer();
+    const name = String(customer?.name || "").trim();
+    const email = String(customer?.email || "").trim();
+    if (!name || !email) {
+      toast.error("Customer name/email not found. Please log in first.");
+      return;
+    }
+    const payload = {
+      product_id: product?.id,
+      rate: reviewStars,
+      customer_id: customer?.id ?? null,
+      name,
+      email,
+      review: text,
+    };
+    setReviewSubmitting(true);
+    try {
+      const response = await submitReview(payload);
+      if (response?.status >= 200 && response?.status < 300) {
+        toast.success(response?.data?.message || "Thank you! Your review has been submitted.");
+        closeReviewModal();
+      } else {
+        const msg =
+          response?.data?.message ||
+          response?.data?.error ||
+          "Could not submit your review. Please try again.";
+        toast.error(msg);
+      }
+    } catch {
+      toast.error("Could not submit your review. Please try again.");
+    } finally {
+      setReviewSubmitting(false);
+    }
+  };
+
+  const handleOpenReview = () => {
+    if (!isLoggedIn()) {
+      setReviewLoginPromptOpen(true);
+      return;
+    }
+    setReviewModalOpen(true);
   };
 
   // Detect which section is in view
@@ -987,7 +1028,7 @@ export default function ProductPageClient({ params }) {
         <div className="mt-8 flex justify-center sm:mt-10">
           <button
             type="button"
-            onClick={() => setReviewModalOpen(true)}
+            onClick={handleOpenReview}
             className="rounded-lg border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-800 shadow-sm transition hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2"
           >
             Write a review
@@ -1062,24 +1103,6 @@ export default function ProductPageClient({ params }) {
             </div>
             <form onSubmit={handleReviewSubmit} className="space-y-4">
               <div>
-                <label
-                  htmlFor="review-order-id"
-                  className="mb-1 block text-sm font-medium text-gray-700"
-                >
-                  Order ID <span className="text-red-500">*</span>
-                </label>
-                <input
-                  id="review-order-id"
-                  type="text"
-                  name="orderId"
-                  autoComplete="off"
-                  placeholder="e.g. 12345"
-                  value={reviewOrderId}
-                  onChange={(e) => setReviewOrderId(e.target.value)}
-                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-black focus:outline-none focus:ring-2 focus:ring-black/20"
-                />
-              </div>
-              <div>
                 <span className="mb-1 block text-sm font-medium text-gray-700">
                   Your rating <span className="text-red-500">*</span>
                 </span>
@@ -1135,18 +1158,69 @@ export default function ProductPageClient({ params }) {
                 <button
                   type="button"
                   onClick={closeReviewModal}
+                  disabled={reviewSubmitting}
                   className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
+                  disabled={reviewSubmitting}
                   className="rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
                 >
-                  Submit review
+                  {reviewSubmitting ? "Submitting..." : "Submit review"}
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {reviewLoginPromptOpen && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="review-login-modal-title"
+        >
+          <button
+            type="button"
+            className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
+            onClick={() => setReviewLoginPromptOpen(false)}
+            aria-label="Close login prompt"
+          />
+          <div
+            className="relative z-10 w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl sm:p-6"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h4
+              id="review-login-modal-title"
+              className="text-lg font-semibold text-gray-900 sm:text-xl"
+            >
+              Login required
+            </h4>
+            <p className="mt-2 text-sm text-gray-600">
+              Login to place review.
+            </p>
+            <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={() => setReviewLoginPromptOpen(false)}
+                className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setReviewLoginPromptOpen(false);
+                  router.push("/login");
+                }}
+                className="rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
+              >
+                Login
+              </button>
+            </div>
           </div>
         </div>
       )}
