@@ -1,4 +1,5 @@
 const WISHLIST_KEY = "watchshop_wishlist";
+const WISHLIST_EVENT = "watchshop:wishlist-updated";
 
 export function getWishlist() {
   if (typeof sessionStorage === "undefined") return [];
@@ -15,6 +16,14 @@ export function getWishlist() {
 export function setWishlist(items) {
   if (typeof sessionStorage === "undefined") return;
   try {
-    sessionStorage.setItem(WISHLIST_KEY, JSON.stringify(Array.isArray(items) ? items : []));
+    const nextItems = Array.isArray(items) ? items : [];
+    sessionStorage.setItem(WISHLIST_KEY, JSON.stringify(nextItems));
+    if (typeof window !== "undefined") {
+      window.dispatchEvent(
+        new CustomEvent(WISHLIST_EVENT, {
+          detail: { count: nextItems.length },
+        })
+      );
+    }
   } catch (_) {}
 }

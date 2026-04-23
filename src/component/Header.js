@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 import { isLoggedIn } from '@/lib/auth';
+import { getWishlist } from '@/lib/wishlistStorage';
 import { getCategories, postSearchProducts } from '@/stores/ProductAPI';
 import DesktopSearch from './DesktopSearch';
 
@@ -19,6 +20,7 @@ export default function Header() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
+  const [wishlistCount, setWishlistCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
   const isHome = pathname === '/';
@@ -78,7 +80,25 @@ export default function Header() {
   
   // Mock data - in real app, get from context/state
   const cartCount = 0;
-  const wishlistCount = 0;
+
+  useEffect(() => {
+    const syncWishlistCount = (event) => {
+      if (event?.detail?.count != null) {
+        setWishlistCount(Number(event.detail.count) || 0);
+        return;
+      }
+      setWishlistCount(getWishlist().length);
+    };
+    syncWishlistCount();
+    window.addEventListener("focus", syncWishlistCount);
+    document.addEventListener("visibilitychange", syncWishlistCount);
+    window.addEventListener("watchshop:wishlist-updated", syncWishlistCount);
+    return () => {
+      window.removeEventListener("focus", syncWishlistCount);
+      document.removeEventListener("visibilitychange", syncWishlistCount);
+      window.removeEventListener("watchshop:wishlist-updated", syncWishlistCount);
+    };
+  }, [pathname]);
 
   const [categories, setCategories] = useState([]);
   const [navigationItems, setNavigationItems] = useState([]);
