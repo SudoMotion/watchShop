@@ -170,20 +170,26 @@ export default function ProductPageClient({ params }) {
   const authentics = productData?.authentics ?? [];
   const related = productData?.related ?? [];
 
-  const mockReviews = [
-    { id: 1, name: "Rahim Khan", rating: 4.5, comment: "Great watch, looks exactly as shown. Delivery was fast and packaging was secure. Very satisfied with the purchase." },
-    { id: 2, name: "Sara Ahmed", rating: 5.0, comment: "Excellent quality and finish. The strap is comfortable and the dial is easy to read. Would definitely buy again from WatchShop BD." },
-    { id: 3, name: "Karim Hossain", rating: 4.0, comment: "Good value for money. Only minor issue was the clasp took a few days to break in, but now it's perfect." },
-    { id: 4, name: "Fatima Islam", rating: 4.8, comment: "Beautiful timepiece! Gifted it to my husband and he loves it. Authentic and well-packaged. Highly recommend." },
-    { id: 5, name: "Tariq Mahmud", rating: 3.5, comment: "Decent watch for the price. Keeps time well. Would have given 5 stars if the box had been a bit sturdier." },
-  ];
-  const totalReviews = mockReviews.length;
+  const rawReviewList = productData?.reviewList || product?.reviewList || [];
+  const reviewList = Array.isArray(rawReviewList)
+    ? rawReviewList.map((review) => {
+        const rating = Number(review?.rate || 0);
+        return {
+          id: review?.id,
+          name: String(review?.name || "Anonymous"),
+          rating: Number.isFinite(rating) ? Math.max(0, Math.min(5, rating)) : 0,
+          comment: String(review?.review || "").trim(),
+          createdAt: review?.created_at,
+        };
+      })
+    : [];
+  const totalReviews = reviewList.length;
   const averageRating =
     totalReviews > 0
-      ? mockReviews.reduce((sum, review) => sum + review.rating, 0) / totalReviews
+      ? reviewList.reduce((sum, review) => sum + review.rating, 0) / totalReviews
       : 0;
-  const visibleReviews = showAllReviews ? mockReviews : mockReviews.slice(0, 3);
-  const hasMoreReviews = mockReviews.length > 3;
+  const visibleReviews = showAllReviews ? reviewList : reviewList.slice(0, 3);
+  const hasMoreReviews = reviewList.length > 3;
   const productItem = productData?.productItem || product?.productItem || [];
   const brand = product?.brand || null;
   const category = product?.category || null;
@@ -1009,10 +1015,24 @@ export default function ProductPageClient({ params }) {
                   ))}
                   <span className="text-sm text-gray-500 ml-1">({review.rating})</span>
                 </span>
+                {review.createdAt && (
+                  <span className="text-xs text-gray-500">
+                    {new Date(review.createdAt).toLocaleDateString("en-BD", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                  </span>
+                )}
               </div>
               <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{review.comment}</p>
             </div>
           ))}
+          {visibleReviews.length === 0 && (
+            <div className="rounded-lg border border-dashed border-gray-300 bg-white p-5 text-center text-sm text-gray-600 sm:text-base">
+              No reviews yet. Be the first to write a review.
+            </div>
+          )}
         </div>
         {!showAllReviews && hasMoreReviews && (
           <div className="mt-6 flex justify-center">
