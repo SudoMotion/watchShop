@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import React, { useState, useEffect, useRef } from 'react';
 import { isLoggedIn } from '@/lib/auth';
 import { getWishlist } from '@/lib/wishlistStorage';
+import { getCart } from '@/lib/cartStorage';
 import { getCategories, postSearchProducts } from '@/stores/ProductAPI';
 import DesktopSearch from './DesktopSearch';
 
@@ -21,6 +22,7 @@ export default function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [wishlistCount, setWishlistCount] = useState(0);
+  const [cartCount, setCartCount] = useState(0);
   const pathname = usePathname();
   const router = useRouter();
   const isHome = pathname === '/';
@@ -79,8 +81,6 @@ export default function Header() {
   }, [showUserMenu, activeDropdown, open, mobileSearchOpen]);
   
   // Mock data - in real app, get from context/state
-  const cartCount = 0;
-
   useEffect(() => {
     const syncWishlistCount = (event) => {
       if (event?.detail?.count != null) {
@@ -97,6 +97,25 @@ export default function Header() {
       window.removeEventListener("focus", syncWishlistCount);
       document.removeEventListener("visibilitychange", syncWishlistCount);
       window.removeEventListener("watchshop:wishlist-updated", syncWishlistCount);
+    };
+  }, [pathname]);
+
+  useEffect(() => {
+    const syncCartCount = (event) => {
+      if (event?.detail?.count != null) {
+        setCartCount(Number(event.detail.count) || 0);
+        return;
+      }
+      setCartCount(getCart().length);
+    };
+    syncCartCount();
+    window.addEventListener("focus", syncCartCount);
+    document.addEventListener("visibilitychange", syncCartCount);
+    window.addEventListener("watchshop:cart-updated", syncCartCount);
+    return () => {
+      window.removeEventListener("focus", syncCartCount);
+      document.removeEventListener("visibilitychange", syncCartCount);
+      window.removeEventListener("watchshop:cart-updated", syncCartCount);
     };
   }, [pathname]);
 
