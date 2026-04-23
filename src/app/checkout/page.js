@@ -6,7 +6,11 @@ import { getCart, setCart } from "@/lib/cartStorage";
 import { getAuthToken, getCustomer, isLoggedIn } from "@/lib/auth";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import { couponApply } from "@/stores/CartAPI";
-import { useSendOtpMutation, useVerifyOtpMutation } from "@/stores/AuthAPI";
+import {
+  useRegisterMutation,
+  useSendOtpMutation,
+  useVerifyOtpMutation,
+} from "@/stores/AuthAPI";
 import {
   getCheckoutData,
   checkoutStore,
@@ -93,6 +97,7 @@ export default function CheckoutPage() {
     b_phone: "",
     b_district: "",
     b_address: "",
+    password: "",
   });
 
   const [districtId, setDistrictId] = useState("");
@@ -119,6 +124,7 @@ export default function CheckoutPage() {
   const [otpVerified, setOtpVerified] = useState(false);
   const [otpCode, setOtpCode] = useState("");
   const [otpVerifying, setOtpVerifying] = useState(false);
+  const [registering, setRegistering] = useState(false);
   /** User chose to enter a code without requesting a new OTP via SMS. */
   const [hasExistingCode, setHasExistingCode] = useState(false);
   const [apiReadOnly, setApiReadOnly] = useState({
@@ -309,6 +315,67 @@ export default function CheckoutPage() {
     setError(null);
   };
 
+  const handleSignupAndSendOtp = async () => {
+    const name = String(formData.name || "").trim();
+    const email = String(formData.email || "").trim();
+    const phone = String(formData.phone || "").replace(/\D/g, "");
+    const address = String(formData.address || "").trim();
+    const password = String(formData.password || "");
+
+    if (!name || !email || !phone || !address || !password) {
+      toast.error("Name, Email, Phone, Address and Password are required.");
+      return;
+    }
+    if (phone.length !== 11) {
+      toast.error("Enter a valid 11-digit mobile number.");
+      return;
+    }
+    if (password.length < 6) {
+      toast.error("Password must be at least 6 characters.");
+      return;
+    }
+
+    setRegistering(true);
+    try {
+      const registerRes = await useRegisterMutation({
+        name,
+        email,
+        phone,
+        address,
+        password,
+        privacy_policy: 1,
+      });
+      if (!(registerRes?.status >= 200 && registerRes?.status < 300)) {
+        const msg =
+          registerRes?.data?.message ||
+          registerRes?.data?.error ||
+          "Registration failed.";
+        toast.error(msg);
+        return;
+      }
+
+      const otpRes = await useSendOtpMutation({ phone });
+      if (otpRes?.status >= 200 && otpRes?.status < 300) {
+        setHasExistingCode(false);
+        setOtpSent(true);
+        toast.success(
+          otpRes?.data?.message ||
+            "Account created. OTP sent. Verify OTP to continue."
+        );
+      } else {
+        const msg =
+          otpRes?.data?.message ||
+          otpRes?.data?.error ||
+          "Account created but OTP send failed.";
+        toast.error(msg);
+      }
+    } catch {
+      toast.error("Could not complete signup and OTP send.");
+    } finally {
+      setRegistering(false);
+    }
+  };
+
   const handleSendOtp = async () => {
     const phone = String(formData.phone || "").replace(/\D/g, "");
     if (phone.length !== 11) {
@@ -476,10 +543,13 @@ export default function CheckoutPage() {
       toast.error(msg);
       return;
     }
-    if (!isLoggedIn() && existingCustomerMode && !otpVerified) {
-      const msg = !otpSent
-        ? "Send OTP to your phone first."
-        : "Enter and verify the OTP code first.";
+    if (!isLoggedIn() && !otpVerified) {
+      const msg =
+        !otpSent
+          ? existingCustomerMode
+            ? "Send OTP to your phone first."
+            : "Sign up and send OTP first."
+          : "Enter and verify the OTP code first.";
       setError(msg);
       toast.error(msg);
       return;
@@ -521,8 +591,12 @@ export default function CheckoutPage() {
     }
 
     const billingDistrict = districts.find((d) => String(d.id) === String(districtId));
+    const isNewSignupMode = !isLoggedIn() && !existingCustomerMode;
     const billingAreaName =
-      billingDistrict?.name || formData.area || formData.district || "";
+      billingDistrict?.name ||
+      formData.area ||
+      formData.district ||
+      (isNewSignupMode ? String(formData.address || "").trim() : "");
 
     const shippingDistrict = districts.find(
       (d) => String(d.id) === String(shippingDistrictId)
@@ -693,6 +767,7 @@ export default function CheckoutPage() {
     isLoggedIn() ||
     !existingCustomerMode ||
     (existingCustomerMode && otpVerified);
+  const showAdvancedCheckoutFields = isLoggedIn() || existingCustomerMode;
 
   return (
     <div className="bg-gray-50 py-4">
@@ -763,6 +838,23 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
+                  {!isLoggedIn() && !existingCustomerMode && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        Password <span className="text-red-600">*</span>
+                      </label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password}
+                        onChange={handleInputChange}
+                        required
+                        minLength={6}
+                        placeholder="Create a password"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                      />
+                    </div>
+                  )}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Address <span className="text-red-600">*</span>
@@ -831,6 +923,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
+                  {showAdvancedCheckoutFields && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       District / Area <span className="text-red-600">*</span>
@@ -872,6 +965,7 @@ export default function CheckoutPage() {
                       />
                     )}
                   </div>
+                  )}
 
                   <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                     <input
@@ -1016,7 +1110,18 @@ export default function CheckoutPage() {
             </div> */}
             <div className="lg:col-span-2 space-y-6">
             <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Billing Address For New Customer</h2>
+                <h2 className="text-xl font-semibold mb-4">
+                  {isLoggedIn()
+                    ? "Billing Address"
+                    : existingCustomerMode
+                      ? "Existing Customer Verification"
+                      : "Create Account"}
+                </h2>
+                {!isLoggedIn() && (
+                  <p className="mb-4 text-sm text-gray-600">
+                    New customer: complete signup details, then verify OTP to continue checkout.
+                  </p>
+                )}
                 <div className="space-y-4">
                   {!isLoggedIn() && (
                   <label className="flex items-start gap-3 cursor-pointer select-none">
@@ -1143,9 +1248,140 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
+                  {!isLoggedIn() && !existingCustomerMode && otpSent && !otpVerified && (
+                    <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
+                      <p className="text-sm text-gray-600">
+                        Enter the OTP sent to{" "}
+                        <span className="font-medium text-gray-900">
+                          {formData.phone || "your number"}
+                        </span>
+                        .
+                      </p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          OTP code <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          inputMode="numeric"
+                          autoComplete="one-time-code"
+                          value={otpCode}
+                          onChange={(e) => {
+                            setOtpCode(e.target.value);
+                            setError(null);
+                          }}
+                          placeholder="Enter 6-digit code"
+                          maxLength={12}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent tracking-widest"
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleVerifyOtp}
+                        disabled={otpVerifying}
+                        className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {otpVerifying ? "Verifying…" : "Confirm OTP"}
+                      </button>
+                    </div>
+                  )}
+
                   {showFullCheckoutFields && (
                     <>
+                  {!isLoggedIn() && !existingCustomerMode && (
+                    <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
+                      <p className="text-sm font-semibold text-blue-900">Register Form</p>
+                      <p className="mt-1 text-xs text-blue-800">
+                        Fill Name, Email, Phone, Address and Password, then press
+                        {" "}
+                        <span className="font-semibold">Sign up & Send OTP</span>.
+                      </p>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Name <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="name"
+                          value={formData.name}
+                          onChange={handleInputChange}
+                          required
+                          maxLength={60}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Phone (11 digits) <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="tel"
+                          name="phone"
+                          value={formData.phone}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="01XXXXXXXXX"
+                          maxLength={11}
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Email <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="email"
+                          name="email"
+                          value={formData.email}
+                          onChange={handleInputChange}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Address <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="text"
+                          name="address"
+                          value={formData.address}
+                          onChange={handleInputChange}
+                          required
+                          maxLength={191}
+                          placeholder="House/Flat, Road, Area"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                          Password <span className="text-red-600">*</span>
+                        </label>
+                        <input
+                          type="password"
+                          name="password"
+                          value={formData.password}
+                          onChange={handleInputChange}
+                          required
+                          minLength={6}
+                          placeholder="Create a password"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
+                        />
+                      </div>
+                      {!otpSent && (
+                        <button
+                          type="button"
+                          onClick={handleSignupAndSendOtp}
+                          disabled={registering}
+                          className="w-full rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                        >
+                          {registering ? "Creating account…" : "Sign up & Send OTP"}
+                        </button>
+                      )}
+                    </div>
+                  )}
                   {/* name */}
+                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Name <span className="text-red-600">*</span>
@@ -1163,7 +1399,9 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
+                  )}
                   {/* phone */}
+                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Phone (11 digits) <span className="text-red-600">*</span>
@@ -1182,7 +1420,9 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
+                  )}
                   {/* email */}
+                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
                     <input
@@ -1196,8 +1436,10 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
+                  )}
 
                   {/* address */}
+                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Address <span className="text-red-600">*</span>
@@ -1216,6 +1458,7 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
+                  )}
                   {/* <div className="pt-2 border-t border-gray-100">
                     <p className="text-sm font-medium text-gray-800 mb-3">Billing address (optional)</p>
                     <div className="space-y-3">
@@ -1323,6 +1566,7 @@ export default function CheckoutPage() {
                     </span>
                   </label> */}
                   
+                  {showAdvancedCheckoutFields && (
                   <div>
                     <p className="text-base font-bold text-gray-900 mb-3">Shipping method</p>
                     <div className="space-y-2">
@@ -1400,8 +1644,9 @@ export default function CheckoutPage() {
                       </label>
                     </div>
                   </div>
+                  )}
 
-                  {pathaoEnabled && (
+                  {showAdvancedCheckoutFields && pathaoEnabled && (
                     <div className="pt-2 border-t border-gray-200">
                       <p className="text-sm font-medium text-gray-800 mb-1">
                         Pathao delivery location
@@ -1468,6 +1713,7 @@ export default function CheckoutPage() {
                   )}
 
                   {/* note */}
+                  {showAdvancedCheckoutFields && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Order note
@@ -1480,7 +1726,9 @@ export default function CheckoutPage() {
                       className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                     />
                   </div>
+                  )}
 
+                  {showAdvancedCheckoutFields && (
                   <label className="flex items-center gap-2 font-semibold cursor-pointer">
                     <input
                       type="checkbox"
@@ -1510,8 +1758,9 @@ export default function CheckoutPage() {
                     />
                     <span>Ship to a different address</span>
                   </label>
+                  )}
 
-                  {formData.ship_to_different_address && (
+                  {showAdvancedCheckoutFields && formData.ship_to_different_address && (
                     <div className="pt-4 border-t border-gray-200 space-y-4">
                       <p className="text-sm font-medium text-gray-800">
                         Shipping address
@@ -1718,7 +1967,7 @@ export default function CheckoutPage() {
                   type="submit"
                   disabled={
                     submitting ||
-                    (!isLoggedIn() && existingCustomerMode && !otpVerified)
+                    (!isLoggedIn() && !otpVerified)
                   }
                   className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                 >
