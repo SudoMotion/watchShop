@@ -924,47 +924,49 @@ export default function CheckoutPage() {
                   </div>
 
                   {showAdvancedCheckoutFields && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      District / Area <span className="text-red-600">*</span>
-                    </label>
-                    {districts.length > 0 ? (
-                      <select
-                        name="area"
-                        value={districtId}
-                        onChange={(e) => {
-                          setDistrictId(e.target.value);
-                          const d = districts.find(
-                            (x) => String(x.id) === String(e.target.value)
-                          );
-                          setFormData((f) => ({
-                            ...f,
-                            area: d?.name || "",
-                            district: d?.name || "",
-                          }));
-                        }}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      >
-                        <option value="">Select district</option>
-                        {districts.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.name} {d.amount != null ? `(৳${d.amount})` : ""}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        name="area"
-                        value={formData.area}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="e.g. Dhaka"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                    )}
-                  </div>
+                  {isLoggedIn() && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">
+                        District / Area <span className="text-red-600">*</span>
+                      </label>
+                      {districts.length > 0 ? (
+                        <select
+                          name="area"
+                          value={districtId}
+                          onChange={(e) => {
+                            setDistrictId(e.target.value);
+                            const d = districts.find(
+                              (x) => String(x.id) === String(e.target.value)
+                            );
+                            setFormData((f) => ({
+                              ...f,
+                              area: d?.name || "",
+                              district: d?.name || "",
+                            }));
+                          }}
+                          required
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        >
+                          <option value="">Select district</option>
+                          {districts.map((d) => (
+                            <option key={d.id} value={d.id}>
+                              {d.name} {d.amount != null ? `(৳${d.amount})` : ""}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        <input
+                          type="text"
+                          name="area"
+                          value={formData.area}
+                          onChange={handleInputChange}
+                          required
+                          placeholder="e.g. Dhaka"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                        />
+                      )}
+                    </div>
+                  )}
                   )}
 
                   <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
@@ -1288,7 +1290,7 @@ export default function CheckoutPage() {
 
                   {showFullCheckoutFields && (
                     <>
-                  {!isLoggedIn() && !existingCustomerMode && (
+                  {!isLoggedIn() && !existingCustomerMode && !otpSent && !otpVerifying && (
                     <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
                       <p className="text-sm font-semibold text-blue-900">Register Form</p>
                       <p className="mt-1 text-xs text-blue-800">
@@ -1508,6 +1510,7 @@ export default function CheckoutPage() {
                     </div>
                   </div> */}
 
+                  {isLoggedIn() && (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       District / Area <span className="text-red-600">*</span>
@@ -1549,6 +1552,7 @@ export default function CheckoutPage() {
                       />
                     )}
                   </div>
+                  )}
 
                   {/* <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                     <input
