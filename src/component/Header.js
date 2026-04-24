@@ -489,7 +489,7 @@ export default function Header() {
             {/* Wishlist (desktop only) */}
             <Link
               href="/wishlist"
-              className={`relative transition-colors hidden md:inline-flex ${
+              className={`relative inline-flex transition-colors ${
                 onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
               }`}
             >
