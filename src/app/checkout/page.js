@@ -771,7 +771,7 @@ export default function CheckoutPage() {
 
   return (
     <div className="bg-gray-50 py-4">
-      <div className="max-w-7xl mx-auto px-4">
+      <div className="w-full sm:max-w-7xl mx-auto px-4">
         <h1 className="md:text-3xl text-2xl font-bold mb-6">Checkout</h1>
 
         {!isLoggedIn() && (
@@ -1110,8 +1110,8 @@ export default function CheckoutPage() {
                 </label>
               </div>
             </div> */}
-            <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg shadow-sm p-6">
+            <div className="min-w-0 lg:col-span-2 space-y-6">
+              <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">
                   {isLoggedIn()
                     ? "Billing Address"
@@ -1866,8 +1866,8 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm p-6 sticky top-8">
+            <div className="min-w-0 lg:col-span-1">
+              <div className="min-w-0 bg-white rounded-lg shadow-sm p-6 lg:sticky lg:top-8">
                 <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
 
                 <div className="space-y-3 mb-4 border-b pb-4 max-h-48 overflow-y-auto">
