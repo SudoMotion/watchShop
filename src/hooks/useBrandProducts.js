@@ -75,6 +75,7 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
   const [products, setProducts] = useState([]);
   const [response, setResponse] = useState(null);
   const [banner_img, setBannerImage] = useState('');
+  const [stockCounts, setStockCounts] = useState({ in: 0, out: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -83,6 +84,7 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
       setProducts([]);
       setResponse(null);
       setBannerImage('');
+      setStockCounts({ in: 0, out: 0 });
       setIsLoading(false);
       return;
     }
@@ -108,6 +110,7 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
         setProducts([]);
         setResponse(null);
         setBannerImage('');
+        setStockCounts({ in: 0, out: 0 });
         setError('Could not load products.');
         setIsLoading(false);
         return;
@@ -115,6 +118,14 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
       setResponse(raw);
       setBannerImage(extractBrandBannerImage(raw));
       const normalized = normalizeBrandProductsResponse(raw);
+      const inStockCount = normalized.filter((item) => {
+        const qty = Number(item?.quantity ?? item?.stock ?? 0);
+        return Number.isFinite(qty) ? qty > 0 : false;
+      }).length;
+      setStockCounts({
+        in: inStockCount,
+        out: Math.max(0, normalized.length - inStockCount),
+      });
       setProducts(applyQuantityFilter(normalized, parsedFilters));
       setIsLoading(false);
     })();
@@ -124,5 +135,5 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
     };
   }, [brandId, filtersKey, sortBy]);
 
-  return { products, response, banner_img, isLoading, error };
+  return { products, response, banner_img, stockCounts, isLoading, error };
 }

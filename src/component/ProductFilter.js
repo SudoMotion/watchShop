@@ -36,6 +36,7 @@ export default function ProductFilter({
   brandId,
   filters: filtersProp,
   setFilters: setFiltersProp,
+  stockCounts,
 }) {
   const [open, setOpen] = useState("quantity");
   const [localFilters, setLocalFilters] = useState({
@@ -120,7 +121,11 @@ export default function ProductFilter({
                   }))
                 }
               />
-              <span>Stock in</span>
+              <span>
+                Stock in
+                {" "}
+                <span className="text-gray-500">({Number(stockCounts?.in || 0)})</span>
+              </span>
             </label>
             <label className="flex items-center gap-x-2 text-sm text-gray-700">
               <input
@@ -136,7 +141,11 @@ export default function ProductFilter({
                   }))
                 }
               />
-              <span>Stock out</span>
+              <span>
+                Stock out
+                {" "}
+                <span className="text-gray-500">({Number(stockCounts?.out || 0)})</span>
+              </span>
             </label>
           </div>
         )}

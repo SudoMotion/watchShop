@@ -23,7 +23,7 @@ export default function BrandPageClient({ brandId }) {
   const [sortBy, setSortBy] = useState('');
   const [bannerLoaded, setBannerLoaded] = useState(false);
   const [displayBannerUrl, setDisplayBannerUrl] = useState('');
-  const { products, banner_img, isLoading, error } = useBrandProducts(
+  const { products, banner_img, stockCounts, isLoading, error } = useBrandProducts(
     brandId,
     filters,
     sortBy
@@ -96,7 +96,12 @@ export default function BrandPageClient({ brandId }) {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:mt-4 px-2 mt-2">
-        <ProductFilter brandId={brandId} filters={filters} setFilters={setFilters} />
+        <ProductFilter
+          brandId={brandId}
+          filters={filters}
+          setFilters={setFilters}
+          stockCounts={stockCounts}
+        />
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
           <div
             className={`mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${
