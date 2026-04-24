@@ -542,12 +542,18 @@ export default function Header() {
 
           </div>
         </div>
-          {mobileSearchOpen && (
-          <div className='md:hidden border bg-gray-200 rounded flex items-center px-2 py-1'>
-            <input type="text" name="" id="" placeholder='Search for products' className='w-full outline-none' />
-            <button>
-            <svg
-                className="w-5 h-5"
+        {mobileSearchOpen && (
+          <div className="md:hidden mt-2 rounded-md border border-gray-200 bg-white p-2">
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search for products"
+                className="w-full rounded-md border border-gray-200 px-3 py-2 text-sm text-gray-900 outline-none focus:border-gray-400"
+              />
+              <svg
+                className="h-5 w-5 shrink-0 text-gray-500"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
@@ -555,13 +561,39 @@ export default function Header() {
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={1}
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                  strokeWidth={2}
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                 />
               </svg>
-            </button>
+            </div>
+            {String(searchQuery || "").trim().length > 0 && (
+              <div className="mt-2 max-h-72 overflow-y-auto rounded border border-gray-100">
+                {searchResults.length > 0 ? (
+                  searchResults.map((item) => (
+                    <Link
+                      key={item.id}
+                      href={`/product/${item.slug}`}
+                      onClick={() => {
+                        setMobileSearchOpen(false);
+                        setSearchQuery("");
+                      }}
+                      className="block border-b border-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                    >
+                      <p className="truncate font-medium">
+                        {item?.name || item?.meta_title || "Product"}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        BDT {Number(item?.selling_price || item?.discount_price || item?.price || 0).toLocaleString("en-BD")}
+                      </p>
+                    </Link>
+                  ))
+                ) : (
+                  <p className="px-3 py-2 text-sm text-gray-500">No products found.</p>
+                )}
+              </div>
+            )}
           </div>
-          )}
+        )}
 
       </div>
 
