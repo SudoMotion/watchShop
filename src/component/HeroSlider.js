@@ -116,27 +116,7 @@ export default function HeroSlider() {
           {phoneSlides.map((slide, index) => (
             <SwiperSlide key={index} className="w-full h-full">
               <div className="relative w-full h-full overflow-hidden">
-                <div
-                  className="hero-bg absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${NEXT_PUBLIC_API_URL}/${slide.image})` }}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex h-full items-center px-6">
-                  <div className="text-white max-w-md">
-                    <h1 className="text-3xl font-light tracking-wide mb-3">
-                      {slide.title}
-                    </h1>
-                    <p className="text-xs tracking-widest uppercase mb-6">
-                      {slide.subtitle}
-                    </p>
-                    <a
-                      href={slide.link}
-                      className="inline-block border border-white px-6 py-2 text-[11px] tracking-widest uppercase hover:bg-white hover:text-black transition"
-                    >
-                      Discover
-                    </a>
-                  </div>
-                </div>
+                <Image src={`${NEXT_PUBLIC_API_URL}/${slide.image}`} alt={slide.title} className="w-full hero-bg h-full object-cover" width={1920} height={1080} />
               </div>
             </SwiperSlide>
           ))}
