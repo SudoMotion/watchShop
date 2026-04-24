@@ -39,7 +39,7 @@ export default function ProductFilter({
 }) {
   const [open, setOpen] = useState("quantity");
   const [localFilters, setLocalFilters] = useState({
-    quantity: "",
+    quantity: { in: false, out: false },
     movement: {},
     band_type: {},
     brands: [],
@@ -88,7 +88,7 @@ export default function ProductFilter({
 
   return (
     <div
-      className="border border-gray-200 p-5 rounded-xl shadow-md flex flex-col gap-y-4 max-h-screen overflow-y-auto sticky top-0"
+      className="border border-gray-200 p-5 rounded-xl shadow-md flex flex-col gap-y-4 max-h-screen overflow-y-auto md:sticky top-0"
       data-brand-id={brandId ?? undefined}
     >
       <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
@@ -105,24 +105,39 @@ export default function ProductFilter({
           <span className="text-gray-500">{open === "quantity" ? "-" : "+"}</span>
         </button>
         {open === "quantity" && (
-          <div className="mt-3 ml-1">
-            <label className="block text-sm text-gray-600 mb-1">
-              Minimum quantity in stock
+          <div className="mt-3 ml-1 space-y-2">
+            <label className="flex items-center gap-x-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={!!filters?.quantity?.in}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...mergeDefaults(prev),
+                    quantity: {
+                      ...mergeDefaults(prev).quantity,
+                      in: e.target.checked,
+                    },
+                  }))
+                }
+              />
+              <span>Stock in</span>
             </label>
-            <input
-              type="number"
-              min={0}
-              step={1}
-              placeholder="e.g. 1"
-              value={filters.quantity ?? ""}
-              onChange={(e) =>
-                setFilters((prev) => ({
-                  ...mergeDefaults(prev),
-                  quantity: e.target.value,
-                }))
-              }
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
-            />
+            <label className="flex items-center gap-x-2 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={!!filters?.quantity?.out}
+                onChange={(e) =>
+                  setFilters((prev) => ({
+                    ...mergeDefaults(prev),
+                    quantity: {
+                      ...mergeDefaults(prev).quantity,
+                      out: e.target.checked,
+                    },
+                  }))
+                }
+              />
+              <span>Stock out</span>
+            </label>
           </div>
         )}
       </div>
@@ -248,8 +263,15 @@ export default function ProductFilter({
 
 function mergeDefaults(f) {
   const x = f && typeof f === "object" ? f : {};
+  const quantityObj =
+    x.quantity && typeof x.quantity === "object"
+      ? x.quantity
+      : { in: false, out: false };
   return {
-    quantity: x.quantity ?? "",
+    quantity: {
+      in: !!quantityObj.in,
+      out: !!quantityObj.out,
+    },
     movement: x.movement && typeof x.movement === "object" ? x.movement : {},
     band_type: x.band_type && typeof x.band_type === "object" ? x.band_type : {},
     brands: Array.isArray(x.brands) ? x.brands : [],

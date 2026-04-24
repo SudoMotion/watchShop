@@ -16,8 +16,15 @@ const BAND_LABELS = new Map([
 
 function mergeDefaults(f) {
   const x = f && typeof f === "object" ? f : {};
+  const quantityObj =
+    x.quantity && typeof x.quantity === "object"
+      ? x.quantity
+      : { in: false, out: false };
   return {
-    quantity: x.quantity ?? "",
+    quantity: {
+      in: !!quantityObj.in,
+      out: !!quantityObj.out,
+    },
     movement: x.movement && typeof x.movement === "object" ? x.movement : {},
     band_type: x.band_type && typeof x.band_type === "object" ? x.band_type : {},
     brands: Array.isArray(x.brands) ? x.brands : [],
@@ -28,11 +35,8 @@ function mergeDefaults(f) {
 export function getActiveFilterChipCount(filters) {
   const f = mergeDefaults(filters);
   let n = 0;
-  const q = String(f.quantity ?? "").trim();
-  if (q !== "") {
-    const num = Number(q);
-    if (Number.isFinite(num) && num >= 0) n += 1;
-  }
+  if (f.quantity?.in) n += 1;
+  if (f.quantity?.out) n += 1;
   n += Object.keys(f.movement || {}).filter((k) => f.movement[k]).length;
   n += Object.keys(f.band_type || {}).filter((k) => f.band_type[k]).length;
   n += (f.brands || []).length;
@@ -101,17 +105,21 @@ export default function FilterIndicator({ filters, setFilters }) {
 
   const chips = [];
 
-  const q = String(f.quantity ?? "").trim();
-  if (q !== "") {
-    const n = Number(q);
-    if (Number.isFinite(n) && n >= 0) {
-      chips.push({
-        key: "quantity",
-        id: "quantity",
-        text: `Stock ≥ ${n}`,
-        aria: `Minimum stock ${n}`,
-      });
-    }
+  if (f.quantity?.in) {
+    chips.push({
+      key: "quantity",
+      id: "quantity:in",
+      text: "Stock in",
+      aria: "Remove stock in filter",
+    });
+  }
+  if (f.quantity?.out) {
+    chips.push({
+      key: "quantity",
+      id: "quantity:out",
+      text: "Stock out",
+      aria: "Remove stock out filter",
+    });
   }
 
   Object.keys(f.movement || {})
@@ -152,7 +160,13 @@ export default function FilterIndicator({ filters, setFilters }) {
     setFilters((prev) => {
       const cur = mergeDefaults(prev);
       if (chip.key === "quantity") {
-        return { ...cur, quantity: "" };
+        if (chip.id === "quantity:in") {
+          return { ...cur, quantity: { ...cur.quantity, in: false } };
+        }
+        if (chip.id === "quantity:out") {
+          return { ...cur, quantity: { ...cur.quantity, out: false } };
+        }
+        return { ...cur, quantity: { in: false, out: false } };
       }
       if (chip.key === "movement") {
         const sub = chip.id.replace("movement:", "");
@@ -178,7 +192,7 @@ export default function FilterIndicator({ filters, setFilters }) {
   const clearAll = () => {
     if (typeof setFilters !== "function") return;
     setFilters({
-      quantity: "",
+      quantity: { in: false, out: false },
       movement: {},
       band_type: {},
       brands: [],

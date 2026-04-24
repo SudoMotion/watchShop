@@ -13,9 +13,9 @@ export function buildBrandFilterParams(filters) {
   if (!filters || typeof filters !== 'object') return out;
 
   const q = filters.quantity;
-  if (q != null && String(q).trim() !== '') {
-    const n = Number(String(q).trim());
-    if (Number.isFinite(n) && n >= 0) out.quantity = String(n);
+  if (q && typeof q === 'object') {
+    if (q.in) out.stock_in = '1';
+    if (q.out) out.stock_out = '1';
   }
 
   if (filters.movement && typeof filters.movement === 'object') {
@@ -51,6 +51,22 @@ function extractBrandBannerImage(raw) {
     raw.data?.brand?.banner_img ??
     ''
   );
+}
+
+function applyQuantityFilter(products, filters) {
+  const quantity = filters?.quantity;
+  if (!quantity || typeof quantity !== 'object') return products;
+
+  const wantsIn = !!quantity.in;
+  const wantsOut = !!quantity.out;
+  if (!wantsIn && !wantsOut) return products;
+  if (wantsIn && wantsOut) return products;
+
+  return products.filter((item) => {
+    const qty = Number(item?.quantity ?? item?.stock ?? 0);
+    const isInStock = Number.isFinite(qty) ? qty > 0 : false;
+    return wantsIn ? isInStock : !isInStock;
+  });
 }
 
 export function useBrandProducts(brandId, filters, sortBy = '') {
@@ -98,7 +114,8 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
       }
       setResponse(raw);
       setBannerImage(extractBrandBannerImage(raw));
-      setProducts(normalizeBrandProductsResponse(raw));
+      const normalized = normalizeBrandProductsResponse(raw);
+      setProducts(applyQuantityFilter(normalized, parsedFilters));
       setIsLoading(false);
     })();
 
