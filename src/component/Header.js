@@ -238,7 +238,7 @@ export default function Header() {
   }, [searchQuery]);
 
   return (
-  <header ref={headerRef} className={`${isHome ? 'md:fixed top-0 left-0 right-0' : 'relative'} w-full z-50`}>
+  <header ref={headerRef} className={`sticky top-0 ${isHome ? 'md:fixed md:top-0 md:left-0 md:right-0' : ''} w-full z-50`}>
 
       {/* Main Header: single row */}
       <div
