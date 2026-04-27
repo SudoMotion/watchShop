@@ -657,27 +657,35 @@ export default function ProductPageClient({ params }) {
 
           {/* Inline Add to Cart & Buy Now — fixed bar appears after 500px scroll */}
           <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
-            <button
-              type="button"
-              onClick={handleAddToCart}
-              disabled={!inStock || addToCartLoading}
-              className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <circle cx="8" cy="21" r="1" />
-                <circle cx="19" cy="21" r="1" />
-                <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
-              </svg>
-              <span>{addToCartLoading ? "Adding..." : "Add to Cart"}</span>
-            </button>
-            <button
-              type="button"
-              onClick={handleBuyNow}
-              disabled={!inStock || buyNowLoading}
-              className="rounded-lg bg-sky-400 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {buyNowLoading ? "Processing..." : "Buy Now"}
-            </button>
+            {inStock ? (
+              <>
+                <button
+                  type="button"
+                  onClick={handleAddToCart}
+                  disabled={addToCartLoading}
+                  className="inline-flex items-center gap-2 rounded-lg bg-black px-5 py-2.5 font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <circle cx="8" cy="21" r="1" />
+                    <circle cx="19" cy="21" r="1" />
+                    <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                  </svg>
+                  <span>{addToCartLoading ? "Adding..." : "Add to Cart"}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleBuyNow}
+                  disabled={buyNowLoading}
+                  className="rounded-lg bg-sky-400 px-5 py-2.5 font-semibold text-white transition-colors hover:bg-sky-500 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {buyNowLoading ? "Processing..." : "Buy Now"}
+                </button>
+              </>
+            ) : (
+              <span className="inline-flex rounded-full bg-black px-4 py-2 text-sm font-bold uppercase tracking-wider text-amber-400">
+                Out of stock
+              </span>
+            )}
           </div>
 
           {/* <ul className="space-y-1.5 text-sm text-gray-700">
@@ -1054,8 +1062,8 @@ export default function ProductPageClient({ params }) {
       </div>
 
       {/* Fixed CTA — only after scrolling 500px (inline buttons stay at top) */}
-      {showFloatingCta && (
-        <div className="fixed inset-x-0 bottom-10 z-40 flex justify-center px-3 pb-[max(0.35rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none">
+      {showFloatingCta && inStock && (
+        <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 pb-[max(0.2rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none">
           <div className="pointer-events-auto flex w-full max-w-[min(100%,20rem)] gap-1 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm sm:max-w-[22rem]">
             <button
               type="button"
