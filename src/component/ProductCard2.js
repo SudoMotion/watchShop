@@ -12,6 +12,12 @@ function productImagePath(path) {
   return path.includes("/") ? path : `uploads/product/${path}`;
 }
 
+function getRoundedDiscountLabel(discount) {
+  const n = Number(discount);
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return `${Math.round(n)}% Off`;
+}
+
 export default function ProductCard2({ item }) {
   if (!item) {
     return (
@@ -70,9 +76,9 @@ export default function ProductCard2({ item }) {
             </div>
           )}
         </Link>
-        {item.discount && (
+        {getRoundedDiscountLabel(item.discount) && (
           <div className="absolute left-2 top-2 z-[5] rounded-md bg-red-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
-            {item.discount}% Off
+            {getRoundedDiscountLabel(item.discount)}
           </div>
         )}
         {mainImage && (

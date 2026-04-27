@@ -19,6 +19,13 @@ export default function CartPage() {
     return parseInt(String(priceStr).replace(/[৳,]/g, ""), 10) || 0;
   };
 
+  const roundedDiscountLabel = (value) => {
+    if (value == null) return "";
+    const n = Number(String(value).replace(/[^\d.-]/g, ""));
+    if (!Number.isFinite(n) || n <= 0) return "";
+    return `${Math.round(n)}% OFF`;
+  };
+
   // Calculate totals
   const calculateSubtotal = () => {
     return cartItems.reduce((total, item) => {
@@ -154,8 +161,8 @@ export default function CartPage() {
                       {item.originalPrice && (
                         <span className="text-sm text-gray-500 line-through">{item.originalPrice}</span>
                       )}
-                      {item.discount && (
-                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">{item.discount}</span>
+                      {roundedDiscountLabel(item.discount) && (
+                        <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">{roundedDiscountLabel(item.discount)}</span>
                       )}
                     </div>
 

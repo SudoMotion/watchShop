@@ -140,9 +140,7 @@ export default function ProductPageClient({ params }) {
       : 0;
   const discountPercentText =
     discountPercent > 0
-      ? Number.isInteger(discountPercent)
-        ? String(discountPercent)
-        : discountPercent.toFixed(2)
+      ? String(Math.round(discountPercent))
       : "0";
   const isEmiAvailable = product?.is_emi_available === "1";
   const inStock = Number(product?.quantity || 0) > 0;
@@ -985,7 +983,7 @@ export default function ProductPageClient({ params }) {
             meta_title: r.meta_title || r.name,
             price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
             discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
-            discount: r.discount ? `${r.discount}% OFF` : "",
+            discount: toNum(r.discount) > 0 ? `${Math.round(toNum(r.discount))}% OFF` : "",
             image: r.image || r.thumb_image,
             otherimage: r.otherimage || r.image,
             image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),

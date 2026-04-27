@@ -14,6 +14,13 @@ const wishlistImageUrl = (path) => {
   return path.startsWith("/") ? `${base}${path}` : `${base}/${path}`;
 };
 
+const roundedDiscountLabel = (value) => {
+  if (value == null) return "";
+  const n = Number(String(value).replace(/[^\d.-]/g, ""));
+  if (!Number.isFinite(n) || n <= 0) return "";
+  return `${Math.round(n)}% OFF`;
+};
+
 export default function WishlistPage() {
   const [wishlistItems, setWishlistItems] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -153,9 +160,9 @@ export default function WishlistPage() {
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-400 text-sm">No image</div>
                   )}
-                  {item.discount && (
+                  {roundedDiscountLabel(item.discount) && (
                     <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-1 rounded text-xs font-semibold">
-                      {item.discount}
+                      {roundedDiscountLabel(item.discount)}
                     </div>
                   )}
                   {!item.inStock && (
