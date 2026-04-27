@@ -13,13 +13,39 @@ export default function DesktopSearch({
   onResultClick,
 }) {
   const hasQuery = String(searchQuery || "").trim().length > 0;
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
 
   const productImage = (item) => {
-    const raw = item?.thumb_image || item?.image || item?.otherimage || "";
+    const candidates = [item?.image, item?.thumb_image, item?.otherimage].filter(Boolean);
+    const raw =
+      candidates.find((value) => {
+        const s = String(value || "").trim();
+        if (!s) return false;
+        // Ignore unresolved template placeholders from API like "${image}".
+        return !s.includes("${") && !s.includes("%7B") && !s.includes("%7D");
+      }) || "";
     if (!raw) return "";
     if (String(raw).startsWith("http")) return raw;
     const normalized = raw.includes("/") ? raw : `uploads/product/${raw}`;
     return `${Backend_Base_Url}/${normalized}`;
+  };
+
+  const priceMeta = (item) => {
+    const original = toNum(item?.price);
+    const discounted = toNum(
+      item?.discount_price ?? item?.selling_price ?? item?.after_discount_price ?? item?.price
+    );
+    const rawDiscount = toNum(item?.discount);
+    const discountPercent =
+      rawDiscount > 0
+        ? rawDiscount
+        : original > discounted && original > 0
+          ? ((original - discounted) / original) * 100
+          : 0;
+    return { original, discounted, discountPercent };
   };
 
   return (
@@ -77,32 +103,47 @@ export default function DesktopSearch({
           {hasQuery && (
             <div className="mt-2 max-h-80 overflow-y-auto rounded border border-gray-100">
               {searchResults.length > 0 ? (
-                searchResults.map((item) => (
-                  <Link
-                    key={item.id}
-                    href={`/product/${item.slug}`}
-                    onClick={onResultClick}
-                    className="flex items-center gap-2 border-b border-gray-100 p-2 hover:bg-gray-50"
-                  >
-                    {productImage(item) ? (
-                      <img
-                        src={productImage(item)}
-                        alt={item?.name || "Product"}
-                        className="h-12 w-12 rounded object-cover"
-                      />
-                    ) : (
-                      <div className="h-12 w-12 rounded bg-gray-100" />
-                    )}
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-medium text-gray-800">
-                        {item?.name || item?.meta_title || "Product"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        BDT {Number(item?.selling_price || item?.discount_price || item?.price || 0).toLocaleString("en-BD")}
-                      </p>
-                    </div>
-                  </Link>
-                ))
+                searchResults.map((item) => {
+                  const { original, discounted, discountPercent } = priceMeta(item);
+                  return (
+                    <Link
+                      key={item.id}
+                      href={`/product/${item.slug}`}
+                      onClick={onResultClick}
+                      className="flex items-center gap-2 border-b border-gray-100 p-2 hover:bg-gray-50"
+                    >
+                      {productImage(item) ? (
+                        <img
+                          src={productImage(item)}
+                          alt={item?.name || "Product"}
+                          className="h-12 w-12 rounded object-cover"
+                        />
+                      ) : (
+                        <div className="h-12 w-12 rounded bg-gray-100" />
+                      )}
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-gray-800">
+                          {item?.name || item?.meta_title || "Product"}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                          <span className="font-semibold text-gray-800">
+                            BDT {discounted.toLocaleString("en-BD")}
+                          </span>
+                          {discountPercent > 0 && (
+                            <>
+                              <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-semibold text-green-700">
+                                {Math.round(discountPercent)}% OFF
+                              </span>
+                              <span className="text-gray-400 line-through">
+                                BDT {original.toLocaleString("en-BD")}
+                              </span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+                    </Link>
+                  );
+                })
               ) : (
                 <p className="p-3 text-sm text-gray-500">No products found.</p>
               )}

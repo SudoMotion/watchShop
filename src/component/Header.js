@@ -7,6 +7,7 @@ import { isLoggedIn } from '@/lib/auth';
 import { getWishlist } from '@/lib/wishlistStorage';
 import { getCart } from '@/lib/cartStorage';
 import { getCategories, postSearchProducts } from '@/stores/ProductAPI';
+import { Backend_Base_Url } from '@/config';
 import DesktopSearch from './DesktopSearch';
 
 export default function Header() {
@@ -121,6 +122,41 @@ export default function Header() {
 
   const [categories, setCategories] = useState([]);
   const [navigationItems, setNavigationItems] = useState([]);
+
+  const toNum = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+
+  const searchProductImage = (item) => {
+    const candidates = [item?.thumb_image, item?.image, item?.otherimage].filter(Boolean);
+    const raw =
+      candidates.find((value) => {
+        const s = String(value || "").trim();
+        if (!s) return false;
+        // Ignore unresolved template placeholders from API like "${image}".
+        return !s.includes("${") && !s.includes("%7B") && !s.includes("%7D");
+      }) || "";
+    if (!raw) return "";
+    if (String(raw).startsWith("http")) return raw;
+    const normalized = raw.includes("/") ? raw : `uploads/product/${raw}`;
+    return `${Backend_Base_Url}/${normalized}`;
+  };
+
+  const searchPriceMeta = (item) => {
+    const original = toNum(item?.price);
+    const discounted = toNum(
+      item?.discount_price ?? item?.selling_price ?? item?.after_discount_price ?? item?.price
+    );
+    const rawDiscount = toNum(item?.discount);
+    const discountPercent =
+      rawDiscount > 0
+        ? rawDiscount
+        : original > discounted && original > 0
+          ? ((original - discounted) / original) * 100
+          : 0;
+    return { original, discounted, discountPercent };
+  };
 
   // Fetch categories once (for debugging / future use)
   useEffect(() => {
@@ -569,24 +605,50 @@ export default function Header() {
             {String(searchQuery || "").trim().length > 0 && (
               <div className="mt-2 max-h-72 overflow-y-auto rounded border border-gray-100">
                 {searchResults.length > 0 ? (
-                  searchResults.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={`/product/${item.slug}`}
-                      onClick={() => {
-                        setMobileSearchOpen(false);
-                        setSearchQuery("");
-                      }}
-                      className="block border-b border-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
-                    >
-                      <p className="truncate font-medium">
-                        {item?.name || item?.meta_title || "Product"}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        BDT {Number(item?.selling_price || item?.discount_price || item?.price || 0).toLocaleString("en-BD")}
-                      </p>
-                    </Link>
-                  ))
+                  searchResults.map((item) => {
+                    const { original, discounted, discountPercent } = searchPriceMeta(item);
+                    return (
+                      <Link
+                        key={item.id}
+                        href={`/product/${item.slug}`}
+                        onClick={() => {
+                          setMobileSearchOpen(false);
+                          setSearchQuery("");
+                        }}
+                        className="flex items-center gap-2 border-b border-gray-100 px-3 py-2 text-sm text-gray-800 hover:bg-gray-50"
+                      >
+                        {searchProductImage(item) ? (
+                          <img
+                            src={searchProductImage(item)}
+                            alt={item?.name || "Product"}
+                            className="h-10 w-10 rounded object-cover"
+                          />
+                        ) : (
+                          <div className="h-10 w-10 rounded bg-gray-100" />
+                        )}
+                        <div className="min-w-0">
+                          <p className="truncate font-medium">
+                            {item?.name || item?.meta_title || "Product"}
+                          </p>
+                          <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                            <span className="font-semibold text-gray-800">
+                              BDT {discounted.toLocaleString("en-BD")}
+                            </span>
+                            {discountPercent > 0 && (
+                              <>
+                                <span className="rounded bg-green-100 px-1 py-0.5 text-[10px] font-semibold text-green-700">
+                                  {Math.round(discountPercent)}% OFF
+                                </span>
+                                <span className="text-gray-400 line-through">
+                                  BDT {original.toLocaleString("en-BD")}
+                                </span>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })
                 ) : (
                   <p className="px-3 py-2 text-sm text-gray-500">No products found.</p>
                 )}
