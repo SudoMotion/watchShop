@@ -611,11 +611,47 @@ export default function Header() {
                     key={index}
                     className="border-b border-gray-100 last:border-b-0"
                   >
-                    <div className="flex items-center justify-between">
+                    {hasSubmenu ? (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setMobileActiveDropdown(
+                            isDropdownOpen ? null : index
+                          )
+                        }
+                        className={`flex w-full items-center justify-between py-3 px-2 text-left text-sm font-medium transition-colors ${
+                          item.highlight
+                            ? 'text-green-600 hover:text-green-700'
+                            : 'text-gray-700 hover:text-red-600'
+                        }`}
+                        aria-label={`Toggle ${item.label} submenu`}
+                        aria-expanded={isDropdownOpen}
+                      >
+                        <span>
+                          {item.label}
+                          {item.highlight && <span className="ml-1">🤝</span>}
+                        </span>
+                        <svg
+                          className={`w-5 h-5 transition-transform ${
+                            isDropdownOpen ? 'rotate-180' : ''
+                          }`}
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
+                        </svg>
+                      </button>
+                    ) : (
                       <Link
                         href={item.href}
-                        onClick={() => !hasSubmenu && setMobileMenuOpen(false)}
-                        className={`flex-1 py-3 px-2 text-sm font-medium transition-colors ${
+                        onClick={() => setMobileMenuOpen(false)}
+                        className={`block py-3 px-2 text-sm font-medium transition-colors ${
                           item.highlight
                             ? 'text-green-600 hover:text-green-700'
                             : 'text-gray-700 hover:text-red-600'
@@ -624,34 +660,7 @@ export default function Header() {
                         {item.label}
                         {item.highlight && <span className="ml-1">🤝</span>}
                       </Link>
-                      {hasSubmenu && (
-                        <button
-                          onClick={() =>
-                            setMobileActiveDropdown(
-                              isDropdownOpen ? null : index
-                            )
-                          }
-                          className="p-3 text-gray-700 hover:text-red-600 transition-colors"
-                          aria-label="Toggle submenu"
-                        >
-                          <svg
-                            className={`w-5 h-5 transition-transform ${
-                              isDropdownOpen ? 'rotate-180' : ''
-                            }`}
-                            fill="none"
-                            viewBox="0 0 24 24"
-                            stroke="currentColor"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M19 9l-7 7-7-7"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                    </div>
+                    )}
 
                     {/* Mobile Submenu */}
                     {hasSubmenu && isDropdownOpen && (
