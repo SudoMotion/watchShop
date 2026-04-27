@@ -253,13 +253,13 @@ export default function Header() {
               )}
             </button>
             {/* Logo */}
-            <Link href="/">
+            <Link href="/" className="block shrink-0 w-[140px] md:w-[250px]">
               <Image
                 src={'/logo.png'}
                 height={100}
                 width={250}
                 alt="watchshopbd"
-                className="h-10 object-contain my-3 lg:my-4"
+                className="h-10 w-full object-contain"
               />
             </Link>
 
@@ -280,7 +280,7 @@ export default function Header() {
                     <Link
                       href={item.href}
                       onClick={() => !hasSubmenu && setActiveDropdown(null)}
-                      className={`flex items-center gap-1 text-[10px] md:text-xs font-medium whitespace-nowrap transition-colors ${
+                      className={`flex items-center gap-1 font-semibold text-sm md:text-sm whitespace-nowrap transition-colors ${
                         item.highlight
                           ? onTransparent
                             ? 'text-green-300 hover:text-green-200'
