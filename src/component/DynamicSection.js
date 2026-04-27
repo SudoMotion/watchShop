@@ -27,7 +27,7 @@ export default function DynamicSection() {
     path.startsWith("/") ? path : `/${path}`;
 
   return (
-    <div className="mx-auto grid max-w-7xl grid-cols-2 gap-4 px-2 py-10 md:gap-8 md:px-0 md:py-16 lg:grid-cols-4">
+    <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 px-2 py-10 md:gap-8 md:px-0 md:py-16 lg:grid-cols-4">
       {data.map((item) => (
         <article
           key={item.id}
@@ -49,11 +49,11 @@ export default function DynamicSection() {
                   className="object-cover transition duration-700 group-hover/card:scale-105"
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
                 />
-                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-3 pb-3 pt-10 md:px-4 md:pb-4 md:pt-12">
-                  <h2 className="text-sm font-semibold leading-tight tracking-tight text-white md:text-base">
+                <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/75 via-black/35 to-transparent px-2 pb-2 pt-8 md:px-4 md:pb-4 md:pt-12">
+                  <h2 className="text-xs font-semibold leading-tight tracking-tight text-white md:text-base">
                     {item.title}
                   </h2>
-                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-[0.12em] text-white/80 md:text-[11px]">
+                  <p className="mt-0.5 text-[9px] font-medium uppercase tracking-[0.1em] text-white/80 md:text-[11px]">
                     Hover to explore
                   </p>
                 </div>
@@ -64,20 +64,20 @@ export default function DynamicSection() {
             <div
               className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-neutral-700 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-950 px-6 py-8 text-center shadow-inner [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translate3d(0,0,1px)]"
             >
-              <span className="mb-2 text-[0.55rem] font-semibold uppercase tracking-[0.22em] text-amber-200/90 md:text-[0.6rem]">
+              <span className="mb-1 text-[0.5rem] font-semibold uppercase tracking-[0.16em] text-amber-200/90 md:mb-2 md:text-[0.6rem]">
                 Collection
               </span>
-              <h3 className="text-sm font-semibold leading-tight tracking-tight text-white md:text-base">
+              <h3 className="text-xs font-semibold leading-tight tracking-tight text-white md:text-base">
                 {item.title}
               </h3>
-              <p className="mt-2 max-w-[14rem] text-[11px] leading-snug text-neutral-300 md:text-xs">
+              <p className="mt-1.5 max-w-[12rem] text-[10px] leading-snug text-neutral-300 md:mt-2 md:max-w-[14rem] md:text-xs">
                 {item.description}
               </p>
               <div
-                className="mt-4 h-px w-10 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent"
+                className="mt-3 h-px w-8 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent md:mt-4 md:w-10"
                 aria-hidden
               />
-              <p className="mt-2 text-[0.58rem] uppercase tracking-[0.18em] text-neutral-500 md:text-[0.62rem]">
+              <p className="text-[0.52rem] uppercase tracking-[0.14em] text-neutral-500 md:mt-2 md:text-[0.62rem]">
                 Premium selection
               </p>
             </div>
