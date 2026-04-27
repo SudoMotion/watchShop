@@ -27,20 +27,20 @@ export default function Footer() {
 
             {/* Social Icons */}
             <div className="flex items-center space-x-4 mt-5">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="Facebook">
-                <img src="/social-media/sns-facebook.svg" alt="" className="w-8 h-8" />
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-white rounded-full hover:opacity-80 transition-opacity" aria-label="Facebook">
+                <img src="/social-media/facebook.png" alt="" className="w-8 h-8" />
               </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="Instagram">
-                <img src="/social-media/sns-instagram.svg" alt="" className="w-8 h-8" />
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="Instagram">
+                <img src="/social-media/instagram.png" alt="" className="w-8 h-8" />
               </a>
-              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="X (Twitter)">
-                <img src="/social-media/sns-twitter.svg" alt="" className="w-8 h-8" />
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="X (Twitter)">
+                <img src="/social-media/x.png" alt="" className="w-8 h-8" />
               </a>
-              <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="WhatsApp">
-                <img src="/social-media/whatsapp.png" alt="WhatsApp" className="w-5 h-5" />
+              <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="WhatsApp">
+                <img src="/social-media/whatsapp.png" alt="WhatsApp" className="w-8 h-8 rounded-full" />
               </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity" aria-label="YouTube">
-                <img src="/social-media/sns-youtube.svg" alt="YouTube" className="h-10" />
+              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="rounded-full overflow-hidden hover:opacity-80 transition-opacity" aria-label="YouTube">
+                <img src="/social-media/youtube.jpeg" alt="YouTube" className="h-10" />
               </a>
             </div>
 
