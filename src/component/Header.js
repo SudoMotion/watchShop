@@ -289,7 +289,7 @@ export default function Header() {
               )}
             </button>
             {/* Logo */}
-            <Link href="/" className="block shrink-0 w-[140px] md:w-[250px]">
+            <Link href="/" className="block shrink-0 w-[140px] md:w-[150px] 2xl:w-[250px]">
               <Image
                 src={'/logo.png'}
                 height={100}
@@ -300,7 +300,7 @@ export default function Header() {
             </Link>
 
             {/* Main navigation - desktop */}
-            <div className="hidden lg:flex items-center gap-4 md:gap-6">
+            <div className="hidden lg:flex items-center gap-4 md:gap-2 2xl:gap-6">
               {navigationItems.map((item, index) => {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const isDropdownOpen = activeDropdown === index;
@@ -397,7 +397,7 @@ export default function Header() {
           </div>
 
           {/* Right: search + shortcuts */}
-          <div className="flex items-center gap-2 md:gap-6 flex-1 justify-end py-3 lg:py-4">
+          <div className="flex items-center gap-2 md:gap-3 2xl:gap-6 flex-1 justify-end py-3 lg:py-4">
             {/* Desktop search icon */}
             <DesktopSearch
               open={open}
