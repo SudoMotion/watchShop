@@ -717,7 +717,7 @@ export default function ProductPageClient({ params }) {
               To speak an Expert 24/7
             </h2>
             <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
-              Chat with our team any time on WhatsApp or call us directly.
+            Contact Us Now
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <a
