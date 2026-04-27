@@ -633,8 +633,17 @@ export default function ProductPageClient({ params }) {
             )}
           </div>
 
-          {modelText && (
-            <p className="text-xs sm:text-sm mt-1">Model: {modelText}</p>
+          {(String(product?.bullet_point || "").trim() || modelText) && (
+            <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-700 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_li]:leading-relaxed">
+              {modelText && (
+                <ul className="mb-1 list-disc pl-5">
+                  <li>Model: {modelText}</li>
+                </ul>
+              )}
+              {String(product?.bullet_point || "").trim() && (
+                <div dangerouslySetInnerHTML={{ __html: String(product.bullet_point) }} />
+              )}
+            </div>
           )}
 
           {/* EMI Section */}
