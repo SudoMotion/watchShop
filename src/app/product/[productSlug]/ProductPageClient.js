@@ -478,15 +478,14 @@ export default function ProductPageClient({ params }) {
             /
             <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
           </div>
-          <div className="relative border rounded-xl flex justify-center min-h-[200px] bg-gray-50 overflow-hidden">
+          <div className="relative aspect-square w-full border rounded-xl bg-gray-50 overflow-hidden">
             {(mainImg || displayImages[0]) ? (
               <>
                 <Image
                   src={mainImg || displayImages[0]}
-                  width={400}
-                  height={400}
+                  fill
                   alt="Watch"
-                  className="object-contain w-full h-auto max-w-full sm:max-w-md md:max-w-lg"
+                  className="object-cover"
                   unoptimized
                 />
                 {!inStock ? (
