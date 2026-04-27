@@ -599,24 +599,24 @@ export default function ProductPageClient({ params }) {
           <div className="mt-2 sm:mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
             <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
               {sellingPriceNum > 0 && (
-                <span className="text-red-600 font-bold text-base sm:text-lg md:text-xl">
+                <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl">
                   BDT {sellingPriceNum.toLocaleString("en-BD")}
                 </span>
               )}
               {discountPercent > 0 && (
-                <span className="text-xs sm:text-sm font-medium text-red-700">
+                <span className="text-sm sm:text-base font-medium text-red-700">
                   {discountPercentText}% off
                 </span>
               )}
               {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
-                <del className="text-xs sm:text-sm text-gray-500">
+                <del className="text-sm sm:text-base text-gray-500">
                   BDT {originalPriceNum.toLocaleString("en-BD")}
                 </del>
               )}
             </div>
             {totalReviews > 0 && (
               <div className="flex items-center gap-2 sm:justify-end">
-                <div className="flex items-center text-amber-500 text-sm">
+                <div className="flex items-center text-amber-500 text-base sm:text-lg">
                   {[1, 2, 3, 4, 5].map((star) => (
                     <span
                       key={star}
@@ -626,7 +626,7 @@ export default function ProductPageClient({ params }) {
                     </span>
                   ))}
                 </div>
-                <span className="text-xs sm:text-sm text-gray-600">
+                <span className="text-sm sm:text-base text-gray-600">
                   {averageRating.toFixed(1)} ({totalReviews} reviews)
                 </span>
               </div>
