@@ -491,7 +491,7 @@ export default function ProductPageClient({ params }) {
                 />
                 {!inStock ? (
                   <div className="pointer-events-none absolute right-3 top-3 z-10 max-w-[calc(100%-1.5rem)]">
-                    <span className="inline-block rounded-full bg-red-600 px-4 py-2 text-center text-xs font-bold uppercase tracking-wider text-white shadow-lg">
+                    <span className="inline-block rounded-full bg-black px-4 py-2 text-center text-xs font-bold uppercase tracking-wider text-amber-400 shadow-lg">
                       Out of stock
                     </span>
                   </div>

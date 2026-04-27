@@ -167,7 +167,7 @@ export default function WishlistPage() {
                   )}
                   {!item.inStock && (
                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                      <span className="bg-white text-black px-4 py-2 rounded font-semibold text-sm">
+                      <span className="bg-black text-amber-400 px-4 py-2 rounded font-semibold text-sm">
                         Out of Stock
                       </span>
                     </div>
@@ -211,7 +211,7 @@ export default function WishlistPage() {
                   ) : (
                     <button
                       disabled
-                      className="flex-1 bg-gray-300 text-gray-500 py-2 rounded-lg font-semibold cursor-not-allowed text-sm"
+                      className="flex-1 bg-black text-amber-400 py-2 rounded-lg font-semibold cursor-not-allowed text-sm"
                     >
                       Out of Stock
                     </button>

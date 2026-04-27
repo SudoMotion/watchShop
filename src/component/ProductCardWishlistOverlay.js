@@ -100,10 +100,10 @@ export default function ProductCardWishlistOverlay({
   if (!inStock) {
     return (
       <div className="pointer-events-none absolute right-2 top-2 z-20 max-w-[calc(100%-1rem)]">
-        <span className="hidden md:inline-block rounded-full bg-red-600 px-2.5 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-white shadow-md sm:px-3 sm:text-xs">
+        <span className="hidden md:inline-block rounded-full bg-black px-2.5 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-amber-400 shadow-md sm:px-3 sm:text-xs">
           Out of stock
         </span>
-        <span className="inline-block md:hidden rounded-full bg-red-600 px-2.5 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-white shadow-md sm:px-3 sm:text-xs">
+        <span className="inline-block md:hidden rounded-full bg-black px-2.5 py-1 text-center text-[10px] font-bold uppercase tracking-wider text-amber-400 shadow-md sm:px-3 sm:text-xs">
           Stock Out
         </span>
       </div>
