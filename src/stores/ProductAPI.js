@@ -124,6 +124,36 @@ export function normalizeMovementsList(res) {
     .filter(Boolean);
 }
 
+export function normalizeBrandLabelsList(res) {
+  if (res == null) return [];
+  const raw = Array.isArray(res) ? res : res?.data ?? res?.brands ?? res?.labels ?? [];
+  if (!Array.isArray(raw)) return [];
+  return raw
+    .map((item) => {
+      if (typeof item === 'string') {
+        const s = item.trim();
+        return s ? { slug: s, name: s } : null;
+      }
+      const slug = String(
+        item.slug ??
+          item.brand_slug ??
+          item.value ??
+          item.id ??
+          item.brand?.slug ??
+          ''
+      ).trim();
+      const name = String(
+        item.name ??
+          item.title ??
+          item.label ??
+          item.brand?.name ??
+          slug
+      ).trim();
+      return slug ? { slug, name: name || slug } : null;
+    })
+    .filter(Boolean);
+}
+
 /**
  * Category products
  * @param {string} cat - Category slug
@@ -311,4 +341,5 @@ export default {
   postSearchProducts,
   getCategoryLabels,
   getbrandLabels,
+  normalizeBrandLabelsList,
 };

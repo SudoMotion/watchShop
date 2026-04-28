@@ -1,8 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getBrands } from "@/stores/homeSpecification";
-import { getCategoryLabels, normalizeMovementsList } from "@/stores/ProductAPI";
+import {
+  getCategoryLabels,
+  getbrandLabels,
+  normalizeBrandLabelsList,
+  normalizeMovementsList,
+} from "@/stores/ProductAPI";
 
 const BAND_LABELS = new Map([
   ["stainless_steel", "Stainless steel"],
@@ -60,9 +64,10 @@ export default function FilterIndicator({ filters, setFilters }) {
 
   useEffect(() => {
     let cancelled = false;
-    getBrands()
-      .then((list) => {
-        if (cancelled || !Array.isArray(list)) return;
+    getbrandLabels()
+      .then((res) => {
+        if (cancelled) return;
+        const list = normalizeBrandLabelsList(res);
         setBrandList(list);
       })
       .catch(() => setBrandList([]));

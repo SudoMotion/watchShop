@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { getBrands } from "@/stores/homeSpecification";
-import { getCategoryLabels, normalizeMovementsList } from "@/stores/ProductAPI";
+import {
+  getCategoryLabels,
+  getbrandLabels,
+  normalizeBrandLabelsList,
+  normalizeMovementsList,
+} from "@/stores/ProductAPI";
 
 function patchMap(prev, key, value, checked) {
   const next = { ...prev };
@@ -54,9 +58,10 @@ export default function ProductFilter({
 
   useEffect(() => {
     let cancelled = false;
-    getBrands()
-      .then((list) => {
-        if (cancelled || !Array.isArray(list)) return;
+    getbrandLabels()
+      .then((res) => {
+        if (cancelled) return;
+        const list = normalizeBrandLabelsList(res);
         setBrandList(list);
       })
       .catch(() => setBrandList([]));
