@@ -22,32 +22,12 @@ export const dynamic = 'force-dynamic';
 export default async function page() {
   const home = await getHome() || {};
   const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = home;
-  const topBrands = await getTopBrands();
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
     <div>
       <HeroSlider/>
       <DynamicSection/>
-      <div className='py-10 bg-gray-50 px-2'>
-        <div className='max-w-7xl mx-auto'>
-          <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
-          <div className='grid grid-cols-5 md:grid-cols-10 items-center justify-center'>
-            {topBrands.slice(0, 10).map((brand, index) => (
-              <div key={index} className='flex flex-col items-center p-3 bg-white shadow-sm hover:shadow-md transition-shadow duration-300 w-full'>
-                <div className='relative w-full h-10 md:h-20'>
-                  <Image
-                    src={Backend_Base_Url + '/' + brand.image}
-                    alt={brand.name}
-                    fill
-                    className='object-contain p-2'
-                    // sizes='(max-width: 768px) 33vw, (max-width: 1024px) 25vw, 10vw'
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      
       <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-5 mb-10 md:h-[400px] px-2'>
         <div className='col-span-1 md:col-span-4 rounded-md md:rounded-lg overflow-hidden'>
           <video preload='true' autoPlay loop muted playsInline>
