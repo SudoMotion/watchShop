@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { getBrands } from "@/stores/homeSpecification";
-import { getMovements, normalizeMovementsList } from "@/stores/ProductAPI";
+import { getCategoryLabels, normalizeMovementsList } from "@/stores/ProductAPI";
 
 function patchMap(prev, key, value, checked) {
   const next = { ...prev };
@@ -67,7 +67,7 @@ export default function ProductFilter({
 
   useEffect(() => {
     let cancelled = false;
-    getMovements({})
+    getCategoryLabels()
       .then((res) => {
         if (cancelled) return;
         setMovementOptions(normalizeMovementsList(res));

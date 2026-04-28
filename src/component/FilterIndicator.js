@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { getBrands } from "@/stores/homeSpecification";
-import { getMovements, normalizeMovementsList } from "@/stores/ProductAPI";
+import { getCategoryLabels, normalizeMovementsList } from "@/stores/ProductAPI";
 
 const BAND_LABELS = new Map([
   ["stainless_steel", "Stainless steel"],
@@ -73,7 +73,7 @@ export default function FilterIndicator({ filters, setFilters }) {
 
   useEffect(() => {
     let cancelled = false;
-    getMovements({})
+    getCategoryLabels()
       .then((res) => {
         if (cancelled) return;
         setMovementOptions(normalizeMovementsList(res));

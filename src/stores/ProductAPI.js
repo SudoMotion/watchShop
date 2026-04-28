@@ -109,7 +109,7 @@ export const getMovements = async (body = {}) => {
 
 export function normalizeMovementsList(res) {
   if (res == null) return [];
-  const raw = Array.isArray(res) ? res : res?.data ?? res?.movements ?? [];
+  const raw = Array.isArray(res) ? res : res?.data ?? res?.movements ?? res?.labels ?? [];
   if (!Array.isArray(raw)) return [];
   return raw
     .map((item) => {
@@ -273,6 +273,24 @@ export const postSearchProducts = async (body = {}) => {
     return null;
   }
 };
+export const getCategoryLabels = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/category-labels',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
+export const getbrandLabels = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/brand-labels',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
 
 export default {
   getMensProducts,
@@ -291,4 +309,6 @@ export default {
   getProductBySlug,
   getAllProductSlugs,
   postSearchProducts,
+  getCategoryLabels,
+  getbrandLabels,
 };
