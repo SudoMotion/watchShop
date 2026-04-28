@@ -6,7 +6,6 @@ import { Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
-import { getHome } from "@/stores/HomeAPI";
 import { getMobileSliders, getSliders } from "@/stores/homeSpecification";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import Image from "next/image";
@@ -15,28 +14,29 @@ export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
   const [sliders, setSliders] = useState([]);
   const [mobileSliders, setMobileSliders] = useState([]);
-  // 🔑 Prevent Swiper from initializing during hydration
+
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  // Fetch sliders data
   useEffect(() => {
     const fetchSliders = async () => {
       try {
         const data = await getSliders();
         const mobileData = await getMobileSliders();
-        setSliders(data);
-        setMobileSliders(mobileData);
+        setSliders(data || []);
+        setMobileSliders(mobileData || []);
       } catch (error) {
-        console.error('Failed to fetch sliders:', error);
+        console.error("Failed to fetch sliders:", error);
       }
     };
     fetchSliders();
   }, []);
 
   if (!mounted) {
-    return <section className="relative w-full h-[60vh] md:h-screen bg-black" />;
+    return (
+      <section className="w-full aspect-[96/35] bg-black animate-pulse" />
+    );
   }
 
   const desktopSlides = sliders;
@@ -44,88 +44,127 @@ export default function HeroSlider() {
 
   return (
     <section className="relative w-full overflow-hidden">
-      {/* Desktop / large screens */}
-      <div className="hidden md:block h-full">
-        <Swiper
-          modules={[Autoplay, Pagination]}
-          slidesPerView={1}
-          loop
-          speed={1200}
-          autoplay={{
-            delay: 4000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false,
-          }}
-          pagination={{
-            clickable: true,
-            bulletClass: "hero-bullet",
-            bulletActiveClass: "hero-bullet-active",
-          }}
-          className="h-full w-full"
-        >
-          {desktopSlides.map((slide, index) => (
-            <SwiperSlide key={index} className="w-full h-full">
-              {/* <div className="relative w-full h-full overflow-hidden">
-                <div
-                  className="hero-bg absolute inset-0 bg-cover bg-center"
-                  style={{ backgroundImage: `url(${NEXT_PUBLIC_API_URL}/${slide.image})` }}
-                />
-                <div className="absolute inset-0 bg-black/30" />
-                <div className="relative z-10 flex h-full items-center px-6 md:px-24">
-                  <div className="text-white max-w-xl">
-                    <h1 className="text-4xl md:text-6xl font-light tracking-wide mb-4">
-                      {slide.title}
-                    </h1>
-                    <p className="text-sm md:text-base tracking-widest uppercase mb-8">
-                      {slide.subtitle}
-                    </p>
-                    <a
-                      href={slide.link}
-                      className="inline-block border border-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-white hover:text-black transition"
-                    >
-                      Discover
-                    </a>
+      
+      {/* Desktop */}
+      <div className="hidden md:block">
+        <div className="w-full aspect-[96/35]">
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            slidesPerView={1}
+            loop
+            speed={1200}
+            autoplay={{
+              delay: 4000,
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              el: ".hero-pagination",
+              clickable: true,
+              bulletClass: "hero-bullet",
+              bulletActiveClass: "hero-bullet-active",
+            }}
+            className="w-full h-full"
+          >
+            {desktopSlides.map((slide, index) => (
+              <SwiperSlide key={index}>
+                <div className="relative w-full h-full overflow-hidden">
+                  
+                  {/* Zoom Effect Wrapper */}
+                  <div className="absolute inset-0 hero-zoom">
+                    <Image
+                      src={`${NEXT_PUBLIC_API_URL}/${slide.image}`}
+                      alt={slide.title || "slider image"}
+                      fill
+                      priority={index === 0}
+                      sizes="100vw"
+                      className="object-cover"
+                    />
                   </div>
+
+                  {/* Optional Overlay */}
+                  <div className="absolute inset-0 bg-black/20" />
                 </div>
-              </div> */}
-              <Image src={`${NEXT_PUBLIC_API_URL}/${slide.image}`} alt={slide.title} className="w-full hero-bg h-full object-cover" width={1920} height={1080} />
-            </SwiperSlide>
-          ))}
-        </Swiper>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </div>
 
-      {/* Mobile / small screens */}
-      <div className="block md:hidden h-full">
-        <Swiper
-          modules={[Autoplay, Pagination]}
-          slidesPerView={1}
-          loop
-          speed={1200}
-          autoplay={{
-            delay: 5000,
-            disableOnInteraction: false,
-            pauseOnMouseEnter: false,
-          }}
-          pagination={{
-            clickable: true,
-            bulletClass: "hero-bullet",
-            bulletActiveClass: "hero-bullet-active",
-          }}
-          className="h-full w-full"
-        >
-          {phoneSlides.map((slide, index) => (
-            <SwiperSlide key={index} className="w-full h-full">
-              <div className="relative w-full h-full overflow-hidden">
-                <Image src={`${NEXT_PUBLIC_API_URL}/${slide.image}`} alt={slide.title} className="w-full hero-bg h-full object-cover" width={1920} height={1080} />
-              </div>
-            </SwiperSlide>
-          ))}
-        </Swiper>
+      {/* Mobile */}
+      <div className="block md:hidden">
+        <div className="w-full aspect-[96/35]">
+          <Swiper
+            modules={[Autoplay, Pagination]}
+            slidesPerView={1}
+            loop
+            speed={1200}
+            autoplay={{
+              delay: 5000,
+              disableOnInteraction: false,
+            }}
+            pagination={{
+              el: ".hero-pagination",
+              clickable: true,
+              bulletClass: "hero-bullet",
+              bulletActiveClass: "hero-bullet-active",
+            }}
+            className="w-full h-full"
+          >
+            {phoneSlides.map((slide, index) => (
+              <SwiperSlide key={index}>
+                <div className="relative w-full h-full overflow-hidden">
+                  
+                  <div className="absolute inset-0 hero-zoom">
+                    <Image
+                      src={`${NEXT_PUBLIC_API_URL}/${slide.image}`}
+                      alt={slide.title || "slider image"}
+                      fill
+                      sizes="100vw"
+                      className="object-cover"
+                    />
+                  </div>
+
+                  <div className="absolute inset-0 bg-black/20" />
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
       </div>
 
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
-        <div className="swiper-pagination" />
-      </div>
+      {/* Pagination */}
+      <div className="hero-pagination absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex gap-2" />
+
+      {/* Styles */}
+      <style jsx global>{`
+        /* Pagination bullets */
+        .hero-bullet {
+          width: 10px;
+          height: 10px;
+          background: rgba(255, 255, 255, 0.4);
+          border-radius: 9999px;
+          transition: all 0.3s ease;
+        }
+
+        .hero-bullet-active {
+          width: 24px;
+          background: white;
+        }
+
+        /* Zoom animation */
+        .hero-zoom {
+          animation: heroZoom 6s ease-in-out forwards;
+        }
+
+        @keyframes heroZoom {
+          0% {
+            transform: scale(1);
+          }
+          100% {
+            transform: scale(1.1);
+          }
+        }
+      `}</style>
     </section>
   );
 }
