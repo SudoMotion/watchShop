@@ -77,8 +77,8 @@ export default async function DynamicSection() {
                 <h3 className="text-xs font-semibold leading-tight tracking-tight text-white md:text-base">
                   {item.name}
                 </h3>
-                <p className="mt-1.5 text-[10px] line-clamp-2 text-neutral-300 md:mt-2 md:text-xs">
-                  abcdefghijklmnonopqrstuvwxyz abcdefghijklmnonopqrstuvwxyz {item.description}
+                <p className="mt-1.5 text-[10px] text-neutral-300 md:mt-2 md:text-xs">
+                  {item.description}
                 </p>
                 <div
                   className="mt-3 h-px w-8 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent md:mt-4 md:w-10"
