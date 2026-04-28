@@ -3,7 +3,6 @@ import { topBrands } from '@/_lib/tobBrands';
 import BigButton from '@/component/BigButton';
 import HeroSlider from '@/component/HeroSlider';
 import ProductCard from '@/component/ProductCard';
-import ProductSection from '@/component/ProductSection';
 import RecomendedProducts from '@/component/Recomended-Products';
 import SecoundaryProductSlider from '@/component/SecoundaryProductSlider';
 import HomeSeoExpandable from '@/component/HomeSeoExpandable';
@@ -16,12 +15,21 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import DynamicSection from '@/component/DynamicSection';
+import { getSections } from '@/stores/sectionsAPI';
 
 export const dynamic = 'force-dynamic';
 
 export default async function page() {
   const home = await getHome() || {};
   const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = home;
+  const sectionsResponse = await getSections();
+  const sections = sectionsResponse?.sections ?? [];
+  const firstSection = sections.slice(0, 1);
+  const secondSection = sections.slice(1, 2);
+  const thirdSection = sections.slice(2, 3);
+  const fourthSection = sections.slice(3, 4);
+  const remainingSections = sections.slice(4);
+  console.log('sectionsResponse', sectionsResponse)
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
     <div>
@@ -50,7 +58,7 @@ export default async function page() {
           <a href="#">More</a>
         </div>
       </div>
-      <SectionArea/>
+      <SectionArea sections={firstSection} />
       <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
         <SecoundaryProductSlider/>
         <RecomendedProducts/>
@@ -58,7 +66,7 @@ export default async function page() {
       <div className='max-w-7xl mx-auto my-10 px-2'>
         <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
       </div>
-      <ProductSection products={new_arrival} title="New Arrival"/>
+      <SectionArea sections={secondSection} className="py-0 md:py-0" />
       {/* <div className='max-w-7xl mx-auto my-10 px-2'>
         <h1 className='title'>Trending Now</h1>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
@@ -70,11 +78,12 @@ export default async function page() {
         </div>
       </div> */}
       <TwoBanners/>
-      <ProductSection products={mens_products} title="MEN'S BEST SELLER"/>
+      <SectionArea sections={thirdSection} className="py-0 md:py-0" />
       <div className='max-w-7xl mx-auto my-10 px-2'>
         <Image placeholder="blur" blurDataURL={blurSvg} src="/images/offer3.webp" className='w-full object-contain' alt="offer1" width={1500} height={1500}/>
       </div>
-      <ProductSection products={ladies_products} title="LADIES BEST SELLER"/>
+      <SectionArea sections={fourthSection} className="py-0 md:py-0" />
+      <SectionArea sections={remainingSections} className="py-0 md:py-0" />
       <div className='max-w-7xl mx-auto my-10 px-2'>
         <h1 className='title'>Trending Now</h1>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>

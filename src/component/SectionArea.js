@@ -4,9 +4,11 @@ import ProductCard2 from './ProductCard2';
 import Link from 'next/link';
 import ProductSlider from './ProductSlider';
 
-export default async function SectionArea() {
-    const response = await getSections();
-    const sections = response?.sections ?? [];
+export default async function SectionArea({ sections: sectionProp, className = '' }) {
+    const fetchedResponse = sectionProp ? null : await getSections();
+    const sections = Array.isArray(sectionProp)
+        ? sectionProp
+        : (fetchedResponse?.sections ?? []);
     
     const isSliderEnabled = (section) => {
         const flag = section?.is_slider ?? section?.is_slide;
@@ -17,7 +19,7 @@ export default async function SectionArea() {
     };
     if (sections.length === 0) return null;
   return (
-    <div className='max-w-7xl mx-auto px-2 md:px-0 flex flex-col gap-y-16 md:gap-y-20 py-10 md:py-16'>
+    <div className={`max-w-7xl mx-auto px-2 md:px-0 flex flex-col gap-y-16 md:gap-y-20 py-10 md:py-16 ${className}`.trim()}>
         {
             sections?.map((section) => (
                 <div key={section.id}>
