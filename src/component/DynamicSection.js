@@ -8,32 +8,12 @@ export default async function DynamicSection() {
   const topBrands = await getTopBrands();
   const {sections : newDynamicSection} = await getNewDynamicSection();
   console.log('newDynamicSection', newDynamicSection);
-  const data = [
-    {
-      id: 1,
-      title: "Mens Watch",
-      description: "Mens Watch Description",
-      image: "images/men.jpg",
-    },
-    {
-      id: 2,
-      title: "Ladies Watch",
-      description: "Mens Watch Description",
-      image: "images/ladies.jpg",
-    },
-    {
-      id: 3,
-      title: "Watch Accessories",
-      description: "Watch Accessories Description",
-      image: "images/accessories.jpg",
-    },
-  ];
-
-  const imageSrc = (path) =>
-    path.startsWith("/") ? path : `/${path}`;
+  const hasDynamicSection =
+    Array.isArray(newDynamicSection) && newDynamicSection.length > 0;
 
   return (
     <div>
+      {hasDynamicSection && (
       <div className="mx-auto grid max-w-7xl grid-cols-2 gap-2 px-2 py-10 md:gap-8 md:px-0 md:py-16 lg:grid-cols-4">
         {newDynamicSection.map((item) => (
           <article
@@ -92,6 +72,8 @@ export default async function DynamicSection() {
           </article>
         ))}
       </div>
+      )}
+      {!hasDynamicSection && (
       <div className='py-10 bg-gray-50 px-2'>
         <div className='max-w-7xl mx-auto'>
           <h2 className='text-3xl md:text-4xl font-bold mb-8'>Top Watch Brands</h2>
@@ -112,6 +94,7 @@ export default async function DynamicSection() {
           </div>
         </div>
       </div>
+      )}
     </div>
   );
 }
