@@ -19,3 +19,12 @@ export const getSectionDetail = async (id, params = {}) => {
     return null;
   }
 };
+export const getNotice = async () => {
+  try {
+    const response = await apiRequest(`/api/notice`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching notice:', error);
+    return null;
+  }
+};

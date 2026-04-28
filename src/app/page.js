@@ -15,7 +15,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import DynamicSection from '@/component/DynamicSection';
-import { getSections } from '@/stores/sectionsAPI';
+import { getNotice, getSections } from '@/stores/sectionsAPI';
 
 export const dynamic = 'force-dynamic';
 
@@ -29,7 +29,7 @@ export default async function page() {
   const thirdSection = sections.slice(2, 3);
   const fourthSection = sections.slice(3, 4);
   const remainingSections = sections.slice(4);
-  console.log('sectionsResponse', sectionsResponse)
+  const {notices :notice} = await getNotice();
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
     <div>
@@ -51,11 +51,13 @@ export default async function page() {
         <div className='max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between'>
           <p>Important</p>
           <div>
-            <p>Important Notice regarding Counterfeit and Modified SEIKO watches</p>
-            <p>Notice Concerning Succession of Clock Sales Business from Seiko Time Creation Inc.</p>
-            <p>[About the "fake accounts" on our official SNS]</p>
+            {
+              notice?.map((item, index)=>(
+                <Link className='hover:underline transition-all duration-200' key={index} href={item?.page_link ?? '#'}>{item?.name}</Link>
+              ))
+            }
           </div>
-          <a href="#">More</a>
+          <Link href="#" className='text-blue-500 hover:text-blue-700 transition-all duration-200'>More</Link>
         </div>
       </div>
       <SectionArea sections={firstSection} />
