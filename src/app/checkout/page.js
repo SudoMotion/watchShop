@@ -97,7 +97,6 @@ export default function CheckoutPage() {
     b_phone: "",
     b_district: "",
     b_address: "",
-    password: "",
   });
 
   const [districtId, setDistrictId] = useState("");
@@ -320,21 +319,16 @@ export default function CheckoutPage() {
     const email = String(formData.email || "").trim();
     const phone = String(formData.phone || "").replace(/\D/g, "");
     const address = String(formData.address || "").trim();
-    const password = String(formData.password || "");
+    const password = "123456789";
 
-    if (!name || !email || !phone || !address || !password) {
-      toast.error("Name, Email, Phone, Address and Password are required.");
+    if (!name || !email || !phone || !address) {
+      toast.error("Name, Email, Phone and Address are required.");
       return;
     }
     if (phone.length !== 11) {
       toast.error("Enter a valid 11-digit mobile number.");
       return;
     }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters.");
-      return;
-    }
-
     setRegistering(true);
     try {
       const registerRes = await useRegisterMutation({
@@ -838,23 +832,6 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
-                  {!isLoggedIn() && !existingCustomerMode && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Password <span className="text-red-600">*</span>
-                      </label>
-                      <input
-                        type="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleInputChange}
-                        required
-                        minLength={6}
-                        placeholder="Create a password"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                    </div>
-                  )}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Address <span className="text-red-600">*</span>
@@ -1352,21 +1329,6 @@ export default function CheckoutPage() {
                           required
                           maxLength={191}
                           placeholder="House/Flat, Road, Area"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Password <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          required
-                          minLength={6}
-                          placeholder="Create a password"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
                         />
                       </div>
