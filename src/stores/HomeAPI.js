@@ -34,8 +34,18 @@ export const getPopup = async () => {
   }
   return null;
 };
+export const getNewDynamicSection = async (slug) => {
+  try {
+    const response = await apiRequest(`/api/default-top-ten-sections`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product by slug:', error);
+    return null;
+  }
+};
 
 export default {
   getHome,
   getPopup,
+  getNewDynamicSection,
 };
