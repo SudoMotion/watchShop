@@ -2,7 +2,7 @@ import { getDiscountProducts } from '@/stores/ProductAPI'
 import Link from 'next/link';
 import React from 'react'
 import BigButton from './BigButton';
-import ProductCard from './ProductCard';
+import ProductCard2 from './ProductCard2';
 
 export default async function RecomendedProducts() {
     const result = await getDiscountProducts();
@@ -13,7 +13,7 @@ export default async function RecomendedProducts() {
         <h1 className='title leading-7'>recomended Products</h1>
         <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
             {items.map((item, index) => (
-            <ProductCard item={item} key={index} />
+            <ProductCard2 item={item} key={index} />
             ))}
         </div>
         <Link href={"/product"} className='flex items-center justify-center'>

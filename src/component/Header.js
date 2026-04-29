@@ -350,12 +350,15 @@ export default function Header() {
                       const len = item.submenu.length;
                       const isCol1 = len <= 7;
                       const isCol2 = len <= 16;
-                      const gridCols = isCol1 ? 'grid-cols-1' : isCol2 ? 'grid-cols-2' : 'grid-cols-4';
+                      const isCol3 = len <= 26;
+                      const gridCols = isCol1 ? 'grid-cols-1' : isCol2 ? 'grid-cols-2' : isCol3 ? 'grid-cols-4' : 'grid-cols-6';
                       const widthClass = isCol1
                         ? 'w-52 min-w-[13rem] max-w-[18rem]'
                         : isCol2
                           ? 'w-80 md:w-96 min-w-[20rem] max-w-[32rem]'
-                          : 'w-64 md:w-[28rem] lg:w-[650px] min-w-[36rem] max-w-[650px]';
+                          : isCol3
+                            ? 'w-64 md:w-[28rem] lg:w-[650px] min-w-[36rem] max-w-[650px]'
+                          : 'w-64 md:w-[28rem] min-w-[36rem] lg:min-w-[55rem] max-w-[650px]';
 
                           // if(isCol1 || isCol2){
                           // }

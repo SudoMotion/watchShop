@@ -73,7 +73,7 @@ export default function DesktopSearch({
         </button>
       )}
       {open && (
-        <div className="absolute right-0 top-full mt-2 z-50 w-[min(92vw,58rem)] rounded-md border border-gray-200 bg-white p-2 shadow-lg">
+        <div className="absolute right-0 top-full mt-2 z-50 w-[min(92vw,28rem)] md:w-[min(92vw,58rem)] 2xl:w-[min(92vw,83rem)] rounded-md border border-gray-200 bg-white p-2 shadow-lg">
           <form
             onSubmit={(e) => e.preventDefault()}
             className="flex items-center gap-x-2"
