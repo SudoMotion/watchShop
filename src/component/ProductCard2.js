@@ -77,7 +77,7 @@ export default function ProductCard2({ item }) {
           )}
         </Link>
         {getRoundedDiscountLabel(item.discount) && (
-          <div className="absolute left-2 top-2 z-[5] rounded-md bg-red-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
+          <div className="absolute top-2 left-1 z-[5] rounded-br-xl rounded-tl-xl bg-red-500 px-2 py-1 text-xs font-medium text-white shadow-sm">
             {getRoundedDiscountLabel(item.discount)}
           </div>
         )}
