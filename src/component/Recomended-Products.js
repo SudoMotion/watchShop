@@ -9,8 +9,8 @@ export default async function RecomendedProducts() {
     const {products, brands, categories    } = result || {};
     const items = (products?.data ?? (Array.isArray(products) ? products : [])).slice(0, 6);
   return (
-    <div className='text-center p-5'>
-        <h1 className='title'>recomended Products</h1>
+    <div className='text-center p-5 pt-0'>
+        <h1 className='title leading-7'>recomended Products</h1>
         <div className='grid grid-cols-2 md:grid-cols-3 gap-x-5 gap-y-10'>
             {items.map((item, index) => (
             <ProductCard item={item} key={index} />

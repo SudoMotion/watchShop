@@ -38,12 +38,12 @@ export default function SecoundaryProductSlider() {
 
   if (!mounted) {
     return (
-      <section className="relative w-full h-screen lg:h-[120vh] bg-black" />
+      <section className="relative w-full h-screen lg:h-[120vh] 2xl:h-[120vh] bg-black" />
     );
   }
 
   return (
-    <section className="relative w-full min-h-screen overflow-hidden">
+    <section className="relative w-full min-h-screen max-h-[700px] overflow-hidden">
       <Swiper
         modules={[Autoplay, Pagination]}
         slidesPerView={1}
@@ -63,7 +63,7 @@ export default function SecoundaryProductSlider() {
       >
         {slides.map((slide, index) => (
           <SwiperSlide key={index} className="w-full h-full">
-            <div className="relative w-full h-screen overflow-hidden">
+            <div className="relative w-full h-full overflow-hidden">
               {/* Background image */}
               <div
                 className="hero-bg absolute inset-0 bg-cover bg-center"
