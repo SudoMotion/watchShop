@@ -43,7 +43,7 @@ export default function SecoundaryProductSlider() {
   }
 
   return (
-    <section className="relative w-full min-h-screen max-h-[700px] overflow-hidden">
+    <section className="relative w-full h-[700px] 2xl:h-[880px] overflow-hidden">
       <Swiper
         modules={[Autoplay, Pagination]}
         slidesPerView={1}
