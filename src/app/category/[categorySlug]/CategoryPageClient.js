@@ -31,6 +31,14 @@ export default function CategoryPageClient({ categorySlug }) {
   const activeFilterCount = getActiveFilterChipCount(filters);
   const filtersKey = JSON.stringify(filters ?? {});
 
+  const getQuantityAgnosticFilters = (rawFilters) => {
+    if (!rawFilters || typeof rawFilters !== 'object') return {};
+    return {
+      ...rawFilters,
+      quantity: { in: false, out: false },
+    };
+  };
+
   useEffect(() => {
     let mounted = true;
 
@@ -53,7 +61,12 @@ export default function CategoryPageClient({ categorySlug }) {
         params.sortBy = sortBy;
       }
 
-      const response = await getProductsByCategory(categorySlug, params);
+      const baseCountParams = buildBrandFilterParams(getQuantityAgnosticFilters(parsedFilters));
+      const [response, stockInResponse, stockOutResponse] = await Promise.all([
+        getProductsByCategory(categorySlug, params),
+        getProductsByCategory(categorySlug, { ...baseCountParams, stock_in: '1', page: 1 }),
+        getProductsByCategory(categorySlug, { ...baseCountParams, stock_out: '1', page: 1 }),
+      ]);
       if (!mounted) return;
       const paginated = response?.products;
       const items = paginated?.data ?? [];
@@ -62,17 +75,15 @@ export default function CategoryPageClient({ categorySlug }) {
         setError('Could not load products.');
       }
 
-      const inStockCount = items.filter((item) => {
-        const qty = Number(item?.quantity ?? item?.stock ?? 0);
-        return Number.isFinite(qty) ? qty > 0 : false;
-      }).length;
+      const inStockCount = Number(stockInResponse?.products?.total ?? 0);
+      const outStockCount = Number(stockOutResponse?.products?.total ?? 0);
 
       setProducts(Array.isArray(items) ? items : []);
       setLastPage(Math.max(1, Number(paginated?.last_page ?? 1)));
       setTotal(Number(paginated?.total ?? 0));
       setStockCounts({
         in: inStockCount,
-        out: Math.max(0, items.length - inStockCount),
+        out: outStockCount,
       });
       setIsLoading(false);
     };
