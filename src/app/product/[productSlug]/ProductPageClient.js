@@ -729,11 +729,11 @@ export default function ProductPageClient({ params }) {
           )}
 
           {/* SPECS */}
-          <div className="mt-6 sm:mt-8 border rounded-xl p-3 sm:p-4 md:p-5">
-            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold mb-2 sm:mb-3">
+          <div className="mt-2 md:mt-4">
+            <h2 className="text-base sm:text-lg md:text-xl lg:text-2xl font-semibold">
               To speak an Expert 24/7
             </h2>
-            <p className="text-sm sm:text-base text-gray-600 mb-3 sm:mb-4">
+            <p className="text-sm sm:text-base text-gray-600 mb-1 sm:mb-2">
             Contact Us Now
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
@@ -763,25 +763,6 @@ export default function ProductPageClient({ params }) {
                 </span>
                 <span>WhatsApp</span>
               </a>
-              <a
-                href="tel:+8801720392824"
-                className="inline-flex items-center justify-center gap-1.5 rounded-md border border-gray-300 text-gray-800 px-3 py-1.5 text-xs sm:text-sm font-semibold hover:bg-gray-50"
-              >
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-gray-100 text-gray-700">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 24 24"
-                    className="w-4 h-4"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fill="currentColor"
-                      d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24 11.36 11.36 0 003.56.57 1 1 0 011 1V20a1 1 0 01-1 1A16 16 0 014 5a1 1 0 011-1h3.5a1 1 0 011 1 11.36 11.36 0 00.57 3.56 1 1 0 01-.24 1.01z"
-                    />
-                  </svg>
-                </span>
-                <span>Call Now</span>
-              </a>
             </div>
 
             {/* <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -798,37 +779,37 @@ export default function ProductPageClient({ params }) {
                 <Image src="/images/warrenty.png" alt="Cycle" width={100} height={100} className="w-full h-auto" />
               </div>
             </div> */}
-            <div className="mt-4 sm:mt-6 grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-5 text-center">
-            {authentics.length > 0
-              ? authentics.map((a) => (
-                  <div key={a.id} className="flex flex-col items-center">
-                    {a.image && (
-                      <div className="w-10 h-10 sm:w-12 sm:h-12 relative mb-1">
-                        <Image
-                          src={imgUrl(a.image)}
-                          alt={a.title}
-                          fill
-                          className="object-contain"
-                        />
-                      </div>
-                    )}
-                    <div className="font-semibold text-xs sm:text-sm">{a.title}</div>
-                  </div>
-                ))
-              : (
-                <>
-                  <div><div className="font-semibold text-xs sm:text-sm">100% Authentic</div></div>
-                  <div><div className="font-semibold text-xs sm:text-sm">Fast Delivery</div></div>
-                  <div><div className="font-semibold text-xs sm:text-sm">Secure Checkout</div></div>
-                </>
-              )}
-          </div>
           </div>
         </div>
       </div>
 
       {/* DESCRIPTION */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-5 text-center border-y border-gray-300 py-5 mb-5">
+        {authentics.length > 0
+          ? authentics.map((a) => (
+              <div key={a.id} className="flex flex-col items-center">
+                {a.image && (
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 relative mb-1">
+                    <Image
+                      src={imgUrl(a.image)}
+                      alt={a.title}
+                      fill
+                      className="object-contain"
+                    />
+                  </div>
+                )}
+                <div className="font-semibold text-xs sm:text-sm">{a.title}</div>
+              </div>
+            ))
+          : (
+            <>
+              <div><div className="font-semibold text-xs sm:text-sm">100% Authentic</div></div>
+              <div><div className="font-semibold text-xs sm:text-sm">Fast Delivery</div></div>
+              <div><div className="font-semibold text-xs sm:text-sm">Secure Checkout</div></div>
+            </>
+          )}
+      </div>
         <div className="flex items-center gap-2 sm:gap-4 md:gap-6 sticky top-0 bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button
               onClick={() => scrollToSection("editor-note")}

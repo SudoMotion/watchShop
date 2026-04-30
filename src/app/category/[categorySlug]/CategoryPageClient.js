@@ -6,6 +6,7 @@ import { Pagination } from '@/component/Pagination';
 import ProductCard2 from '@/component/ProductCard2';
 import ProductFilter from '@/component/ProductFilter';
 import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
+import { NEXT_PUBLIC_API_URL } from '@/config';
 import { getProductsByCategory } from '@/stores/ProductAPI';
 import { useEffect, useMemo, useState } from 'react';
 import { BRAND_SORT_VALUES, buildBrandFilterParams } from '@/hooks/useBrandProducts';
@@ -28,6 +29,8 @@ export default function CategoryPageClient({ categorySlug }) {
   const [stockCounts, setStockCounts] = useState({ in: 0, out: 0 });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [categoryImageUrl, setCategoryImageUrl] = useState('/images/brand-banner.webp');
+  const [categoryTitle, setCategoryTitle] = useState('');
   const activeFilterCount = getActiveFilterChipCount(filters);
   const filtersKey = JSON.stringify(filters ?? {});
 
@@ -37,6 +40,12 @@ export default function CategoryPageClient({ categorySlug }) {
       ...rawFilters,
       quantity: { in: false, out: false },
     };
+  };
+
+  const resolveImageUrl = (path) => {
+    if (!path) return '/images/brand-banner.webp';
+    if (String(path).startsWith('http')) return path;
+    return `${NEXT_PUBLIC_API_URL}/${String(path).replace(/^\//, '')}`;
   };
 
   useEffect(() => {
@@ -70,6 +79,8 @@ export default function CategoryPageClient({ categorySlug }) {
       if (!mounted) return;
       const paginated = response?.products;
       const items = paginated?.data ?? [];
+      const catImage = response?.cat?.image ?? '';
+      const catName = response?.cat?.name ?? '';
 
       if (response == null) {
         setError('Could not load products.');
@@ -85,6 +96,8 @@ export default function CategoryPageClient({ categorySlug }) {
         in: inStockCount,
         out: outStockCount,
       });
+      setCategoryImageUrl(resolveImageUrl(catImage));
+      setCategoryTitle(catName || '');
       setIsLoading(false);
     };
 
@@ -99,7 +112,7 @@ export default function CategoryPageClient({ categorySlug }) {
     setCurrentPage(1);
   }, [categorySlug, filtersKey, sortBy]);
 
-  const categoryName = useMemo(
+  const categoryNameFromSlug = useMemo(
     () =>
       categorySlug
         .split('-')
@@ -107,14 +120,15 @@ export default function CategoryPageClient({ categorySlug }) {
         .join(' '),
     [categorySlug]
   );
+  const categoryName = categoryTitle || categoryNameFromSlug;
 
   return (
     <div>
       <div
-        className="py-24 flex items-center justify-center"
-        style={{ backgroundImage: "url('/images/brand-banner.webp')" }}
+        className="py-7 md:py-10 flex items-center justify-center bg-center bg-cover"
+        style={{ backgroundImage: `url('${categoryImageUrl}')` }}
       >
-        <div className="text-5xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
+        <div className="text-xl md:text-5xl font-bold bg-gray-400/40 text-white rounded-lg md:rounded-2xl backdrop-blur-md py-2 px-8 md:p-5">
           <span className="capitalize">{categoryName}</span>
         </div>
       </div>
