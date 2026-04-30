@@ -7,7 +7,6 @@ import React from "react";
 export default async function DynamicSection() {
   const topBrands = await getTopBrands();
   const {sections : newDynamicSection} = await getNewDynamicSection();
-  console.log('newDynamicSection', newDynamicSection);
   const hasDynamicSection =
     Array.isArray(newDynamicSection) && newDynamicSection.length > 0;
 
