@@ -633,18 +633,6 @@ export default function ProductPageClient({ params }) {
             )}
           </div>
 
-          {(String(product?.bullet_point || "").trim() || modelText) && (
-            <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-700 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_li]:leading-relaxed">
-              {modelText && (
-                <ul className="mb-1 list-disc pl-5">
-                  <li>Model: {modelText}</li>
-                </ul>
-              )}
-              {String(product?.bullet_point || "").trim() && (
-                <div dangerouslySetInnerHTML={{ __html: String(product.bullet_point) }} />
-              )}
-            </div>
-          )}
 
           {/* EMI Section */}
           {isEmiAvailable && (
@@ -702,31 +690,56 @@ export default function ProductPageClient({ params }) {
               <span className="text-red-500">●</span> 100% Authentic
             </li>
             <li className="flex items-center gap-2">
-              <span className="text-red-500">●</span> Fast Delivery
+            <span className="text-red-500">●</span> Fast Delivery
             </li>
             <li className="flex items-center gap-2">
               <span className="text-red-500">●</span> Secure Checkout
-            </li>
-          </ul> */}
+              </li>
+              </ul> */}
+              {/* bullet points */}
+              {/* {(String(product?.bullet_point || "").trim() || modelText) && (
+                <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-700 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_li]:leading-relaxed">
+                  {modelText && (
+                    <ul className="mb-1 list-disc pl-5">
+                      <li>Model: {modelText}</li>
+                    </ul>
+                  )}
+                  {String(product?.bullet_point || "").trim() && (
+                    <div dangerouslySetInnerHTML={{ __html: String(product.bullet_point) }} />
+                  )}
+                </div>
+              )} */}
 
-          {productItem.filter((item) => item.value != null && item.value !== "").length > 0 && (
+          {/* {productItem.filter((item) => item.value != null && item.value !== "").length > 0 ? (
             <div className="mt-4 sm:mt-5 pt-4 border-t border-gray-200">
-              <ul className="space-y-1.5 text-sm text-gray-700">
-                {productItem
-                  .filter((item) => item.value != null && item.value !== "")
-                  .slice(0, 6)
-                  .map((item) => (
-                    <li key={item.id ?? item.label} className="flex items-start gap-2">
-                      <span className="text-red-500 mt-0.5 shrink-0">●</span>
-                      <span>
-                        <span className="font-medium text-gray-800">{item.label}:</span>{" "}
-                        <span className="text-gray-600">{item.value}</span>
-                      </span>
-                    </li>
-                  ))}
-              </ul>
+              Bangladesho
             </div>
-          )}
+          ) : 'Bangladesho'} */}
+              <ul className="space-y-1.5 text-sm text-gray-700 mt-1 md:mt-3">
+                <li className="flex items-start gap-2">
+                  <span className="text-red-500 mt-0.5 shrink-0">●</span>
+                  <span>
+                    <span className="font-medium text-gray-800">Model:</span>
+                    <span className="text-gray-600">{modelText}</span>
+                  </span>
+                </li>
+              {productItem.filter(
+                (item) =>
+                  item?.value != null &&
+                  String(item.value).trim() !== "" &&
+                  String(item?.label || "").trim().toLowerCase() !== "model"
+              )
+              .slice(0, 6)
+              .map((item) => (
+                <li key={item.id ?? item.label} className="flex items-start gap-2">
+                  <span className="text-red-500 mt-0.5 shrink-0">●</span>
+                  <span>
+                    <span className="font-medium text-gray-800">{item.label}:</span>{" "}
+                    <span className="text-gray-600">{item.value}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
 
           {/* SPECS */}
           <div className="mt-2 md:mt-4">
