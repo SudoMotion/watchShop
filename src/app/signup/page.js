@@ -14,38 +14,54 @@ export default function SignupPage() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
-  const [password, setPassword] = useState("");
   const [privacyPolicy, setPrivacyPolicy] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     if (isLoggedIn()) router.replace("/account");
   }, [router]);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const submitRegistration = async () => {
     setLoading(true);
+    const defaultPassword = "123456789";
     const response = await useRegisterMutation({
       name: name.trim(),
       email: email.trim(),
       phone: phone.trim(),
       address: address.trim(),
-      password,
+      password: defaultPassword,
       privacy_policy: privacyPolicy ? 1 : 0,
     });
     setLoading(false);
     if (response?.status >= 200 && response?.status < 300) {
-      toast.success("Account created successfully.");
+      const { token, customer, token_type } = response?.data ?? {};
+      if (token != null && customer) {
+        try {
+          localStorage.setItem(
+            "watchshop_auth",
+            JSON.stringify({ token, customer, token_type: token_type || "Bearer" })
+          );
+          document.cookie = "watchshop_logged_in=1; path=/; max-age=2592000";
+        } catch (_) {}
+      }
+      toast.success(response?.data?.message || "Account created successfully.");
       setName("");
       setEmail("");
       setPhone("");
       setAddress("");
-      setPassword("");
       setPrivacyPolicy(false);
+      setShowConfirm(false);
+      router.push("/account");
     } else {
       const errorMsg = response?.data?.message || response?.data?.error || "Registration failed. Please try again.";
       toast.error(errorMsg);
     }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setShowConfirm(true);
   };
 
   return (
@@ -113,20 +129,6 @@ export default function SignupPage() {
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="password"
-              placeholder="Create a password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-teal-500 focus:border-transparent outline-none transition-colors"
-              required
-            />
-          </div>
-
           <div className="flex items-center">
             <input
               id="privacy_policy"
@@ -175,6 +177,40 @@ export default function SignupPage() {
           </div>
         </div>
       </div>
+      {showConfirm && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="text-xl font-semibold text-gray-900">Verify your details</h2>
+            <p className="mt-1 text-sm text-gray-600">
+              Please confirm your information before registration.
+            </p>
+            <div className="mt-4 space-y-2 text-sm text-gray-700">
+              <p><span className="font-medium">Name:</span> {name || "-"}</p>
+              <p><span className="font-medium">Email:</span> {email || "-"}</p>
+              <p><span className="font-medium">Phone:</span> {phone || "-"}</p>
+              <p><span className="font-medium">Address:</span> {address || "-"}</p>
+            </div>
+            <div className="mt-6 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setShowConfirm(false)}
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+                disabled={loading}
+              >
+                Edit
+              </button>
+              <button
+                type="button"
+                onClick={submitRegistration}
+                disabled={loading}
+                className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-semibold text-white hover:bg-teal-700 disabled:opacity-60"
+              >
+                {loading ? "Submitting..." : "Confirm & Register"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
       <ToastContainer position="top-right" autoClose={3000} newestOnTop />
     </div>
   )
