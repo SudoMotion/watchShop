@@ -49,29 +49,37 @@ export default function DesktopSearch({
   };
 
   return (
-    <div className="relative" ref={searchRef}>
-      {!open && (
+    <div className="relative hidden md:block w-10" ref={searchRef}>
+      <div className="flex items-center justify-center w-10">
         <button
-          onClick={() => setOpen(true)}
-          className={`hidden md:flex items-center justify-center p-2 ${
+          type="button"
+          onClick={() => setOpen((prev) => !prev)}
+          aria-label={open ? "Close search" : "Open search"}
+          className={`flex items-center justify-center p-2 ${
             onTransparent ? "md:md:text-white hover:text-white/80" : "text-gray-700 hover:text-gray-900"
           }`}
         >
-          <svg
-            className="w-6 h-6"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
+          {open ? (
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg
+              className="w-6 h-6"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          )}
         </button>
-      )}
+      </div>
       {open && (
         <div className="absolute right-0 top-full mt-2 z-50 w-[min(92vw,28rem)] md:w-[min(92vw,58rem)] 2xl:w-[min(92vw,83rem)] rounded-md border border-gray-200 bg-white p-2 shadow-lg">
           <form
