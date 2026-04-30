@@ -1,6 +1,7 @@
 import { productList } from '@/_lib/productList';
 import ProductCard2 from '@/component/ProductCard2';
 import ProductFilter from '@/component/ProductFilter';
+import { getProductsByCategory } from '@/stores/ProductAPI';
 import React from 'react'
 
 export async function generateStaticParams() {
@@ -22,7 +23,9 @@ export async function generateStaticParams() {
 
 export default async function CategoryPage({ params }) {
   const { categorySlug } = await params;
-  const data = productList;
+  const {products} = await getProductsByCategory(categorySlug);
+  const {data, last_page, total  } = products;
+  console.log('categories', products);
   
   // Format category name for display (convert slug to readable format)
   const categoryName = categorySlug
@@ -42,17 +45,8 @@ export default async function CategoryPage({ params }) {
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4 max-h-screen overflow-y-auto">
           {/* Products will be loaded here */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {data.map((product) => (
+            {data?.map((product) => (
               <ProductCard2 key={product.id} item={product}/>
-            ))}
-            {data.map((product) => (
-              <ProductCard2 key={`${product.id}-2`} item={product}/>
-            ))}
-            {data.map((product) => (
-              <ProductCard2 key={`${product.id}-3`} item={product}/>
-            ))}
-            {data.map((product) => (
-              <ProductCard2 key={`${product.id}-4`} item={product}/>
             ))}
           </div>
         </div>
