@@ -135,7 +135,7 @@ export default function AccountPage() {
 
           {/* Actions */}
           <div className="px-6 py-5 bg-gray-50 border-t border-gray-100 flex flex-col sm:flex-row gap-3">
-            <Link
+            {/* <Link
               href="/dashboard"
               className="inline-flex justify-center items-center gap-2 px-5 py-2.5 border border-teal-600 text-teal-600 rounded-lg text-sm font-medium hover:bg-teal-50 transition-colors"
             >
@@ -143,7 +143,7 @@ export default function AccountPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z" />
               </svg>
               Dashboard
-            </Link>
+            </Link> */}
             <button
               type="button"
               onClick={handleLogout}
