@@ -101,52 +101,67 @@ export default function DesktopSearch({
           </form>
 
           {hasQuery && (
-            <div className="mt-2 max-h-80 overflow-y-auto rounded border border-gray-100">
-              {searchResults.length > 0 ? (
-                searchResults.map((item) => {
-                  const { original, discounted, discountPercent } = priceMeta(item);
-                  return (
-                    <Link
-                      key={item.id}
-                      href={`/product/${item.slug}`}
-                      onClick={onResultClick}
-                      className="flex items-center gap-2 border-b border-gray-100 p-2 hover:bg-gray-50"
-                    >
-                      {productImage(item) ? (
-                        <img
-                          src={productImage(item)}
-                          alt={item?.name || "Product"}
-                          className="h-12 w-12 rounded object-cover"
-                        />
-                      ) : (
-                        <div className="h-12 w-12 rounded bg-gray-100" />
-                      )}
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-medium text-gray-800">
-                          {item?.name || item?.meta_title || "Product"}
-                        </p>
-                        <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                          <span className="font-semibold text-gray-800">
-                            BDT {discounted.toLocaleString("en-BD")}
-                          </span>
-                          {discountPercent > 0 && (
-                            <>
-                              <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-semibold text-green-700">
-                                {Math.round(discountPercent)}% OFF
-                              </span>
-                              <span className="text-gray-400 line-through">
-                                BDT {original.toLocaleString("en-BD")}
-                              </span>
-                            </>
+            <div className="mt-2 overflow-hidden rounded border border-gray-100">
+              <div className="flex flex-col md:flex-row">
+                <div className="w-full border-b border-gray-100 bg-gray-50 p-3 md:w-1/3 md:border-b-0 md:border-r">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
+                    Keyword suggestions
+                  </p>
+                  <p className="mt-2 text-sm text-gray-500">
+                    No keyword found with this keyword:
+                    {" "}
+                    <span className="font-medium text-gray-700">{searchQuery}</span>
+                  </p>
+                </div>
+
+                <div className="w-full max-h-80 overflow-y-auto md:w-2/3">
+                  {searchResults.length > 0 ? (
+                    searchResults.map((item) => {
+                      const { original, discounted, discountPercent } = priceMeta(item);
+                      return (
+                        <Link
+                          key={item.id}
+                          href={`/product/${item.slug}`}
+                          onClick={onResultClick}
+                          className="flex items-center gap-2 border-b border-gray-100 p-2 hover:bg-gray-50"
+                        >
+                          {productImage(item) ? (
+                            <img
+                              src={productImage(item)}
+                              alt={item?.name || "Product"}
+                              className="h-12 w-12 rounded object-cover"
+                            />
+                          ) : (
+                            <div className="h-12 w-12 rounded bg-gray-100" />
                           )}
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })
-              ) : (
-                <p className="p-3 text-sm text-gray-500">No products found.</p>
-              )}
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-medium text-gray-800">
+                              {item?.name || item?.meta_title || "Product"}
+                            </p>
+                            <div className="flex flex-wrap items-center gap-1.5 text-xs">
+                              <span className="font-semibold text-gray-800">
+                                BDT {discounted.toLocaleString("en-BD")}
+                              </span>
+                              {discountPercent > 0 && (
+                                <>
+                                  <span className="rounded bg-green-100 px-1.5 py-0.5 text-[10px] font-semibold text-green-700">
+                                    {Math.round(discountPercent)}% OFF
+                                  </span>
+                                  <span className="text-gray-400 line-through">
+                                    BDT {original.toLocaleString("en-BD")}
+                                  </span>
+                                </>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })
+                  ) : (
+                    <p className="p-3 text-sm text-gray-500">No products found.</p>
+                  )}
+                </div>
+              </div>
             </div>
           )}
         </div>
