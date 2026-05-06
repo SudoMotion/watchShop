@@ -83,6 +83,23 @@ export default function HeroSlider() {
 
                   {/* Optional Overlay */}
                   <div className="absolute inset-0 bg-black/20" />
+                  {slide?.title && slide?.link && (
+                    <div className="relative z-10 flex h-full items-end px-6 pb-12 md:px-20 md:pb-16">
+                      <div className="text-white">
+                        <h2 className="mb-4 text-3xl font-light tracking-wide md:text-5xl">
+                          {slide.title}
+                        </h2>
+                        <a
+                          href={slide.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block border border-white px-8 py-3 text-xs font-semibold tracking-widest uppercase text-white hover:bg-white hover:text-black transition"
+                        >
+                          Show More
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </SwiperSlide>
             ))}
@@ -125,6 +142,23 @@ export default function HeroSlider() {
                   </div>
 
                   <div className="absolute inset-0 bg-black/20" />
+                  {slide?.title && slide?.link && (
+                    <div className="relative z-10 flex h-full items-end px-4 pb-8">
+                      <div className="text-white">
+                        <h2 className="mb-3 text-xl font-light tracking-wide">
+                          {slide.title}
+                        </h2>
+                        <a
+                          href={slide.link}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block border border-white px-5 py-2 text-[10px] font-semibold tracking-widest uppercase text-white hover:bg-white hover:text-black transition"
+                        >
+                          Show More
+                        </a>
+                      </div>
+                    </div>
+                  )}
                 </div>
               </SwiperSlide>
             ))}
