@@ -3,14 +3,9 @@
 import { Backend_Base_Url } from '@/config'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useEffect } from 'react'
+import React from 'react'
 
 export default function BannerSection({ data = [], gifBanner = [] }) {
-    useEffect(() => {
-        console.log('sticky_banner (from BannerSection)', data);
-        console.log('gif_banner (from BannerSection)', gifBanner);
-    }, [data, gifBanner]);
-
   const stickyBanner = data?.[0];
   const stickyBannerImage = stickyBanner?.image
     ? (stickyBanner.image.startsWith('http') ? stickyBanner.image : `${Backend_Base_Url}/${stickyBanner.image}`)
