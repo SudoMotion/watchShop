@@ -9,18 +9,26 @@ import HomeSeoExpandable from '@/component/HomeSeoExpandable';
 import SectionArea from '@/component/SectionArea';
 import TwoBanners from '@/component/TwoBanners';
 import { Backend_Base_Url } from '@/config';
-import { getHome } from '@/stores/HomeAPI';
+import { getBannerContent, getHome } from '@/stores/HomeAPI';
 import { getTopBrands } from '@/stores/homeSpecification';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import DynamicSection from '@/component/DynamicSection';
 import { getNotice, getSections } from '@/stores/sectionsAPI';
+import BannerSection from '@/component/BannerSection';
 
 export const dynamic = 'force-dynamic';
 
 export default async function page() {
   const home = await getHome() || {};
+  const bannerResponse = await getBannerContent();
+  const bannersByType =
+    bannerResponse?.banners_by_type ??
+    bannerResponse?.data?.banners_by_type ??
+    {};
+  const stickyBanner = bannersByType?.sticky_banner ?? [];
+  const gifBanner = bannersByType?.gif_banner ?? [];
   const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = home;
   const sectionsResponse = await getSections();
   const sections = sectionsResponse?.sections ?? [];
@@ -36,17 +44,7 @@ export default async function page() {
       <HeroSlider/>
       <DynamicSection/>
       
-      <div className='max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-7 gap-5 mb-10 md:h-[400px] px-2'>
-        <div className='col-span-1 md:col-span-4 rounded-md md:rounded-lg overflow-hidden'>
-          <video preload='true' autoPlay loop muted playsInline>
-            <source src="/intro.mp4" type="video/mp4" />            
-            Your browser does not support the video.
-          </video>
-        </div>
-        <div className='col-span-1 md:col-span-3 rounded-md md:rounded-lg overflow-hidden'>
-          <Image src="/images/beside-video.avif" alt="beside-video" width={500} height={500} className='w-full'/>
-        </div>
-      </div>
+      <BannerSection data={stickyBanner} gifBanner={gifBanner}/>
       <div className='py-5 bg-black text-white px-2'>
         <div className='max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between'>
           <p>Important</p>
