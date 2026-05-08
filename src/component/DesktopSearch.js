@@ -10,6 +10,7 @@ export default function DesktopSearch({
   searchQuery,
   setSearchQuery,
   searchResults = [],
+  relatedKeywords = [],
   onResultClick,
 }) {
   const hasQuery = String(searchQuery || "").trim().length > 0;
@@ -115,11 +116,25 @@ export default function DesktopSearch({
                   <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
                     Keyword suggestions
                   </p>
-                  <p className="mt-2 text-sm text-gray-500">
-                    No keyword found with this keyword:
-                    {" "}
-                    <span className="font-medium text-gray-700">{searchQuery}</span>
-                  </p>
+                  {relatedKeywords.length > 0 ? (
+                    <div className="mt-2 flex flex-col items-start flex-wrap gap-2">
+                      {relatedKeywords.map((keyword, keywordIndex) => (
+                        <button
+                          key={`${keyword}-${keywordIndex}`}
+                          type="button"
+                          onClick={() => setSearchQuery(String(keyword))}
+                          className="rounded bg-white hover:bg-gray-100 px-2 py-1 text-xs text-gray-700 border border-gray-200 transition-colors text-start"
+                        >
+                          {keyword}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="mt-2 text-sm text-gray-500">
+                      No related keyword found for{" "}
+                      <span className="font-medium text-gray-700">{searchQuery}</span>
+                    </p>
+                  )}
                 </div>
 
                 <div className="w-full max-h-80 overflow-y-auto md:w-2/3">

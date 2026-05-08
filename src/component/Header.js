@@ -15,6 +15,7 @@ export default function Header() {
   const [open, setOpen] = useState(false); // search modal
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const [relatedKeywords, setRelatedKeywords] = useState([]);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -207,27 +208,34 @@ export default function Header() {
     const search = String(searchQuery || '').trim();
     if (!search) {
       setSearchResults([]);
+      setRelatedKeywords([]);
       return;
     }
     let cancelled = false;
     const fetchSearch = async () => {
       try {
         const response = await postSearchProducts({ search });
-        console.log('Search response realtime:', response.data);
-        const products = Array.isArray(response?.data)
-          ? response.data
-          : Array.isArray(response)
-            ? response
-            : Array.isArray(response?.products)
-              ? response.products
-              : [];
+        const payload = response?.data ?? response ?? {};
+        const products = Array.isArray(payload?.products)
+          ? payload.products
+          : Array.isArray(payload?.data)
+            ? payload.data
+            : Array.isArray(response?.data)
+              ? response.data
+              : Array.isArray(response)
+                ? response
+                : [];
+        const keywords = Array.isArray(payload?.related_keywords)
+          ? payload.related_keywords
+          : [];
         if (!cancelled) {
           setSearchResults(products);
+          setRelatedKeywords(keywords);
         }
       } catch (error) {
-        console.log('Search response realtime error:', error);
         if (!cancelled) {
           setSearchResults([]);
+          setRelatedKeywords([]);
         }
       }
     };
@@ -410,6 +418,7 @@ export default function Header() {
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
               searchResults={searchResults}
+              relatedKeywords={relatedKeywords}
               onResultClick={() => setOpen(false)}
             />
 
@@ -607,6 +616,25 @@ export default function Header() {
             </div>
             {String(searchQuery || "").trim().length > 0 && (
               <div className="mt-2 max-h-72 overflow-y-auto rounded border border-gray-100">
+                {relatedKeywords.length > 0 && (
+                  <div className="border-b border-gray-100 px-3 py-2">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
+                      Related keywords
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {relatedKeywords.map((keyword, keywordIndex) => (
+                        <button
+                          key={`${keyword}-${keywordIndex}`}
+                          type="button"
+                          onClick={() => setSearchQuery(String(keyword))}
+                          className="rounded bg-gray-100 hover:bg-gray-200 px-2 py-1 text-xs text-gray-700 transition-colors"
+                        >
+                          {keyword}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
                 {searchResults.length > 0 ? (
                   searchResults.map((item) => {
                     const { original, discounted, discountPercent } = searchPriceMeta(item);
@@ -653,7 +681,9 @@ export default function Header() {
                     );
                   })
                 ) : (
-                  <p className="px-3 py-2 text-sm text-gray-500">No products found.</p>
+                  <div className="px-3 py-2">
+                    <p className="text-sm text-gray-500">No products found.</p>
+                  </div>
                 )}
               </div>
             )}
