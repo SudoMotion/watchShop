@@ -321,6 +321,15 @@ export const getbrandLabels = async (body = {}) => {
     return null;
   }
 };
+export const getBestDeals = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/page-product-lists/best-deal',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
 
 export default {
   getMensProducts,
@@ -342,4 +351,5 @@ export default {
   getCategoryLabels,
   getbrandLabels,
   normalizeBrandLabelsList,
+  getBestDeals,
 };
