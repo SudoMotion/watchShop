@@ -168,6 +168,14 @@ export default function Header() {
     router.push(`/search?keyword=${encodeURIComponent(selectedKeyword)}`);
   };
 
+  const handleSearchSubmit = () => {
+    const keyword = String(searchQuery || "").trim();
+    if (!keyword) return;
+    setOpen(false);
+    setMobileSearchOpen(false);
+    router.push(`/search?keyword=${encodeURIComponent(keyword)}`);
+  };
+
   // Fetch categories once (for debugging / future use)
   useEffect(() => {
     const fetchCategories = async () => {
@@ -429,6 +437,7 @@ export default function Header() {
               searchResults={searchResults}
               relatedKeywords={relatedKeywords}
               onKeywordClick={handleKeywordClick}
+              onSearchSubmit={handleSearchSubmit}
               onResultClick={() => setOpen(false)}
             />
 
