@@ -2,6 +2,7 @@ import React from 'react'
 import { getTwoBanners } from '@/stores/homeSpecification';
 import Image from 'next/image';
 import { Backend_Base_Url } from '@/config';
+import Link from 'next/link';
 
 export default async function TwoBanners() {
     const two_banners = await getTwoBanners();
@@ -13,7 +14,9 @@ export default async function TwoBanners() {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
           {
             two_banners?.map((item, index)=>(
-              <Image key={index} placeholder="blur" blurDataURL={blurSvg} src={Backend_Base_Url +'/'+ item?.image} className='w-full md:h-96 object-contain' alt={item.title || ''} width={500} height={500}/>
+              <Link href={item?.page_link ?? '#'}>
+                <Image key={index} placeholder="blur" blurDataURL={blurSvg} src={Backend_Base_Url +'/'+ item?.image} className='w-full md:h-96 object-contain' alt={item.title || ''} width={500} height={500}/>
+              </Link>
             ))
           }
         </div>
