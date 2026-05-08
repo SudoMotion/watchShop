@@ -351,7 +351,7 @@ export default function Header() {
                       const isCol1 = len <= 7;
                       const isCol2 = len <= 16;
                       const isCol3 = len <= 26;
-                      const gridCols = isCol1 ? 'grid-cols-1' : isCol2 ? 'grid-cols-2' : isCol3 ? 'grid-cols-4' : 'grid-cols-6';
+                      const rowsClass = len > 28 ? 'grid-rows-10' : 'grid-rows-8';
                       const widthClass = isCol1
                         ? 'w-52 min-w-[13rem] max-w-[18rem]'
                         : isCol2
@@ -363,7 +363,7 @@ export default function Header() {
                           // if(isCol1 || isCol2){
                           // }
                           return (
-                            <div className={`absolute grid z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${gridCols} ${widthClass}`}>
+                            <div className={`absolute grid grid-flow-col z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${rowsClass} ${widthClass}`}>
                               {item.submenu.map((subItem, subIndex) => (
                                 <Link
                                   key={subIndex}
