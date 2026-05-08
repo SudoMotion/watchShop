@@ -330,6 +330,33 @@ export const getBestDeals = async (body = {}) => {
     return null;
   }
 };
+export const getLimitedEdition = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/page-product-lists/limited-edition',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
+export const getTrendingNow1 = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/page-product-lists/trending-now-1',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
+export const getTrendingNow2 = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/page-product-lists/trending-now-2',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching search products:', error);
+    return null;
+  }
+};
 
 export default {
   getMensProducts,
@@ -352,4 +379,7 @@ export default {
   getbrandLabels,
   normalizeBrandLabelsList,
   getBestDeals,
+  getLimitedEdition,
+  getTrendingNow1,
+  getTrendingNow2,
 };
