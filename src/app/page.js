@@ -89,7 +89,9 @@ export default async function page() {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
         {
             trending_banners?.map((item, index)=>(
-              <Image key={index} placeholder="blur" blurDataURL={blurSvg} src={Backend_Base_Url +'/'+ item?.image} className='w-full md:h-96 object-contain' alt={item.title || ''} width={500} height={500}/>
+              <Link href={item?.page_link ?? '#'}>
+                <Image key={index} placeholder="blur" blurDataURL={blurSvg} src={Backend_Base_Url +'/'+ item?.image} className='w-full md:h-96 object-contain' alt={item.title || ''} width={500} height={500}/>
+              </Link>
             ))
           }
         </div>
