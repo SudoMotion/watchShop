@@ -210,6 +210,7 @@ export default function Header() {
 
           setNavigationItems([
             ...navItems,
+            { label: 'Best Deal', href: '/best-deal', submenu: [] },
             { label: 'Outlets', href: '/outlets', submenu: [] },
           ]);
         }
