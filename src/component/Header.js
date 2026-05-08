@@ -159,6 +159,15 @@ export default function Header() {
     return { original, discounted, discountPercent };
   };
 
+  const handleKeywordClick = (keyword) => {
+    const selectedKeyword = String(keyword || "").trim();
+    if (!selectedKeyword) return;
+    setSearchQuery(selectedKeyword);
+    setOpen(false);
+    setMobileSearchOpen(false);
+    router.push(`/search?keyword=${encodeURIComponent(selectedKeyword)}`);
+  };
+
   // Fetch categories once (for debugging / future use)
   useEffect(() => {
     const fetchCategories = async () => {
@@ -419,6 +428,7 @@ export default function Header() {
               setSearchQuery={setSearchQuery}
               searchResults={searchResults}
               relatedKeywords={relatedKeywords}
+              onKeywordClick={handleKeywordClick}
               onResultClick={() => setOpen(false)}
             />
 
@@ -626,7 +636,7 @@ export default function Header() {
                         <button
                           key={`${keyword}-${keywordIndex}`}
                           type="button"
-                          onClick={() => setSearchQuery(String(keyword))}
+                              onClick={() => handleKeywordClick(keyword)}
                           className="rounded bg-gray-100 hover:bg-gray-200 px-2 py-1 text-xs text-gray-700 transition-colors"
                         >
                           {keyword}

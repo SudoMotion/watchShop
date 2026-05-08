@@ -11,6 +11,7 @@ export default function DesktopSearch({
   setSearchQuery,
   searchResults = [],
   relatedKeywords = [],
+  onKeywordClick,
   onResultClick,
 }) {
   const hasQuery = String(searchQuery || "").trim().length > 0;
@@ -122,7 +123,11 @@ export default function DesktopSearch({
                         <button
                           key={`${keyword}-${keywordIndex}`}
                           type="button"
-                          onClick={() => setSearchQuery(String(keyword))}
+                          onClick={() =>
+                            typeof onKeywordClick === "function"
+                              ? onKeywordClick(keyword)
+                              : setSearchQuery(String(keyword))
+                          }
                           className="rounded bg-white hover:bg-gray-100 px-2 py-1 text-xs text-gray-700 border border-gray-200 transition-colors text-start"
                         >
                           {keyword}
