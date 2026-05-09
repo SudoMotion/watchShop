@@ -2004,7 +2004,7 @@ export default function CheckoutPage() {
                   }
                   className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                 >
-                  {submitting ? "Placing order…" : "Place Order"}
+                  {submitting ? "Placing order…" : "Complete Your Order"}
                 </button>
 
                 <Link
