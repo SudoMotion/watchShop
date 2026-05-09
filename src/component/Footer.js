@@ -1,4 +1,5 @@
 "use client";
+import { WHATSAPP_CHAT_URL } from '@/config';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
@@ -36,7 +37,7 @@ export default function Footer() {
               <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="X (Twitter)">
                 <img src="/social-media/x.png" alt="" className="w-8 h-8" />
               </a>
-              <a href="https://wa.me/" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="WhatsApp">
+              <a href={WHATSAPP_CHAT_URL} target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="WhatsApp">
                 <img src="/social-media/whatsapp.png" alt="WhatsApp" className="w-8 h-8 rounded-full" />
               </a>
               <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="rounded-full overflow-hidden hover:opacity-80 transition-opacity" aria-label="YouTube">

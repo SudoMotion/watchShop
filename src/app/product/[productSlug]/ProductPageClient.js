@@ -1,7 +1,7 @@
 "use client";
 import ProductCard2 from "@/component/ProductCard2";
 import ProductSlider from "@/component/ProductSlider";
-import { NEXT_PUBLIC_API_URL } from "@/config";
+import { NEXT_PUBLIC_API_URL, WHATSAPP_CHAT_URL } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
 import { getCart, setCart } from "@/lib/cartStorage";
 import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
@@ -757,7 +757,7 @@ export default function ProductPageClient({ params }) {
             </p>
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <a
-                href="https://wa.me/8801720392824"
+                href={WHATSAPP_CHAT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[#25D366] hover:bg-[#1EBE57] text-white px-3 py-1.5 text-xs sm:text-sm font-semibold"
