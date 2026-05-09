@@ -3,6 +3,7 @@ import "./globals.css";
 import Header from "@/component/Header";
 import Footer from "@/component/Footer";
 import Popup from "@/component/Popup";
+import FixedFloatingActions from "@/component/FixedFloatingActions";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
             {children}
           </div>
           <Footer/>
+          <FixedFloatingActions />
         </div>
       </body>
     </html>
