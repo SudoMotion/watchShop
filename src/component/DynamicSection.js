@@ -50,9 +50,6 @@ export default async function DynamicSection() {
               <div
                 className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-neutral-700 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-950 px-6 py-8 text-center shadow-inner [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translate3d(0,0,1px)]"
               >
-                <span className="mb-1 text-[0.5rem] font-semibold uppercase tracking-[0.16em] text-amber-200/90 md:mb-2 md:text-[0.6rem]">
-                  Collection
-                </span>
                 <h3 className="text-xs font-semibold leading-tight tracking-tight text-white md:text-base">
                   {item.name}
                 </h3>
@@ -63,9 +60,6 @@ export default async function DynamicSection() {
                   className="mt-3 h-px w-8 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent md:mt-4 md:w-10"
                   aria-hidden
                 />
-                <p className="text-[0.52rem] uppercase tracking-[0.14em] text-neutral-500 md:mt-2 md:text-[0.62rem]">
-                  Premium selection
-                </p>
               </div>
             </div>
           </article>
