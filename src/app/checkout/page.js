@@ -622,7 +622,8 @@ export default function CheckoutPage() {
       area: String(deliveryArea),
       district: deliveryDistrict,
       order_note: formData.order_note?.trim() || undefined,
-      payment_type: formData.payment_type || "cod",
+      payment_type:
+        formData.payment_type === "bkash" ? "bkash" : "cod",
       ship_charge: Number(shipCharge) || 0,
       email: formData.email?.trim() || undefined,
       customer_pickup: Boolean(formData.customer_pickup),
@@ -1061,12 +1062,12 @@ export default function CheckoutPage() {
                     <input
                       type="radio"
                       name="payment_type"
-                      value="sslcommerz"
-                      checked={formData.payment_type === "sslcommerz"}
+                      value="bkash"
+                      checked={formData.payment_type === "bkash"}
                       onChange={handleInputChange}
                       className="w-4 h-4 text-black focus:ring-black"
                     />
-                    <span className="ml-3 font-medium">Online Payment (SSL Commerz)</span>
+                    <span className="ml-3 font-medium">bKash</span>
                   </label>
                 </div>
               </div>
@@ -1888,6 +1889,72 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-lg font-bold pt-2 border-t">
                     <span>Total</span>
                     <span className="text-red-600">৳{totalAmount.toLocaleString("en-BD")}</span>
+                  </div>
+                </div>
+
+                <div className="mb-4">
+                  <p className="text-sm font-semibold text-gray-900 mb-2">Payment method</p>
+                  <div className="space-y-2">
+                    <label
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
+                        formData.payment_type === "cod"
+                          ? "border-blue-500 bg-sky-50"
+                          : "border-gray-200 bg-white hover:bg-gray-50/80"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment_type"
+                        value="cod"
+                        checked={formData.payment_type === "cod"}
+                        onChange={handleInputChange}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                          formData.payment_type === "cod"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300 bg-white"
+                        }`}
+                        aria-hidden
+                      >
+                        {formData.payment_type === "cod" ? (
+                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                        ) : null}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
+                        Cash on delivery (COD)
+                      </span>
+                    </label>
+                    <label
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
+                        formData.payment_type === "bkash"
+                          ? "border-blue-500 bg-sky-50"
+                          : "border-gray-200 bg-white hover:bg-gray-50/80"
+                      }`}
+                    >
+                      <input
+                        type="radio"
+                        name="payment_type"
+                        value="bkash"
+                        checked={formData.payment_type === "bkash"}
+                        onChange={handleInputChange}
+                        className="sr-only"
+                      />
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                          formData.payment_type === "bkash"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300 bg-white"
+                        }`}
+                        aria-hidden
+                      >
+                        {formData.payment_type === "bkash" ? (
+                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                        ) : null}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">bKash</span>
+                    </label>
                   </div>
                 </div>
 
