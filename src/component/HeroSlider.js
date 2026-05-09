@@ -35,7 +35,7 @@ export default function HeroSlider() {
 
   if (!mounted) {
     return (
-      <section className="w-full aspect-[2/3] md:aspect-[1920/796] bg-black animate-pulse" />
+      <section className="w-full aspect-720/1080 md:aspect-1920/796 bg-black animate-pulse" />
     );
   }
 
@@ -47,7 +47,7 @@ export default function HeroSlider() {
       
       {/* Desktop */}
       <div className="hidden md:block">
-        <div className="w-full aspect-[1920/796]">
+        <div className="w-full aspect-1920/796">
           <Swiper
             modules={[Autoplay, Pagination]}
             slidesPerView={1}
@@ -109,7 +109,7 @@ export default function HeroSlider() {
 
       {/* Mobile */}
       <div className="block md:hidden">
-        <div className="w-full aspect-[2/3]">
+        <div className="w-full aspect-720/1080">
           <Swiper
             modules={[Autoplay, Pagination]}
             slidesPerView={1}
@@ -136,7 +136,6 @@ export default function HeroSlider() {
                       src={`${NEXT_PUBLIC_API_URL}/${slide.image}`}
                       alt={slide.title || "slider image"}
                       fill
-                      sizes="100vw"
                       className="object-cover"
                     />
                   </div>
