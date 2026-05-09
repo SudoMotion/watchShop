@@ -8,18 +8,22 @@ function normalizeBlogListResult(result) {
   if (!result || typeof result !== 'object') {
     return { blogs: [], lastPage: 1 };
   }
-  const raw = result.data;
-  const blogs = Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
+  let raw = result.data;
+  if (!Array.isArray(raw) && raw && typeof raw === 'object' && Array.isArray(raw.data)) {
+    raw = raw.data;
+  }
+  const blogs = Array.isArray(raw) ? raw : [];
   const lastPage =
     result.last_page ??
     result.lastPage ??
-    raw?.last_page ??
+    (raw && typeof raw === 'object' && !Array.isArray(raw) ? raw.last_page : null) ??
     1;
   return { blogs, lastPage: Number(lastPage) || 1 };
 }
 
-export function useGetBlogList(currentPage) {
+export function useGetBlogList(currentPage, options = {}) {
   const page = Math.max(1, Number(currentPage) || 1);
+  const perPage = options.perPage ?? BLOG_LIST_PER_PAGE;
   const [blogs, setBlogs] = useState([]);
   const [lastPage, setLastPage] = useState(1);
   const [isLoading, setIsLoading] = useState(true);
@@ -30,7 +34,7 @@ export function useGetBlogList(currentPage) {
     (async () => {
       const payload = await getBlogList({
         page,
-        per_page: BLOG_LIST_PER_PAGE,
+        per_page: perPage,
       });
       if (cancelled) return;
       const normalized = normalizeBlogListResult(payload);
@@ -41,7 +45,7 @@ export function useGetBlogList(currentPage) {
     return () => {
       cancelled = true;
     };
-  }, [page]);
+  }, [page, perPage]);
 
   return { blogs, lastPage, isLoading };
 }

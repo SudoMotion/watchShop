@@ -11,26 +11,13 @@ import TwoBanners from '@/component/TwoBanners';
 import { Backend_Base_Url } from '@/config';
 import { getBannerContent, getHome } from '@/stores/HomeAPI';
 import { getTopBrands } from '@/stores/homeSpecification';
-import { getBlogList } from '@/stores/blogAPI';
-import { htmlToPlainText } from '@/lib/htmlToPlainText';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
 import DynamicSection from '@/component/DynamicSection';
 import { getNotice, getSections } from '@/stores/sectionsAPI';
 import BannerSection from '@/component/BannerSection';
-
-function extractBlogRows(payload) {
-  if (!payload || typeof payload !== 'object') return [];
-  const raw = payload.data;
-  return Array.isArray(raw) ? raw : Array.isArray(raw?.data) ? raw.data : [];
-}
-
-/** Only posts flagged as magazine in the API (`is_magazine` === 1). */
-function isMagazinePost(post) {
-  const v = post?.is_magazine;
-  return v === 1 || v === '1';
-}
+import HomeMagazineSection from '@/component/HomeMagazineSection';
 
 export const dynamic = 'force-dynamic';
 
@@ -52,9 +39,6 @@ export default async function page() {
   const fourthSection = sections.slice(3, 4);
   const remainingSections = sections.slice(4);
   const {notices :notice} = await getNotice();
-  const blogListPayload = await getBlogList({ page: 1, per_page: 50 });
-  const magazinePosts = extractBlogRows(blogListPayload).filter(isMagazinePost);
-  console.log('magazinePosts', magazinePosts)
   const blurSvg = `data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIiB2aWV3Qm94PSIwIDAgMzAwIDMwMCI+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0iI2YzZjRmNSIgLz48L3N2Zz4=`;
   return (
     <div>
@@ -113,55 +97,7 @@ export default async function page() {
           }
         </div>
       </div>
-      <div className='max-w-7xl mx-auto mb-10 px-2'>
-        <h1 className='text-2xl md:text-3xl font-semibold'>WATCHSHOPBD:{' '}
-          <Link href="/blog" className='hover:text-red-600 transition-all duration-200'>LATEST MAGAZINE OF WATCH INDUSTRY</Link>
-        </h1>
-        {magazinePosts.length > 0 ? (
-          <div className='grid grid-cols-1 md:grid-cols-3 gap-5 mt-5'>
-            {magazinePosts.map((post) => {
-              const media = post.image || post.banner_image;
-              const mediaStr = media != null ? String(media).trim() : '';
-              const imgSrc = !mediaStr
-                ? '/images/placeholder.jpg'
-                : mediaStr.startsWith('http')
-                  ? mediaStr
-                  : `${Backend_Base_Url}/${mediaStr.replace(/^\//, '')}`;
-              const href = `/blog/${post.slug ?? post.id}`;
-              const excerpt =
-                htmlToPlainText(post.description || post.excerpt || '') ||
-                '';
-
-              return (
-                <Link
-                  key={post.id}
-                  href={href}
-                  className='group flex flex-col gap-y-1'
-                >
-                  <div className='rounded-md overflow-hidden'>
-                    <Image
-                      placeholder="blur"
-                      blurDataURL={blurSvg}
-                      src={imgSrc}
-                      className='w-full object-contain rounded-md transition-transform duration-300 group-hover:scale-110'
-                      alt={post.title || 'Magazine'}
-                      width={500}
-                      height={400}
-                    />
-                  </div>
-                  {post.tag ? (
-                    <p className='text-lg font-medium'>{post.tag}</p>
-                  ) : null}
-                  <p className='text-xl'>{post.title}</p>
-                  {excerpt ? (
-                    <p className='line-clamp-3 text-gray-600'>{excerpt}</p>
-                  ) : null}
-                </Link>
-              );
-            })}
-          </div>
-        ) : null}
-      </div>
+      <HomeMagazineSection />
       <div className='max-w-7xl mx-auto mb-10 px-2'>
         <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-21/9">
           <iframe className="absolute inset-0 h-full w-full" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
