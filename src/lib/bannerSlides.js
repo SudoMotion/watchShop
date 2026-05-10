@@ -21,15 +21,10 @@ export function resolveBannerImageUrl(path) {
   return `${Backend_Base_Url.replace(/\/$/, "")}/${encodedPath}`;
 }
 
-/** CMS often stores placeholder text ("1", "q"); only treat real URLs/paths as links. */
+/** Uses the CMS link exactly as saved (trimmed only). Empty → # — no rewriting. */
 export function normalizeBannerLink(link) {
   const s = String(link ?? "").trim();
-  if (!s) return "#";
-  if (s === "#") return "#";
-  if (s.startsWith("http://") || s.startsWith("https://")) return s;
-  if (s.startsWith("/")) return s;
-  if (s.startsWith("mailto:") || s.startsWith("tel:")) return s;
-  return "#";
+  return s || "#";
 }
 
 /**

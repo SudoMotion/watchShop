@@ -37,6 +37,7 @@ export default function SecoundaryProductSlider({ data }) {
   }, [fromProps.length]);
 
   const resolvedSlides = fromProps.length > 0 ? fromProps : fetchedSlides;
+  console.log('resolvedSlides', resolvedSlides)
 
   useEffect(() => {
     setMounted(true);
@@ -105,7 +106,7 @@ export default function SecoundaryProductSlider({ data }) {
                     </p>
                   ) : null}
                   <a
-                    href={slide.link}
+                    href={slide?.link}
                     className="inline-block border border-white px-8 py-3 text-xs uppercase tracking-widest transition hover:bg-white hover:text-black"
                   >
                     Discover
