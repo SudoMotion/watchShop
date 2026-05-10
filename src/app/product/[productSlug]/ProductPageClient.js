@@ -1,7 +1,7 @@
 "use client";
 import ProductCard2 from "@/component/ProductCard2";
 import ProductSlider from "@/component/ProductSlider";
-import { NEXT_PUBLIC_API_URL, WHATSAPP_CHAT_URL } from "@/config";
+import { NEXT_PUBLIC_API_URL, WHATSAPP_CHAT_URL, WHATSAPP_NUMBER } from "@/config";
 import { getProductBySlug } from "@/stores/ProductAPI";
 import { getCart, setCart } from "@/lib/cartStorage";
 import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
@@ -836,6 +836,7 @@ export default function ProductPageClient({ params }) {
                 </span>
                 <span>WhatsApp</span>
               </a>
+              <span>{WHATSAPP_NUMBER}</span>
             </div>
 
             {/* <div className="grid grid-cols-2 gap-2 sm:gap-3">
