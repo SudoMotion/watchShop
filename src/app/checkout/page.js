@@ -32,8 +32,44 @@ function strFilled(v) {
   return v != null && String(v).trim() !== "";
 }
 
+function normalizeBdPhone(phone) {
+  const d = String(phone || "").replace(/\D/g, "");
+  return d.length >= 11 ? d.slice(-11) : d;
+}
+
 const SHIPPING_INSIDE_DHAKA = 70;
 const SHIPPING_OUTSIDE_DHAKA = 130;
+
+/** First Laravel validation message from `errors` object, if any. */
+function firstLaravelValidationMessage(errors) {
+  if (!errors || typeof errors !== "object" || Array.isArray(errors)) return null;
+  for (const val of Object.values(errors)) {
+    if (Array.isArray(val) && val.length > 0 && typeof val[0] === "string") {
+      return val[0];
+    }
+    if (typeof val === "string" && val.trim()) return val.trim();
+  }
+  return null;
+}
+
+/** SSL Commerz / gateways may expose the redirect URL under different keys. */
+function pickPaymentRedirectUrl(data) {
+  if (!data || typeof data !== "object") return "";
+  const nested = data.data && typeof data.data === "object" ? data.data : {};
+  const candidates = [
+    data.payment_redirect_url,
+    data.payment_url,
+    data.gateway_url,
+    data.GatewayPageURL,
+    nested.payment_redirect_url,
+    nested.GatewayPageURL,
+    nested.gateway_url,
+  ];
+  for (const u of candidates) {
+    if (typeof u === "string" && u.trim()) return u.trim();
+  }
+  return "";
+}
 
 export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState([]);
@@ -91,18 +127,9 @@ export default function CheckoutPage() {
     (sum, item) => sum + getNumericPrice(item.price) * item.quantity,
     0
   );
-  const itemDiscount = cartItems.reduce(
-    (sum, item) =>
-      sum +
-      (getNumericPrice(item.originalPrice) - getNumericPrice(item.price)) *
-        item.quantity,
-    0
-  );
   const orderTotal = subtotal;
-  const totalAmount = Math.max(
-    0,
-    orderTotal - itemDiscount - couponDiscount + shipCharge
-  );
+  /** Customer pays sale subtotal + shipping − coupon (`orderTotal` already uses discounted line prices). */
+  const totalAmount = Math.max(0, orderTotal - couponDiscount + shipCharge);
 
   useEffect(() => {
     setCartItems(getCart());
@@ -334,6 +361,18 @@ export default function CheckoutPage() {
     return null;
   };
 
+  const validateOnlinePaymentFields = () => {
+    if (formData.payment_type !== "sslcommerz") return null;
+    const email = String(formData.email || "").trim();
+    if (!email) {
+      return "Email is required for SSL Commerz payment.";
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return "Enter a valid email address for online payment.";
+    }
+    return null;
+  };
+
   const buildOrderPayload = () => {
     const isNewSignupMode = !isLoggedIn() && !existingCustomerMode;
     const billingAreaName =
@@ -354,37 +393,71 @@ export default function CheckoutPage() {
       deliveryDistrict = (formData.s_district || shippingAreaName || "").trim();
     }
 
-    const productIds = cartItems
-      .map((item) => item.id ?? item.product_id)
-      .filter((id) => id != null && id !== "");
+    const lineRows = cartItems
+      .map((item) => {
+        const rawId = item.id ?? item.product_id;
+        if (rawId == null || rawId === "") return null;
+        const numeric = typeof rawId === "number" ? rawId : Number(rawId);
+        const id = Number.isFinite(numeric) ? numeric : rawId;
+        const quantity = Math.max(1, Math.floor(Number(item.quantity) || 1));
+        return { id, quantity };
+      })
+      .filter(Boolean);
+
+    const productIds = lineRows.map((r) => r.id);
+    const quantities = lineRows.map((r) => r.quantity);
+
+    const paymentType = formData.payment_type || "cod";
+
+    let areaOut = String(deliveryArea || "").trim();
+    let districtOut = String(deliveryDistrict || "").trim();
+    const emailTrim = String(formData.email || "").trim();
+    const phoneOut = normalizeBdPhone(formData.phone);
 
     const payload = {
       name: formData.name.trim(),
-      phone: formData.phone.trim(),
+      phone: phoneOut,
       address: deliveryAddress,
       order_total: Number(orderTotal),
       total_amount: Number(totalAmount),
-      area: String(deliveryArea),
-      district: deliveryDistrict,
+      area: areaOut,
+      district: districtOut,
       order_note: formData.order_note?.trim() || undefined,
-      payment_type:
-        formData.payment_type === "bkash" ? "bkash" : "cod",
+      payment_type: paymentType,
       ship_charge: Number(shipCharge) || 0,
-      email: formData.email?.trim() || undefined,
+      email:
+        paymentType === "sslcommerz"
+          ? emailTrim
+          : formData.email?.trim() || undefined,
       customer_pickup: Boolean(formData.customer_pickup),
       shipping_method: shippingMethod,
       product_ids: productIds,
+      quantities,
     };
 
     if (formData.ship_to_different_address) {
       payload.shipping_name = String(formData.s_name || "").trim();
-      payload.shipping_phone = String(formData.s_phone || "").trim();
+      payload.shipping_phone = normalizeBdPhone(formData.s_phone);
       payload.b_address = formData.address.trim();
       payload.b_district = (formData.district || billingAreaName || "").trim();
     }
 
     if (couponDiscount > 0) {
-      payload.couponDiscount = Number(couponDiscount);
+      const d = Number(couponDiscount);
+      payload.couponDiscount = d;
+      payload.coupon_discount = d;
+    }
+    const codeTrim = String(couponCode || "").trim();
+    if (couponApplied && codeTrim) {
+      payload.coupon_code = codeTrim;
+    }
+
+    if (!String(payload.area || "").trim()) {
+      payload.area =
+        shippingMethod === "inside_dhaka" ? "Dhaka" : "Bangladesh";
+    }
+    if (!String(payload.district || "").trim()) {
+      payload.district = payload.area;
     }
 
     payload.pathao_city_id = 1;
@@ -411,29 +484,45 @@ export default function CheckoutPage() {
     const payload = buildOrderPayload();
     setSubmitting(true);
     try {
-      const authToken = typeof window !== "undefined" ? getAuthToken() : null;
-      const res = await checkoutStore(payload, authToken);
+      const token = typeof window !== "undefined" ? getAuthToken() : null;
+      const res = await checkoutStore(payload, token);
+      const status = res?.status ?? 0;
       const data = res?.data;
+      const ok = status >= 200 && status < 300;
 
-      if (res?.status === 201 && data?.success && data?.order) {
-        const orderId = data.order?.id;
-        setCart([]);
-        if (data.payment_redirect_url) {
-          window.location.href = data.payment_redirect_url;
+      if (ok && data) {
+        const redirectUrl = pickPaymentRedirectUrl(data);
+        if (redirectUrl) {
+          setCart([]);
+          window.location.href = redirectUrl;
           return true;
         }
-        if (orderId) {
-          window.location.href = `/order/success?id=${orderId}`;
-        } else {
-          window.location.href = "/order/success";
+        if (data.success && data.order) {
+          setCart([]);
+          setCartItems([]);
+          const orderId = data.order?.id;
+          toast.success(
+            orderId
+              ? `Order #${orderId} placed successfully.`
+              : "Order placed successfully."
+          );
+          return true;
         }
-        return true;
       }
 
       const msg =
-        data?.message ||
-        (res?.status === 401 ? "Please log in to place an order." : null) ||
-        (res?.status === 422 ? "Invalid form data." : null) ||
+        firstLaravelValidationMessage(
+          typeof data === "object" && data !== null ? data.errors : undefined
+        ) ||
+        (typeof data === "object" && data !== null ? data.message : null) ||
+        (status === 401 ? "Please log in to place an order." : null) ||
+        (status === 422 ? "Invalid form data." : null) ||
+        (status === 502 || status === 503 || status === 504
+          ? "The checkout server did not respond in time or is restarting. Wait a minute and retry, try Cash on Delivery, or contact support if it continues."
+          : null) ||
+        (status >= 500
+          ? "Server error while placing your order. Please try again shortly."
+          : null) ||
         "Could not place order.";
       setError(msg);
       toast.error(msg);
@@ -538,6 +627,12 @@ export default function CheckoutPage() {
         toast.info("Signed in. " + shipErr);
         return;
       }
+      const payErr = validateOnlinePaymentFields();
+      if (payErr) {
+        toast.error(payErr);
+        setError(payErr);
+        return;
+      }
       await placeOrder();
     } catch {
       toast.error("Could not verify OTP. Try again.");
@@ -627,6 +722,12 @@ export default function CheckoutPage() {
       toast.error(shipErr);
       return;
     }
+    const payErr = validateOnlinePaymentFields();
+    if (payErr) {
+      setError(payErr);
+      toast.error(payErr);
+      return;
+    }
     await placeOrder();
   };
 
@@ -705,9 +806,9 @@ export default function CheckoutPage() {
   return (
     <div className="bg-gray-50 py-4">
       <div className="w-full sm:max-w-7xl mx-auto px-4">
-        <h1 className="md:text-3xl text-2xl font-bold mb-6">Checkout</h1>
+        <h1 className="md:text-3xl text-2xl font-bold mb-6 text-center">Order Page</h1>
 
-        {!isLoggedIn() && (
+        {/* {!isLoggedIn() && (
           <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800 text-sm">
             You may need to{" "}
             <Link href="/login" className="font-semibold underline">
@@ -715,350 +816,42 @@ export default function CheckoutPage() {
             </Link>{" "}
             to place an order. Some servers require customer authentication.
           </div>
-        )}
-
+        )} */}
+        {!isLoggedIn() && !guestAwaitingOtp && (
+          <label className="flex items-start gap-3 cursor-pointer select-none mb-2">
+            <input
+              type="checkbox"
+              checked={existingCustomerMode}
+              onChange={(e) =>
+                handleExistingCustomerToggle(e.target.checked)
+              }
+              className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
+            />
+            <span className="font-bold text-gray-900">
+              Click only for existing or old Customer
+            </span>
+          </label>
+          )}
         <form onSubmit={handleSubmit}>
           <div className="grid lg:grid-cols-3 gap-8">
-            {/* <div className="lg:col-span-2 space-y-6">
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Contact &amp; Delivery</h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Name <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="name"
-                      value={formData.name}
-                      onChange={handleInputChange}
-                      readOnly={apiReadOnly.name}
-                      required
-                      maxLength={60}
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
-                        apiReadOnly.name ? readOnlyInputClass : ""
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Phone (11 digits) <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="tel"
-                      name="phone"
-                      value={formData.phone}
-                      onChange={handleInputChange}
-                      readOnly={apiReadOnly.phone}
-                      required
-                      placeholder="01XXXXXXXXX"
-                      maxLength={11}
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
-                        apiReadOnly.phone ? readOnlyInputClass : ""
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
-                    <input
-                      type="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleInputChange}
-                      readOnly={apiReadOnly.email}
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
-                        apiReadOnly.email ? readOnlyInputClass : ""
-                      }`}
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address <span className="text-red-600">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleInputChange}
-                      readOnly={apiReadOnly.address}
-                      required
-                      maxLength={191}
-                      placeholder="House/Flat, Road, Area"
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
-                        apiReadOnly.address ? readOnlyInputClass : ""
-                      }`}
-                    />
-                  </div>
-
-                  <div className="pt-2 border-t border-gray-100">
-                    <p className="text-sm font-medium text-gray-800 mb-3">Billing address (optional)</p>
-                    <div className="space-y-3">
-                      <input
-                        type="text"
-                        name="b_name"
-                        value={formData.b_name}
-                        onChange={handleInputChange}
-                        placeholder="Billing name"
-                        maxLength={60}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                      <input
-                        type="email"
-                        name="b_email"
-                        value={formData.b_email}
-                        onChange={handleInputChange}
-                        placeholder="Billing email"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                      <input
-                        type="tel"
-                        name="b_phone"
-                        value={formData.b_phone}
-                        onChange={handleInputChange}
-                        placeholder="Billing phone"
-                        maxLength={11}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                      <input
-                        type="text"
-                        name="b_district"
-                        value={formData.b_district}
-                        onChange={handleInputChange}
-                        placeholder="Billing district"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                      <input
-                        type="text"
-                        name="b_address"
-                        value={formData.b_address}
-                        onChange={handleInputChange}
-                        placeholder="Billing address"
-                        maxLength={191}
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                    </div>
-                  </div>
-
-                  {showAdvancedCheckoutFields && (
-                  {isLoggedIn() && (
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        District / Area <span className="text-red-600">*</span>
-                      </label>
-                      {districts.length > 0 ? (
-                        <select
-                          name="area"
-                          value={districtId}
-                          onChange={(e) => {
-                            setDistrictId(e.target.value);
-                            const d = districts.find(
-                              (x) => String(x.id) === String(e.target.value)
-                            );
-                            setFormData((f) => ({
-                              ...f,
-                              area: d?.name || "",
-                              district: d?.name || "",
-                            }));
-                          }}
-                          required
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select district</option>
-                          {districts.map((d) => (
-                            <option key={d.id} value={d.id}>
-                              {d.name} {d.amount != null ? `(৳${d.amount})` : ""}
-                            </option>
-                          ))}
-                        </select>
-                      ) : (
-                        <input
-                          type="text"
-                          name="area"
-                          value={formData.area}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="e.g. Dhaka"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        />
-                      )}
-                    </div>
-                  )}
-                  )}
-
-                  <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      name="customer_pickup"
-                      checked={!!formData.customer_pickup}
-                      onChange={handleInputChange}
-                      className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
-                    />
-                    <span className="text-sm text-gray-800">
-                      <span className="font-medium">Customer pickup</span>
-                      <span className="block text-gray-600 mt-0.5">
-                        I will collect my order from the store (not home delivery).
-                      </span>
-                    </span>
-                  </label>
-
-                  {pathaoEnabled && (
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-sm font-medium text-gray-800 mb-1">
-                        Pathao delivery location
-                        {pathaoLocationsRequired && (
-                          <span className="text-red-600"> *</span>
-                        )}
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">
-                        Select city, zone, and area for courier delivery.
-                      </p>
-                      <div className="space-y-3">
-                        <select
-                          value={pathaoCityId}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            setPathaoCityId(v);
-                            setPathaoZoneId("");
-                            setPathaoAreaId("");
-                          }}
-                          required={pathaoLocationsRequired}
-                          disabled={pathaoLoading && pathaoCities.length === 0}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select city</option>
-                          {pathaoCities.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          value={pathaoZoneId}
-                          onChange={(e) => {
-                            setPathaoZoneId(e.target.value);
-                            setPathaoAreaId("");
-                          }}
-                          required={pathaoLocationsRequired}
-                          disabled={!pathaoCityId}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select zone</option>
-                          {pathaoZones.map((z) => (
-                            <option key={z.id} value={z.id}>
-                              {z.name}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          value={pathaoAreaId}
-                          onChange={(e) => setPathaoAreaId(e.target.value)}
-                          required={pathaoLocationsRequired}
-                          disabled={!pathaoZoneId}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select area</option>
-                          {pathaoAreas.map((a) => (
-                            <option key={a.id} value={a.id}>
-                              {a.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Order note
-                    </label>
-                    <textarea
-                      name="order_note"
-                      value={formData.order_note}
-                      onChange={handleInputChange}
-                      rows={2}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                    />
-                  </div>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">Payment</h2>
-                <div className="space-y-3">
-                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      name="payment_type"
-                      value="cod"
-                      checked={formData.payment_type === "cod"}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 text-black focus:ring-black"
-                    />
-                    <span className="ml-3 font-medium">Cash on Delivery (COD)</span>
-                  </label>
-                  <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50">
-                    <input
-                      type="radio"
-                      name="payment_type"
-                      value="bkash"
-                      checked={formData.payment_type === "bkash"}
-                      onChange={handleInputChange}
-                      className="w-4 h-4 text-black focus:ring-black"
-                    />
-                    <span className="ml-3 font-medium">bKash</span>
-                  </label>
-                </div>
-              </div>
-
-              <div className="bg-white rounded-lg shadow-sm p-6">
-                <label className="flex items-start cursor-pointer">
-                  <input type="checkbox" required className="mt-1 w-4 h-4 text-black focus:ring-black" />
-                  <span className="ml-3 text-sm text-gray-700">
-                    I agree to the{" "}
-                    <Link href="/terms-conditions" className="text-red-600 hover:underline">
-                      Terms
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/privacy-policy" className="text-red-600 hover:underline">
-                      Privacy Policy
-                    </Link>
-                  </span>
-                </label>
-              </div>
-            </div> */}
             <div className="min-w-0 lg:col-span-2 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-xl font-semibold mb-4">
+                <h2 className="text-2xl font-semibold mb-4">
                   {guestAwaitingOtp
                     ? "Verify your phone"
                     : isLoggedIn()
                       ? "Billing Address"
                       : existingCustomerMode
                         ? "Existing Customer Verification"
-                        : "Delivery & account"}
+                        : "Billing Address For New Customer"}
                 </h2>
-                {!isLoggedIn() && !existingCustomerMode && !guestAwaitingOtp && (
+                {/* {!isLoggedIn() && !existingCustomerMode && !guestAwaitingOtp && (
                   <p className="mb-4 text-sm text-gray-600">
                     Fill in all details below. Use <span className="font-semibold">Continue to verification</span>{" "}
                     to create your account and receive an OTP. After you confirm the code, we sign you in and place your order.
                   </p>
-                )}
+                )} */}
                 <div className="space-y-4">
-                  {!isLoggedIn() && !guestAwaitingOtp && (
-                  <label className="flex items-start gap-3 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      checked={existingCustomerMode}
-                      onChange={(e) =>
-                        handleExistingCustomerToggle(e.target.checked)
-                      }
-                      className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
-                    />
-                    <span className="font-bold text-gray-900">
-                      Click Only For Existing/Old Customer
-                    </span>
-                  </label>
-                  )}
 
                   {!isLoggedIn() && existingCustomerMode && !otpSent && (
                     <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
@@ -1214,9 +1007,9 @@ export default function CheckoutPage() {
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Email{" "}
-                      {!isLoggedIn() && !existingCustomerMode ? (
+                      {/* {!isLoggedIn() && !existingCustomerMode ? (
                         <span className="text-red-600">*</span>
-                      ) : null}
+                      ) : null} */}
                     </label>
                     <input
                       type="email"
@@ -1234,18 +1027,18 @@ export default function CheckoutPage() {
                   {/* address */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Address <span className="text-red-600">*</span>
+                      Address
                     </label>
-                    <input
-                      type="text"
+                    <textarea
                       name="address"
                       value={formData.address}
                       onChange={handleInputChange}
                       readOnly={apiReadOnly.address}
                       required
+                      rows={3}
                       maxLength={191}
                       placeholder="House/Flat, Road, Area"
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
+                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-y min-h-[5.5rem] ${
                         apiReadOnly.address ? readOnlyInputClass : ""
                       }`}
                     />
@@ -1318,7 +1111,7 @@ export default function CheckoutPage() {
                   {showAdvancedCheckoutFields && (
                   <div>
                     <p className="text-base font-bold text-gray-900 mb-3">Shipping method</p>
-                    <div className="space-y-2">
+                    <div className="grid grid-cols-2 gap-2">
                       <label
                         className={`flex cursor-pointer items-center justify-between gap-4 rounded-lg border-2 px-4 py-3.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-2 ${
                           shippingMethod === "inside_dhaka"
@@ -1481,15 +1274,15 @@ export default function CheckoutPage() {
                         <label className="block text-sm font-medium text-gray-700 mb-1">
                           Shipping address <span className="text-red-600">*</span>
                         </label>
-                        <input
-                          type="text"
+                        <textarea
                           name="s_address"
                           value={formData.s_address}
                           onChange={handleInputChange}
                           required={formData.ship_to_different_address}
+                          rows={3}
                           maxLength={191}
                           placeholder="House/Flat, Road, Area"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-y min-h-[5.5rem]"
                         />
                       </div>
                     </div>
@@ -1627,6 +1420,19 @@ export default function CheckoutPage() {
                       </span>
                       <span className="text-sm font-medium text-gray-900">bKash</span>
                     </label>
+                    <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50">
+                      <input
+                        type="radio"
+                        name="payment_type"
+                        value="sslcommerz"
+                        checked={formData.payment_type === "sslcommerz"}
+                        onChange={handleInputChange}
+                        className="w-4 h-4 text-black focus:ring-black"
+                      />
+                      <span className="ml-3 font-medium">
+                        Online Payment (SSL Commerz)
+                      </span>
+                    </label>
                   </div>
                 </div>
 
@@ -1691,8 +1497,8 @@ export default function CheckoutPage() {
                           !existingCustomerMode &&
                           !otpVerified &&
                           !otpSent
-                        ? "Continue to verification"
-                        : "Place order"}
+                        ? "Confirm Your Order"
+                        : "Place Your Order"}
                 </button>
 
                 <Link
