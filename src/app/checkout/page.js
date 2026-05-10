@@ -833,8 +833,8 @@ export default function CheckoutPage() {
           </label>
           )}
         <form onSubmit={handleSubmit}>
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="min-w-0 lg:col-span-2 space-y-6">
+          <div className="grid lg:grid-cols-2 gap-8">
+            <div className="min-w-0 lg:col-span-1 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-2xl font-semibold mb-4">
                   {guestAwaitingOtp
