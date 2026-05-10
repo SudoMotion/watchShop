@@ -52,12 +52,14 @@ export const getBannerContent = async (slug) => {
     return null;
   }
 };
-export const getHomeMetaContents = async (slug) => {
+export const getHomeMetaContents = async () => {
   try {
-    const response = await apiRequest(`/api/home-page-content`);
-    return response.data;
+    const response = await apiRequest(`/api/home-page-content`, 'GET');
+    const payload = response?.data?.data ?? response?.data ?? null;
+    if (response?.status >= 400 || payload == null) return null;
+    return payload;
   } catch (error) {
-    console.error('Error fetching product by slug:', error);
+    console.error('Error fetching home page content:', error);
     return null;
   }
 };

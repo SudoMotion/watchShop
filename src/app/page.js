@@ -9,7 +9,8 @@ import HomeSeoExpandable from '@/component/HomeSeoExpandable';
 import SectionArea from '@/component/SectionArea';
 import TwoBanners from '@/component/TwoBanners';
 import { Backend_Base_Url } from '@/config';
-import { getBannerContent, getHome, getHomeMetaContents } from '@/stores/HomeAPI';
+import { getHomePageSeo } from '@/lib/homeMeta';
+import { getBannerContent, getHome } from '@/stores/HomeAPI';
 import { getTopBrands } from '@/stores/homeSpecification';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -21,10 +22,27 @@ import HomeMagazineSection from '@/component/HomeMagazineSection';
 
 export const dynamic = 'force-dynamic';
 
+export async function generateMetadata() {
+  const seo = await getHomePageSeo();
+  if (!seo) return {};
+
+  return {
+    ...(seo.meta_title ? { title: { absolute: seo.meta_title } } : {}),
+    ...(seo.meta_description ? { description: seo.meta_description } : {}),
+    ...(seo.meta_keywords ? { keywords: seo.meta_keywords } : {}),
+    ...(seo.canonical_url ? { alternates: { canonical: seo.canonical_url } } : {}),
+    openGraph: {
+      ...(seo.meta_title ? { title: seo.meta_title } : {}),
+      ...(seo.meta_description ? { description: seo.meta_description } : {}),
+      ...(seo.canonical_url ? { url: seo.canonical_url } : {}),
+    },
+  };
+}
+
 export default async function page() {
   const home = await getHome() || {};
   const bannerResponse = await getBannerContent();
-  const homeMetaContents = await getHomeMetaContents();
+  const seo = await getHomePageSeo();
   const bannersByType =
     bannerResponse?.banners_by_type ??
     bannerResponse?.data?.banners_by_type ??
@@ -108,6 +126,19 @@ export default async function page() {
       <div className='max-w-7xl mx-auto px-2'>
         <Image src="/images/payment-method.png" alt="payment-method" width={3000} height={800}/>
       </div>
+      {seo?.content ? (
+        <section className="home-cms-content max-w-7xl mx-auto px-2 py-8">
+          <div
+            className="prose prose-sm sm:prose-base max-w-none prose-headings:font-semibold"
+            dangerouslySetInnerHTML={{ __html: seo.content }}
+          />
+        </section>
+      ) : null}
+      {!seo?.content && seo?.long_description ? (
+        <section className="max-w-7xl mx-auto px-2 py-8 text-sm text-gray-700 leading-relaxed">
+          {seo.long_description}
+        </section>
+      ) : null}
       <HomeSeoExpandable />
     </div>
   )
