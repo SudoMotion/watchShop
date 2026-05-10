@@ -19,7 +19,7 @@ const SORT_OPTIONS = [
   { value: 'nameZtoA', label: 'Name: Z -> A' },
 ];
 
-export default function CategoryPageClient({ categorySlug }) {
+export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,11 +106,11 @@ export default function CategoryPageClient({ categorySlug }) {
     return () => {
       mounted = false;
     };
-  }, [categorySlug, currentPage, filtersKey, sortBy]);
+  }, [categorySlug, categoryId, currentPage, filtersKey, sortBy]);
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [categorySlug, filtersKey, sortBy]);
+  }, [categorySlug, categoryId, filtersKey, sortBy]);
 
   const categoryNameFromSlug = useMemo(
     () =>

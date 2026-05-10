@@ -193,11 +193,14 @@ export default function Header() {
               const isLimitedEditionBrand =
                 slug === 'limited-edition' || name === 'limited edition';
 
+              const categoryHref =
+                cat.id != null && cat.id !== ''
+                  ? `/category/${cat.slug}?category_id=${encodeURIComponent(String(cat.id))}`
+                  : `/category/${cat.slug}`;
+
               return {
                 label: cat.name || '',
-                href: isLimitedEditionBrand
-                  ? `/brand/${cat.slug}`
-                  : `/category/${cat.slug}`,
+                href: isLimitedEditionBrand ? `/brand/${cat.slug}` : categoryHref,
                 submenu:
                   isLimitedEditionBrand || !Array.isArray(cat.brands)
                     ? []

@@ -63,6 +63,17 @@ export const getHomeMetaContents = async () => {
     return null;
   }
 };
+export const getSubcategoryByCategoryId = async (categoryId) => {
+  try {
+    const response = await apiRequest(`/api/subcategories?category_id=${categoryId}`, 'GET');
+    const payload = response?.data?.data ?? response?.data ?? null;
+    if (response?.status >= 400 || payload == null) return null;
+    return payload;
+  } catch (error) {
+    console.error('Error fetching subcategories by category id:', error);
+    return null;
+  }
+};
 
 export default {
   getHome,
@@ -70,4 +81,5 @@ export default {
   getNewDynamicSection,
   getBannerContent,
   getHomeMetaContents,
+  getSubcategoryByCategoryId,
 };
