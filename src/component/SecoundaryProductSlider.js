@@ -6,6 +6,7 @@ import { Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
+import { getBannerContent } from "@/stores/HomeAPI";
 
 const slides = [
   {
@@ -28,7 +29,8 @@ const slides = [
   },
 ];
 
-export default function SecoundaryProductSlider() {
+export default function SecoundaryProductSlider({ data }) {
+  console.log('data ata', data)
   const [mounted, setMounted] = useState(false);
 
   // 🔑 Prevent Swiper from initializing during hydration

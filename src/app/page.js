@@ -61,7 +61,7 @@ export default async function page() {
       </div>
       <SectionArea sections={firstSection} />
       <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
-        <SecoundaryProductSlider/>
+        <SecoundaryProductSlider data={bannerResponse?.banners_by_type?.recommended_banner}/>
         <RecomendedProducts/>
       </div>
       <div className='max-w-7xl mx-auto my-10 px-2'>
@@ -90,8 +90,8 @@ export default async function page() {
         <div className='grid grid-cols-1 md:grid-cols-2 gap-5'>
         {
             trending_banners?.map((item, index)=>(
-              <Link href={item?.page_link ?? '#'}>
-                <Image key={index} placeholder="blur" blurDataURL={blurSvg} src={Backend_Base_Url +'/'+ item?.image} className='w-full md:h-96 object-contain' alt={item.title || ''} width={500} height={500}/>
+              <Link href={item?.page_link ?? '#'} key={index}>
+                <Image placeholder="blur" blurDataURL={blurSvg} src={Backend_Base_Url +'/'+ item?.image} className='w-full md:h-96 object-contain' alt={item.title || ''} width={500} height={500}/>
               </Link>
             ))
           }
