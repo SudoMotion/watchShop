@@ -888,7 +888,7 @@ export default function ProductPageClient({ params }) {
       {/* DESCRIPTION */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8">
       
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 sticky top-[70px] bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="z-30 flex items-center gap-2 sm:gap-4 md:gap-6 sticky top-[70px] bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button
               onClick={() => scrollToSection("editor-note")}
               className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
@@ -1052,37 +1052,36 @@ export default function ProductPageClient({ params }) {
             </div>
           </div>
         </div>
-      </div>
 
-      {/* RELATED PRODUCTS */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10 mb-8 sm:mb-12 md:mb-16">
-        <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 text-center">
-          Related Products
-        </h3>
+        {/* RELATED PRODUCTS */}
+        <div className="mt-6 sm:mt-8 md:mt-10 mb-8 sm:mb-12 md:mb-16">
+          <h3 className="text-base sm:text-lg md:text-xl font-semibold mb-3 sm:mb-4 text-center">
+            Related Products
+          </h3>
 
-        <ProductSlider
-          items={related.map((r) => ({
-            id: r.id,
-            slug: r.slug,
-            name: r.name,
-            meta_title: r.meta_title || r.name,
-            price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
-            discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
-            discount: toNum(r.discount) > 0 ? `${Math.round(toNum(r.discount))}% OFF` : "",
-            image: r.image || r.thumb_image,
-            otherimage: r.otherimage || r.image,
-            image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),
-          }))}
-          sliderId="related-products"
-        />
-      </div>
+          <ProductSlider
+            items={related.map((r) => ({
+              id: r.id,
+              slug: r.slug,
+              name: r.name,
+              meta_title: r.meta_title || r.name,
+              price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
+              discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
+              discount: toNum(r.discount) > 0 ? `${Math.round(toNum(r.discount))}% OFF` : "",
+              image: r.image || r.thumb_image,
+              otherimage: r.otherimage || r.image,
+              image2: imgUrl(r.images?.[0]?.multiimage || r.otherimage || r.image),
+            }))}
+            sliderId="related-products"
+          />
+        </div>
 
-      {/* REVIEWS */}
-      <div
-        id="review"
-        ref={reviewRef}
-        className="max-w-7xl mx-auto scroll-mt-[120px] px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10"
-      >
+        {/* REVIEWS */}
+        <div
+          id="review"
+          ref={reviewRef}
+          className="scroll-mt-[120px] mt-6 sm:mt-8 md:mt-10"
+        >
         <h3 className="mb-4 text-center text-base sm:mb-5 sm:text-lg md:text-xl font-semibold">
           Customer Reviews
         </h3>
@@ -1140,6 +1139,7 @@ export default function ProductPageClient({ params }) {
           >
             Write a review
           </button>
+        </div>
         </div>
       </div>
 
