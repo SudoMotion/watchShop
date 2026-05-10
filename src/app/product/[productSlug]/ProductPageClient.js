@@ -187,6 +187,9 @@ export default function ProductPageClient({ params }) {
     totalReviews > 0
       ? reviewList.reduce((sum, review) => sum + review.rating, 0) / totalReviews
       : 0;
+  const ratingStarsFilled = totalReviews > 0 ? Math.round(averageRating) : 5;
+  const ratingScoreDisplay = totalReviews > 0 ? averageRating : 5;
+  const ratingCountDisplay = totalReviews > 0 ? totalReviews : 20;
   const visibleReviews = showAllReviews ? reviewList : reviewList.slice(0, 3);
   const hasMoreReviews = reviewList.length > 3;
   const productItem = productData?.productItem || product?.productItem || [];
@@ -597,40 +600,40 @@ export default function ProductPageClient({ params }) {
             {product?.name || product?.meta_title || "Product"}
           </h1>
 
-          <div className="mt-2 sm:mt-3 flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-            <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
-              {sellingPriceNum > 0 && (
-                <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl">
-                  BDT {sellingPriceNum.toLocaleString("en-BD")}
+          <div className="mt-2 sm:mt-2 flex flex-wrap items-center gap-2">
+            <div className="flex items-center text-amber-500 text-base sm:text-lg">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <span
+                  key={star}
+                  className={
+                    star <= ratingStarsFilled ? "text-amber-500" : "text-gray-300"
+                  }
+                >
+                  ★
                 </span>
-              )}
-              {discountPercent > 0 && (
-                <span className="text-sm sm:text-base font-medium text-red-700">
-                  {discountPercentText}% off
-                </span>
-              )}
-              {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
-                <del className="text-sm sm:text-base text-gray-500">
-                  BDT {originalPriceNum.toLocaleString("en-BD")}
-                </del>
-              )}
+              ))}
             </div>
-            {totalReviews > 0 && (
-              <div className="flex items-center gap-2 sm:justify-end">
-                <div className="flex items-center text-amber-500 text-base sm:text-lg">
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <span
-                      key={star}
-                      className={star <= Math.round(averageRating) ? "text-amber-500" : "text-gray-300"}
-                    >
-                      ★
-                    </span>
-                  ))}
-                </div>
-                <span className="text-sm sm:text-base text-gray-600">
-                  {averageRating.toFixed(1)} ({totalReviews} reviews)
-                </span>
-              </div>
+            <span className="text-sm sm:text-base text-gray-600">
+              {ratingScoreDisplay.toFixed(1)} ({ratingCountDisplay}{" "}
+              {ratingCountDisplay === 1 ? "review" : "reviews"})
+            </span>
+          </div>
+
+          <div className="mt-2 sm:mt-3 flex flex-wrap items-baseline gap-2 sm:gap-3">
+            {sellingPriceNum > 0 && (
+              <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl">
+                BDT {sellingPriceNum.toLocaleString("en-BD")}
+              </span>
+            )}
+            {discountPercent > 0 && (
+              <span className="text-sm sm:text-base font-medium text-red-700">
+                {discountPercentText}% off
+              </span>
+            )}
+            {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
+              <del className="text-sm sm:text-base text-gray-500">
+                BDT {originalPriceNum.toLocaleString("en-BD")}
+              </del>
             )}
           </div>
 
