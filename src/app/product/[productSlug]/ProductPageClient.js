@@ -637,16 +637,14 @@ export default function ProductPageClient({ params }) {
 
           {/* EMI Section */}
           {isEmiAvailable && (
-            <div className="mt-3 sm:mt-4 flex items-center justify-between gap-3 rounded-xl border bg-gradient-to-br from-blue-50 to-indigo-50 p-3 sm:p-4">
-              <div className="flex items-center gap-2">
-                <span className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
-                <span className="text-xs sm:text-sm font-semibold text-gray-800">
-                  EMI Available
-                </span>
-              </div>
+            <div className="mt-2 sm:mt-3 inline-flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg border border-indigo-100/80 bg-gradient-to-br from-blue-50 to-indigo-50 px-2.5 py-1.5 sm:px-3 sm:py-2">
+              <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-gray-800">
+                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green-500 animate-pulse" aria-hidden />
+                EMI Available
+              </span>
               <Link
                 href="/emi"
-                className="text-xs sm:text-sm font-semibold text-indigo-700 underline underline-offset-2 hover:text-indigo-900"
+                className="text-[11px] sm:text-xs font-semibold text-indigo-700 underline underline-offset-2 hover:text-indigo-900"
               >
                 View plan
               </Link>
