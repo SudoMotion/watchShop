@@ -32,6 +32,9 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
   const [error, setError] = useState('');
   const [categoryImageUrl, setCategoryImageUrl] = useState('/images/brand-banner.webp');
   const [categoryTitle, setCategoryTitle] = useState('');
+  const [subcategoryOptions, setSubcategoryOptions] = useState([]);
+  /** When URL has no ?category_id=, filled from GET /products/category response cat.id */
+  const [categoryIdFromApi, setCategoryIdFromApi] = useState('');
   const activeFilterCount = getActiveFilterChipCount(filters);
   const filtersKey = JSON.stringify(filters ?? {});
 
@@ -70,13 +73,14 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
       if (sortBy && BRAND_SORT_VALUES.has(sortBy)) {
         params.sortBy = sortBy;
       }
-      if (categoryId) {
-        params.category_id = categoryId;
+      const catParam = categoryId || categoryIdFromApi;
+      if (catParam) {
+        params.category_id = catParam;
       }
 
       const baseCountParams = buildBrandFilterParams(getQuantityAgnosticFilters(parsedFilters));
-      if (categoryId) {
-        baseCountParams.category_id = categoryId;
+      if (catParam) {
+        baseCountParams.category_id = catParam;
       }
       const [response, stockInResponse, stockOutResponse] = await Promise.all([
         getProductsByCategory(categorySlug, params),
@@ -105,6 +109,10 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
       });
       setCategoryImageUrl(resolveImageUrl(catImage));
       setCategoryTitle(catName || '');
+      const cid = response?.cat?.id;
+      if (cid != null && cid !== '') {
+        setCategoryIdFromApi(String(cid));
+      }
       setIsLoading(false);
     };
 
@@ -120,16 +128,32 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
   }, [categorySlug, categoryId, filtersKey, sortBy]);
 
   useEffect(() => {
-    if (!categoryId) return;
+    setCategoryIdFromApi('');
+  }, [categorySlug]);
+
+  useEffect(() => {
+    setFilters((prev) => ({
+      ...(prev && typeof prev === "object" ? prev : {}),
+      subcategories: [],
+    }));
+  }, [categorySlug]);
+
+  useEffect(() => {
+    const id = categoryId || categoryIdFromApi;
+    if (!id) {
+      setSubcategoryOptions([]);
+      return;
+    }
     let cancelled = false;
-    getSubcategoryByCategoryId(categoryId).then((result) => {
+    getSubcategoryByCategoryId(id).then((result) => {
       if (cancelled) return;
-      console.log("[getSubcategoryByCategoryId]", { categoryId, result });
+      const list = result?.subcategories ?? result?.data?.subcategories;
+      setSubcategoryOptions(Array.isArray(list) ? list : []);
     });
     return () => {
       cancelled = true;
     };
-  }, [categoryId]);
+  }, [categoryId, categoryIdFromApi]);
 
   const categoryNameFromSlug = useMemo(
     () =>
@@ -156,6 +180,7 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
           filters={filters}
           setFilters={setFilters}
           stockCounts={stockCounts}
+          subcategoryOptions={subcategoryOptions}
         />
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
           <div
@@ -163,7 +188,11 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
               activeFilterCount > 0 ? 'sm:justify-between' : 'sm:justify-end'
             }`}
           >
-            <FilterIndicator filters={filters} setFilters={setFilters} />
+            <FilterIndicator
+              filters={filters}
+              setFilters={setFilters}
+              subcategoryOptions={subcategoryOptions}
+            />
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-56 sm:shrink-0 sm:flex-row sm:items-center">
               <label htmlFor="category-sort" className="text-sm font-medium text-gray-700 shrink-0">
                 Sort by

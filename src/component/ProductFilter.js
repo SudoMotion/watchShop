@@ -41,6 +41,8 @@ export default function ProductFilter({
   filters: filtersProp,
   setFilters: setFiltersProp,
   stockCounts,
+  /** Category page: subcategories from API; omit or empty = hide Subcategory block */
+  subcategoryOptions = null,
 }) {
   const [open, setOpen] = useState("quantity");
   const [localFilters, setLocalFilters] = useState({
@@ -48,6 +50,7 @@ export default function ProductFilter({
     movement: {},
     band_type: {},
     brands: [],
+    subcategories: [],
   });
   const [brandList, setBrandList] = useState([]);
   const [movementOptions, setMovementOptions] = useState([]);
@@ -155,6 +158,51 @@ export default function ProductFilter({
           </div>
         )}
       </div>
+
+      {Array.isArray(subcategoryOptions) && subcategoryOptions.length > 0 ? (
+        <div className="border border-gray-200 p-3 rounded-md">
+          <button
+            type="button"
+            className={`text-xl flex items-center justify-between w-full text-left ${
+              open === "subcategory" ? "border-b border-gray-300" : ""
+            }`}
+            onClick={() => toggle("subcategory")}
+          >
+            <span>Subcategory</span>
+            <span className="text-gray-500">{open === "subcategory" ? "-" : "+"}</span>
+          </button>
+          {open === "subcategory" && (
+            <div className="mt-2 ml-1 max-h-56 overflow-y-auto flex flex-col gap-y-2">
+              {subcategoryOptions.map((sub) => {
+                const slug =
+                  sub?.slug ?? sub?.subcategory_slug ?? String(sub?.id ?? "");
+                if (!slug) return null;
+                const checked =
+                  Array.isArray(filters.subcategories) &&
+                  filters.subcategories.includes(slug);
+                return (
+                  <label key={slug} className="flex items-center gap-x-2">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={() =>
+                        setFilters((prev) => ({
+                          ...mergeDefaults(prev),
+                          subcategories: toggleBrandSlug(
+                            mergeDefaults(prev).subcategories,
+                            slug
+                          ),
+                        }))
+                      }
+                    />
+                    <span className="text-sm">{sub?.name ?? slug}</span>
+                  </label>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      ) : null}
 
       <div className="border border-gray-200 p-3 rounded-md">
         <button
@@ -289,5 +337,6 @@ function mergeDefaults(f) {
     movement: x.movement && typeof x.movement === "object" ? x.movement : {},
     band_type: x.band_type && typeof x.band_type === "object" ? x.band_type : {},
     brands: Array.isArray(x.brands) ? x.brands : [],
+    subcategories: Array.isArray(x.subcategories) ? x.subcategories : [],
   };
 }

@@ -32,6 +32,10 @@ export function buildBrandFilterParams(filters) {
     out.brands = filters.brands.join(',');
   }
 
+  if (Array.isArray(filters.subcategories) && filters.subcategories.length) {
+    out.sub_category = filters.subcategories.join(',');
+  }
+
   return out;
 }
 

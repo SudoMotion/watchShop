@@ -32,6 +32,7 @@ function mergeDefaults(f) {
     movement: x.movement && typeof x.movement === "object" ? x.movement : {},
     band_type: x.band_type && typeof x.band_type === "object" ? x.band_type : {},
     brands: Array.isArray(x.brands) ? x.brands : [],
+    subcategories: Array.isArray(x.subcategories) ? x.subcategories : [],
   };
 }
 
@@ -44,6 +45,7 @@ export function getActiveFilterChipCount(filters) {
   n += Object.keys(f.movement || {}).filter((k) => f.movement[k]).length;
   n += Object.keys(f.band_type || {}).filter((k) => f.band_type[k]).length;
   n += (f.brands || []).length;
+  n += (f.subcategories || []).length;
   return n;
 }
 
@@ -58,7 +60,16 @@ function brandLabel(b) {
 /**
  * Shows active product filters as removable chips (brand page & anywhere ProductFilter state is lifted).
  */
-export default function FilterIndicator({ filters, setFilters }) {
+function subSlug(sub) {
+  return sub?.slug ?? sub?.subcategory_slug ?? String(sub?.id ?? "");
+}
+
+export default function FilterIndicator({
+  filters,
+  setFilters,
+  /** Optional slug → label for category subcategory chips */
+  subcategoryOptions = null,
+}) {
   const [brandList, setBrandList] = useState([]);
   const [movementOptions, setMovementOptions] = useState([]);
 
@@ -105,6 +116,17 @@ export default function FilterIndicator({ filters, setFilters }) {
     });
     return (slug) => map.get(String(slug)) ?? String(slug);
   }, [brandList]);
+
+  const subcategoryNameBySlug = useMemo(() => {
+    const map = new Map();
+    if (Array.isArray(subcategoryOptions)) {
+      subcategoryOptions.forEach((sub) => {
+        const s = subSlug(sub);
+        if (s) map.set(String(s), sub?.name ?? s);
+      });
+    }
+    return (slug) => map.get(String(slug)) ?? String(slug);
+  }, [subcategoryOptions]);
 
   const f = mergeDefaults(filters);
 
@@ -160,6 +182,16 @@ export default function FilterIndicator({ filters, setFilters }) {
     });
   });
 
+  (f.subcategories || []).forEach((slug) => {
+    const name = subcategoryNameBySlug(slug);
+    chips.push({
+      key: "subcategory",
+      id: `subcategory:${slug}`,
+      text: `Subcategory: ${name}`,
+      aria: `Remove subcategory filter ${name}`,
+    });
+  });
+
   const removeChip = (chip) => {
     if (typeof setFilters !== "function") return;
     setFilters((prev) => {
@@ -190,6 +222,13 @@ export default function FilterIndicator({ filters, setFilters }) {
         const arr = (cur.brands || []).filter((s) => String(s) !== String(sub));
         return { ...cur, brands: arr };
       }
+      if (chip.key === "subcategory") {
+        const sub = chip.id.replace("subcategory:", "");
+        const arr = (cur.subcategories || []).filter(
+          (s) => String(s) !== String(sub)
+        );
+        return { ...cur, subcategories: arr };
+      }
       return cur;
     });
   };
@@ -201,6 +240,7 @@ export default function FilterIndicator({ filters, setFilters }) {
       movement: {},
       band_type: {},
       brands: [],
+      subcategories: [],
     });
   };
 
