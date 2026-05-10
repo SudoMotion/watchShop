@@ -6,8 +6,9 @@ import ProductFilter from '@/component/ProductFilter';
 import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
 import { EmptyProducts } from '@/component/EmptyProducts';
 import { useBrandProducts } from '@/hooks/useBrandProducts';
+import { buildBrandJsonLd } from '@/lib/brandMeta';
 import { NEXT_PUBLIC_API_URL } from '@/config';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Default (newest / stock first)' },
@@ -18,17 +19,29 @@ const SORT_OPTIONS = [
 ];
 const FALLBACK_BANNER_URL = '/images/brand-banner.webp';
 
-export default function BrandPageClient({ brandId }) {
+export default function BrandPageClient({ brandId, initialBrand = null }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const [bannerLoaded, setBannerLoaded] = useState(false);
   const [displayBannerUrl, setDisplayBannerUrl] = useState('');
-  const { products, banner_img, stockCounts, isLoading, error } = useBrandProducts(
-    brandId,
-    filters,
-    sortBy
-  );
+  const { products, banner_img, stockCounts, isLoading, error, response } =
+    useBrandProducts(brandId, filters, sortBy);
   const activeFilterCount = getActiveFilterChipCount(filters);
+
+  const brandForSchema = useMemo(() => {
+    if (initialBrand && typeof initialBrand === "object") return initialBrand;
+    const fromApi = response?.brand ?? response?.data?.brand;
+    return fromApi && typeof fromApi === "object" ? fromApi : null;
+  }, [initialBrand, response]);
+
+  const brandJsonLd = useMemo(() => {
+    if (!brandForSchema || !brandId) return null;
+    return buildBrandJsonLd(brandForSchema, brandId);
+  }, [brandForSchema, brandId]);
+
+  const displayName =
+    brandForSchema?.name ||
+    (typeof brandId === "string" ? brandId.replace(/-/g, " ") : brandId);
   const bannerUrl = banner_img
     ? banner_img.startsWith('http')
       ? banner_img
@@ -78,11 +91,19 @@ export default function BrandPageClient({ brandId }) {
 
   return (
     <div>
+      {brandJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(brandJsonLd),
+          }}
+        />
+      ) : null}
       <div className="relative flex items-center justify-center overflow-hidden bg-gray-100">
         {displayBannerUrl && (
           <img
             src={displayBannerUrl}
-            alt={`${brandId} banner`}
+            alt={displayName ? `${displayName} banner` : "Brand banner"}
             className="inset-0 h-full w-full object-contain"
             loading="eager"
             decoding="async"
@@ -92,7 +113,7 @@ export default function BrandPageClient({ brandId }) {
           <div className="absolute inset-0 animate-pulse bg-gray-200" />
         )}
         <div className="absolute z-10 text-3xl font-bold bg-gray-400/40 text-white rounded-2xl backdrop-blur-md p-5">
-          <span className="capitalize">{brandId}</span>
+          <span className="capitalize">{displayName}</span>
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:mt-4 px-2 mt-2">
