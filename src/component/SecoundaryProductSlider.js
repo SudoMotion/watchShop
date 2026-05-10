@@ -1,42 +1,48 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Autoplay, Pagination } from "swiper/modules";
 
 import "swiper/css";
 import "swiper/css/pagination";
+import {
+  mapBannerItemsToSlides,
+  mapBannerResponseToSlides,
+} from "@/lib/bannerSlides";
 import { getBannerContent } from "@/stores/HomeAPI";
 
-const slides = [
-  {
-    image: "/images/1.jpg",
-    title: "Prospex",
-    subtitle: "Keep Going Forward",
-    link: "/prospex",
-  },
-  {
-    image: "/images/2.jpg",
-    title: "Presage",
-    subtitle: "The Beauty of Japanese Craftsmanship",
-    link: "/presage",
-  },
-  {
-    image: "/images/3.jpg",
-    title: "Astron",
-    subtitle: "The World’s First GPS Solar Watch",
-    link: "/astron",
-  },
-];
-
 export default function SecoundaryProductSlider({ data }) {
-  console.log('data ata', data)
   const [mounted, setMounted] = useState(false);
+  const [fetchedSlides, setFetchedSlides] = useState([]);
 
-  // 🔑 Prevent Swiper from initializing during hydration
+  const fromProps = useMemo(() => {
+    if (!Array.isArray(data) || data.length === 0) return [];
+    return mapBannerItemsToSlides(data);
+  }, [data]);
+
+  useEffect(() => {
+    if (fromProps.length > 0) return;
+    let cancelled = false;
+    getBannerContent()
+      .then((raw) => {
+        if (cancelled) return;
+        const mapped = mapBannerResponseToSlides(raw);
+        if (mapped.length > 0) setFetchedSlides(mapped);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [fromProps.length]);
+
+  const resolvedSlides = fromProps.length > 0 ? fromProps : fetchedSlides;
+
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const loopEnabled = resolvedSlides.length > 1;
 
   if (!mounted) {
     return (
@@ -44,18 +50,30 @@ export default function SecoundaryProductSlider({ data }) {
     );
   }
 
+  if (resolvedSlides.length === 0) {
+    return (
+      <section className="relative flex min-h-[280px] w-full items-center justify-center bg-neutral-900 px-6 text-center text-sm text-neutral-400">
+        No recommended banners configured.
+      </section>
+    );
+  }
+
   return (
-    <section className="relative w-full h-[700px] lg:h-[800px] 2xl:h-[880px] overflow-hidden">
+    <section className="relative h-[700px] w-full overflow-hidden lg:h-[800px] 2xl:h-[880px]">
       <Swiper
         modules={[Autoplay, Pagination]}
         slidesPerView={1}
-        loop
+        loop={loopEnabled}
         speed={1200}
-        autoplay={{
-          delay: 5000,
-          disableOnInteraction: false,
-          pauseOnMouseEnter: false,
-        }}
+        autoplay={
+          loopEnabled
+            ? {
+                delay: 5000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: false,
+              }
+            : false
+        }
         pagination={{
           clickable: true,
           bulletClass: "hero-bullet",
@@ -63,30 +81,32 @@ export default function SecoundaryProductSlider({ data }) {
         }}
         className="h-full w-full"
       >
-        {slides.map((slide, index) => (
-          <SwiperSlide key={index} className="w-full h-full">
-            <div className="relative w-full h-full overflow-hidden">
-              {/* Background image */}
+        {resolvedSlides.map((slide, index) => (
+          <SwiperSlide
+            key={slide.id ?? `${slide.image}-${index}`}
+            className="h-full w-full"
+          >
+            <div className="relative h-full w-full overflow-hidden">
               <div
                 className="hero-bg absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url(${slide.image})` }}
               />
 
-              {/* Overlay */}
               <div className="absolute inset-0 bg-black/30" />
 
-              {/* Content */}
               <div className="relative z-10 flex h-full items-center px-6 md:px-24">
-                <div className="text-white max-w-xl">
-                  <h1 className="text-4xl md:text-6xl font-light tracking-wide mb-4">
+                <div className="max-w-xl text-white">
+                  <h1 className="mb-4 text-4xl font-light tracking-wide md:text-6xl">
                     {slide.title}
                   </h1>
-                  <p className="text-sm md:text-base tracking-widest uppercase mb-8">
-                    {slide.subtitle}
-                  </p>
+                  {slide.subtitle ? (
+                    <p className="mb-8 text-sm uppercase tracking-widest md:text-base">
+                      {slide.subtitle}
+                    </p>
+                  ) : null}
                   <a
                     href={slide.link}
-                    className="inline-block border border-white px-8 py-3 text-xs tracking-widest uppercase hover:bg-white hover:text-black transition"
+                    className="inline-block border border-white px-8 py-3 text-xs uppercase tracking-widest transition hover:bg-white hover:text-black"
                   >
                     Discover
                   </a>
@@ -97,8 +117,7 @@ export default function SecoundaryProductSlider({ data }) {
         ))}
       </Swiper>
 
-      {/* Pagination */}
-      <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20">
+      <div className="absolute bottom-10 left-1/2 z-20 -translate-x-1/2">
         <div className="swiper-pagination" />
       </div>
     </section>

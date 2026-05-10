@@ -30,6 +30,7 @@ export default async function page() {
     {};
   const stickyBanner = bannersByType?.sticky_banner ?? [];
   const gifBanner = bannersByType?.gif_banner ?? [];
+  const recommendedBannerList = bannersByType?.recommended_banner ?? [];
   const {trending_banners, two_banners, discount_products, mens_products, ladies_products, new_arrival} = home;
   const sectionsResponse = await getSections();
   const sections = sectionsResponse?.sections ?? [];
@@ -61,7 +62,7 @@ export default async function page() {
       </div>
       <SectionArea sections={firstSection} />
       <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
-        <SecoundaryProductSlider data={bannerResponse?.banners_by_type?.recommended_banner}/>
+        <SecoundaryProductSlider data={recommendedBannerList} />
         <RecomendedProducts/>
       </div>
       <div className='max-w-7xl mx-auto my-10 px-2'>
