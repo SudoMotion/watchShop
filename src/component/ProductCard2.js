@@ -82,7 +82,7 @@ export default function ProductCard2({ item }) {
           </div>
         )}
         {item.brand?.name && (
-          <div className="absolute bottom-2 left-1/2 z-5 truncate -translate-x-1/2 text-base font-medium text-gray-600">
+          <div className="absolute bottom-1 left-1/2 z-5 truncate -translate-x-1/2 text-base font-medium text-gray-600">
             {item.brand.name}
           </div>
         )}
