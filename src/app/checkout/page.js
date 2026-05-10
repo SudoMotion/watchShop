@@ -691,14 +691,16 @@ export default function CheckoutPage() {
     );
   }
 
+  /** Guest user is on the OTP step — hide delivery/shipping fields, show only OTP UI. */
+  const guestAwaitingOtp = !isLoggedIn() && otpSent && !otpVerified;
   const showFullCheckoutFields =
     isLoggedIn() ||
-    !existingCustomerMode ||
-    (existingCustomerMode && otpVerified);
+    (!guestAwaitingOtp &&
+      (!existingCustomerMode || (existingCustomerMode && otpVerified)));
   const showAdvancedCheckoutFields =
     isLoggedIn() ||
-    !existingCustomerMode ||
-    (existingCustomerMode && otpVerified);
+    (!guestAwaitingOtp &&
+      (!existingCustomerMode || (existingCustomerMode && otpVerified)));
 
   return (
     <div className="bg-gray-50 py-4">
@@ -1027,20 +1029,22 @@ export default function CheckoutPage() {
             <div className="min-w-0 lg:col-span-2 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-6">
                 <h2 className="text-xl font-semibold mb-4">
-                  {isLoggedIn()
-                    ? "Billing Address"
-                    : existingCustomerMode
-                      ? "Existing Customer Verification"
-                      : "Delivery & account"}
+                  {guestAwaitingOtp
+                    ? "Verify your phone"
+                    : isLoggedIn()
+                      ? "Billing Address"
+                      : existingCustomerMode
+                        ? "Existing Customer Verification"
+                        : "Delivery & account"}
                 </h2>
-                {!isLoggedIn() && !existingCustomerMode && (
+                {!isLoggedIn() && !existingCustomerMode && !guestAwaitingOtp && (
                   <p className="mb-4 text-sm text-gray-600">
                     Fill in all details below. Use <span className="font-semibold">Continue to verification</span>{" "}
                     to create your account and receive an OTP. After you confirm the code, we sign you in and place your order.
                   </p>
                 )}
                 <div className="space-y-4">
-                  {!isLoggedIn() && (
+                  {!isLoggedIn() && !guestAwaitingOtp && (
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
