@@ -331,6 +331,7 @@ export default function Header() {
               {navigationItems.map((item, index) => {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const isDropdownOpen = activeDropdown === index;
+                const isBestDealNav = item.href === '/best-deal';
 
                 return (
                   <div
@@ -343,14 +344,26 @@ export default function Header() {
                     <Link
                       href={item.href}
                       onClick={() => !hasSubmenu && setActiveDropdown(null)}
-                      className={`flex items-center gap-1 font-semibold text-sm md:text-sm whitespace-nowrap transition-colors ${
-                        item.highlight
-                          ? 'text-green-300 hover:text-green-200'
-                          : 'text-white hover:text-red-400'
+                      className={`flex items-center gap-1.5 font-semibold text-sm md:text-sm whitespace-nowrap transition-colors ${
+                        isBestDealNav
+                          ? 'text-red-500 hover:text-red-400'
+                          : item.highlight
+                            ? 'text-green-300 hover:text-green-200'
+                            : 'text-white hover:text-red-400'
                       }`}
                     >
-                      {item.label}
-                      {item.highlight && <span className="ml-1">🤝</span>}
+                      <span>{item.label}</span>
+                      {isBestDealNav && (
+                        <Image
+                          src="/images/handshake.gif"
+                          alt=""
+                          width={22}
+                          height={22}
+                          className="h-5 w-5 shrink-0 object-contain"
+                          unoptimized
+                        />
+                      )}
+                      {item.highlight && !isBestDealNav && <span className="ml-1">🤝</span>}
                       {hasSubmenu && (
                         <svg
                           className="w-4 h-4"
@@ -706,6 +719,7 @@ export default function Header() {
               {navigationItems.map((item, index) => {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const isDropdownOpen = mobileActiveDropdown === index;
+                const isBestDealNav = item.href === '/best-deal';
 
                 return (
                   <div
@@ -721,16 +735,28 @@ export default function Header() {
                           )
                         }
                         className={`flex w-full items-center justify-between py-3 px-2 text-left text-sm font-medium transition-colors ${
-                          item.highlight
-                            ? 'text-green-300 hover:text-green-200'
-                            : 'text-white hover:text-red-400'
+                          isBestDealNav
+                            ? 'text-red-500 hover:text-red-400'
+                            : item.highlight
+                              ? 'text-green-300 hover:text-green-200'
+                              : 'text-white hover:text-red-400'
                         }`}
                         aria-label={`Toggle ${item.label} submenu`}
                         aria-expanded={isDropdownOpen}
                       >
-                        <span>
+                        <span className="flex items-center gap-2">
                           {item.label}
-                          {item.highlight && <span className="ml-1">🤝</span>}
+                          {isBestDealNav && (
+                            <Image
+                              src="/images/handshake.gif"
+                              alt=""
+                              width={22}
+                              height={22}
+                              className="h-5 w-5 shrink-0 object-contain"
+                              unoptimized
+                            />
+                          )}
+                          {item.highlight && !isBestDealNav && <span className="ml-1">🤝</span>}
                         </span>
                         <svg
                           className={`w-5 h-5 transition-transform ${
@@ -752,14 +778,26 @@ export default function Header() {
                       <Link
                         href={item.href}
                         onClick={() => setMobileMenuOpen(false)}
-                        className={`block py-3 px-2 text-sm font-medium transition-colors ${
-                          item.highlight
-                            ? 'text-green-600 hover:text-green-700'
-                            : 'text-gray-700 hover:text-red-600'
+                        className={`flex items-center gap-2 py-3 px-2 text-sm font-medium transition-colors ${
+                          isBestDealNav
+                            ? 'text-red-500 hover:text-red-400'
+                            : item.highlight
+                              ? 'text-green-300 hover:text-green-200'
+                              : 'text-white hover:text-red-400'
                         }`}
                       >
-                        {item.label}
-                        {item.highlight && <span className="ml-1">🤝</span>}
+                        <span>{item.label}</span>
+                        {isBestDealNav && (
+                          <Image
+                            src="/images/handshake.gif"
+                            alt=""
+                            width={22}
+                            height={22}
+                            className="h-5 w-5 shrink-0 object-contain"
+                            unoptimized
+                          />
+                        )}
+                        {item.highlight && !isBestDealNav && <span className="ml-1">🤝</span>}
                       </Link>
                     )}
 
