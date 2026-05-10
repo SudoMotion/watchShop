@@ -19,15 +19,18 @@ export default function HomeMagazineSection() {
   }, [blogs]);
   return (
     <div className="max-w-7xl mx-auto mb-10 px-2">
-      <h1 className="text-2xl md:text-3xl font-semibold">
-        WATCHSHOPBD:{" "}
-        <Link
-          href="/blog"
-          className="hover:text-red-600 transition-all duration-200"
-        >
-          LATEST MAGAZINE OF WATCH INDUSTRY
-        </Link>
-      </h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl md:text-3xl font-semibold">
+          WATCHSHOPBD:{" "}
+          <Link
+            href="/blog"
+            className="hover:text-red-600 transition-all duration-200"
+          >
+            LATEST MAGAZINE OF WATCH INDUSTRY
+          </Link>
+        </h1>
+        <Link href="/blog" className="bg-black text-white px-4 py-2 rounded-md font-medium text-xs md:text-sm lg:text-base xl:text-sm">VIEW ALL</Link>
+      </div>
       {isLoading ? (
         <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-3">
           {[0, 1, 2].map((k) => (
@@ -82,9 +85,6 @@ export default function HomeMagazineSection() {
           })}
         </div>
       ) : null}
-      <div className="w-full flex items-center justify-end mt-2 md:mt-3 lg:mt-4 xl:mt-5">
-        <Link href="/blog" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all duration-200 text-xs md:text-sm lg:text-base xl:text-sm">VIEW ALL</Link>
-      </div>
     </div>
   );
 }
