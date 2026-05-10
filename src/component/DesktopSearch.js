@@ -115,11 +115,8 @@ export default function DesktopSearch({
             <div className="mt-2 overflow-hidden rounded border border-gray-100">
               <div className="flex flex-col md:flex-row">
                 <div className="w-full border-b border-gray-100 bg-gray-50 p-3 md:w-1/3 md:border-b-0 md:border-r">
-                  <p className="text-xs font-semibold uppercase tracking-wide text-gray-600">
-                    Keyword suggestions
-                  </p>
                   {relatedKeywords.length > 0 ? (
-                    <div className="mt-2 flex flex-col items-start flex-wrap gap-2">
+                    <div className="flex flex-col items-start flex-wrap gap-2">
                       {relatedKeywords.map((keyword, keywordIndex) => (
                         <button
                           key={`${keyword}-${keywordIndex}`}
@@ -129,7 +126,7 @@ export default function DesktopSearch({
                               ? onKeywordClick(keyword)
                               : setSearchQuery(String(keyword))
                           }
-                          className="rounded bg-white hover:bg-gray-100 px-2 py-1 text-xs text-gray-700 border border-gray-200 transition-colors text-start"
+                          className="rounded text-sm text-gray-700 font-medium transition-colors text-start"
                         >
                           {keyword}
                         </button>
