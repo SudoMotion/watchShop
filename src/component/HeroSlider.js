@@ -82,7 +82,7 @@ export default function HeroSlider() {
                   </div>
 
                   {/* Optional Overlay */}
-                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="absolute inset-0" />
                   {slide?.title && slide?.link && (
                     <div className="relative z-10 flex h-full items-end px-6 pb-12 md:px-20 md:pb-16">
                       <div className="text-white">
@@ -140,7 +140,7 @@ export default function HeroSlider() {
                     />
                   </div>
 
-                  <div className="absolute inset-0 bg-black/20" />
+                  <div className="absolute inset-0" />
                   {slide?.title && slide?.link && (
                     <div className="relative z-10 flex h-full items-end px-4 pb-8">
                       <div className="text-white">

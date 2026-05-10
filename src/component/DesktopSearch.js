@@ -5,7 +5,6 @@ import { Backend_Base_Url } from "@/config";
 export default function DesktopSearch({
   open,
   setOpen,
-  onTransparent,
   searchRef,
   searchQuery,
   setSearchQuery,
@@ -58,9 +57,7 @@ export default function DesktopSearch({
           type="button"
           onClick={() => setOpen((prev) => !prev)}
           aria-label={open ? "Close search" : "Open search"}
-          className={`flex items-center justify-center p-2 ${
-            onTransparent ? "md:md:text-white hover:text-white/80" : "text-gray-700 hover:text-gray-900"
-          }`}
+          className="flex items-center justify-center p-2 text-white transition-colors hover:text-white/80"
         >
           {open ? (
             <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">

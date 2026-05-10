@@ -268,8 +268,8 @@ export default function Header() {
 
       {/* Main Header: single row */}
       <div
-        className={`border-b px-4 transition-colors duration-300 ${
-          onTransparent ? 'bg-transparent border-transparent' : 'bg-white border-gray-200 pb-1.5 md:pb-0'
+        className={`border-b px-4 bg-black/20 backdrop-blur-md transition-colors duration-300 ${
+          onTransparent ? 'border-transparent' : 'border-white/15 pb-1.5 md:pb-0'
         }`}
       >
         <div className="flex items-center justify-between gap-4">
@@ -279,9 +279,7 @@ export default function Header() {
             {/* Mobile menu toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`lg:hidden flex items-center justify-center transition-colors ${
-                onTransparent ? 'md:md:text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
-              }`}
+              className="lg:hidden flex items-center justify-center text-white transition-colors hover:text-white/80"
               aria-label="Toggle menu"
             >
               {mobileMenuOpen ? (
@@ -344,12 +342,8 @@ export default function Header() {
                       onClick={() => !hasSubmenu && setActiveDropdown(null)}
                       className={`flex items-center gap-1 font-semibold text-sm md:text-sm whitespace-nowrap transition-colors ${
                         item.highlight
-                          ? onTransparent
-                            ? 'text-green-300 hover:text-green-200'
-                            : 'text-green-600 hover:text-green-700'
-                          : onTransparent
-                            ? 'md:text-white hover:text-white/80'
-                            : 'text-gray-700 hover:text-red-600'
+                          ? 'text-green-300 hover:text-green-200'
+                          : 'text-white hover:text-red-400'
                       }`}
                     >
                       {item.label}
@@ -431,7 +425,6 @@ export default function Header() {
             <DesktopSearch
               open={open}
               setOpen={setOpen}
-              onTransparent={onTransparent}
               searchRef={searchRef}
               searchQuery={searchQuery}
               setSearchQuery={setSearchQuery}
@@ -446,9 +439,7 @@ export default function Header() {
             <button
               type="button"
               onClick={() => setMobileSearchOpen((prev) => !prev)}
-              className={`flex md:hidden items-center justify-center transition-colors ${
-                onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
-              }`}
+              className="flex md:hidden items-center justify-center text-white transition-colors hover:text-white/80"
               aria-label="Toggle search"
             >
               <svg
@@ -470,11 +461,7 @@ export default function Header() {
             <div className="relative" ref={userMenuRef}>
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className={`flex items-center gap-1 text-xs md:text-sm font-medium transition-colors ${
-                  onTransparent
-                    ? 'md:text-white hover:text-white/80'
-                    : 'text-gray-700 hover:text-gray-900'
-                }`}
+                className="flex items-center gap-1 text-xs md:text-sm font-medium text-white transition-colors hover:text-white/80"
               >
                 <svg
                   className="w-5 h-5"
@@ -557,9 +544,7 @@ export default function Header() {
             {/* Wishlist (desktop only) */}
             <Link
               href="/wishlist"
-              className={`relative inline-flex transition-colors ${
-                onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-red-600'
-              }`}
+              className="relative inline-flex text-white transition-colors hover:text-red-400"
             >
               <svg
                 className="w-5 h-5"
@@ -584,9 +569,7 @@ export default function Header() {
             {/* Cart */}
             <Link
               href="/cart"
-              className={`relative transition-colors ${
-                onTransparent ? 'md:text-white hover:text-white/80' : 'text-gray-700 hover:text-gray-900'
-              }`}
+              className="relative text-white transition-colors hover:text-white/80"
             >
               <svg
                 className="w-5 h-5"
@@ -714,7 +697,7 @@ export default function Header() {
 
       {/* Mobile Menu Dropdown (below main header) */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-b border-gray-200 bg-white/95 backdrop-blur px-4 pb-4">
+        <div className="lg:hidden border-b border-white/15 bg-black/50 backdrop-blur-md px-4 pb-4">
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col space-y-1 pt-2">
               {navigationItems.map((item, index) => {
@@ -724,7 +707,7 @@ export default function Header() {
                 return (
                   <div
                     key={index}
-                    className="border-b border-gray-100 last:border-b-0"
+                    className="border-b border-white/10 last:border-b-0"
                   >
                     {hasSubmenu ? (
                       <button
@@ -736,8 +719,8 @@ export default function Header() {
                         }
                         className={`flex w-full items-center justify-between py-3 px-2 text-left text-sm font-medium transition-colors ${
                           item.highlight
-                            ? 'text-green-600 hover:text-green-700'
-                            : 'text-gray-700 hover:text-red-600'
+                            ? 'text-green-300 hover:text-green-200'
+                            : 'text-white hover:text-red-400'
                         }`}
                         aria-label={`Toggle ${item.label} submenu`}
                         aria-expanded={isDropdownOpen}
@@ -779,7 +762,7 @@ export default function Header() {
 
                     {/* Mobile Submenu */}
                     {hasSubmenu && isDropdownOpen && (
-                      <div className="bg-gray-50 pb-2">
+                      <div className="bg-white/5 pb-2">
                         {item.submenu.map((subItem, subIndex) => (
                           <Link
                             key={subIndex}
@@ -788,7 +771,7 @@ export default function Header() {
                               setMobileActiveDropdown(null);
                               setMobileMenuOpen(false);
                             }}
-                            className="block py-2 px-6 text-sm text-gray-600 hover:text-red-600 hover:bg-gray-100 transition-colors"
+                            className="block py-2 px-6 text-sm text-gray-200 hover:text-white hover:bg-white/10 transition-colors"
                           >
                             {subItem.label}
                           </Link>
