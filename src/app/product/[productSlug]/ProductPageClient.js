@@ -7,6 +7,7 @@ import { getCart, setCart } from "@/lib/cartStorage";
 import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
 import { getCustomer, isLoggedIn } from "@/lib/auth";
 import { submitReview } from "@/stores/ReviewsAPI";
+import { buildProductJsonLd } from "@/lib/productMeta";
 import Image from "next/image";
 import Link from "next/link";
 import { useRef, useState, useEffect, useCallback } from "react";
@@ -477,12 +478,22 @@ export default function ProductPageClient({ params }) {
       </div>
     );
   }
+  const productJsonLd = product ? buildProductJsonLd(product, productSlug) : null;
+
   return (
     <div
       className={`w-full bg-white text-gray-800 ${
         showFloatingCta ? "pb-14 sm:pb-16" : ""
       }`}
     >
+      {productJsonLd ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(productJsonLd),
+          }}
+        />
+      ) : null}
 
       {/* CONTAINER */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
@@ -511,7 +522,12 @@ export default function ProductPageClient({ params }) {
                 <Image
                   src={mainImg || displayImages[0]}
                   fill
-                  alt="Watch"
+                  alt={
+                    product?.name ||
+                    product?.meta_title ||
+                    product?.on_page_meta_title ||
+                    "Product image"
+                  }
                   className="object-cover"
                   unoptimized
                 />

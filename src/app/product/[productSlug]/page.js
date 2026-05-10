@@ -1,8 +1,18 @@
 import { productList } from "@/_lib/productList";
-import { getAllProductSlugs } from "@/stores/ProductAPI";
+import { buildProductMetadata } from "@/lib/productMeta";
+import { getAllProductSlugs, getProductBySlug } from "@/stores/ProductAPI";
 import ProductPageClient from "./ProductPageClient";
 
 export const dynamicParams = false;
+
+export async function generateMetadata({ params }) {
+  const { productSlug } = await params;
+  if (!productSlug || productSlug === "placeholder") {
+    return { title: "Product" };
+  }
+  const data = await getProductBySlug(productSlug);
+  return buildProductMetadata(data, productSlug);
+}
 
 export async function generateStaticParams() {
   let slugs = [];
