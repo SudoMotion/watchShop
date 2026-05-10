@@ -41,6 +41,7 @@ export default function ProductPageClient({ params }) {
   const [isInWishlist, setIsInWishlist] = useState(false);
   /** Show fixed CTA only after scrolling down (keeps inline buttons visible at top). */
   const [showFloatingCta, setShowFloatingCta] = useState(false);
+  const [purchaseQty, setPurchaseQty] = useState(1);
 
   const [reviewModalOpen, setReviewModalOpen] = useState(false);
   const [reviewText, setReviewText] = useState("");
@@ -247,6 +248,8 @@ export default function ProductPageClient({ params }) {
       const priceStr = `৳${sellingPriceNum.toLocaleString("en-BD")}`;
       const originalPriceStr = `৳${originalPriceNum.toLocaleString("en-BD")}`;
       const stock = Number(product?.quantity || 0);
+      const cap = Math.max(1, stock);
+      const addQty = Math.min(Math.max(1, purchaseQty), cap);
       const newItem = {
         id: product.id,
         image,
@@ -255,15 +258,18 @@ export default function ProductPageClient({ params }) {
         brand: product?.brand?.name || "",
         price: priceStr,
         originalPrice: originalPriceStr,
-        quantity: 1,
-        stock: Math.max(1, stock),
+        quantity: addQty,
+        stock: cap,
       };
       const cart = getCart();
       const existing = cart.find((item) => item.id === product.id);
       const nextCart = existing
         ? cart.map((item) =>
             item.id === product.id
-              ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
+              ? {
+                  ...item,
+                  quantity: Math.min(item.quantity + addQty, item.stock),
+                }
               : item
           )
         : [...cart, newItem];
@@ -324,6 +330,8 @@ export default function ProductPageClient({ params }) {
       const priceStr = `৳${sellingPriceNum.toLocaleString("en-BD")}`;
       const originalPriceStr = `৳${originalPriceNum.toLocaleString("en-BD")}`;
       const stock = Number(product?.quantity || 0);
+      const cap = Math.max(1, stock);
+      const addQty = Math.min(Math.max(1, purchaseQty), cap);
       const newItem = {
         id: product.id,
         image,
@@ -332,15 +340,18 @@ export default function ProductPageClient({ params }) {
         brand: product?.brand?.name || "",
         price: priceStr,
         originalPrice: originalPriceStr,
-        quantity: 1,
-        stock: Math.max(1, stock),
+        quantity: addQty,
+        stock: cap,
       };
       const cart = getCart();
       const existing = cart.find((item) => item.id === product.id);
       const nextCart = existing
         ? cart.map((item) =>
             item.id === product.id
-              ? { ...item, quantity: Math.min(item.quantity + 1, item.stock) }
+              ? {
+                  ...item,
+                  quantity: Math.min(item.quantity + addQty, item.stock),
+                }
               : item
           )
         : [...cart, newItem];
@@ -438,6 +449,15 @@ export default function ProductPageClient({ params }) {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    setPurchaseQty(1);
+  }, [productSlug]);
+
+  useEffect(() => {
+    if (stockQty < 1) return;
+    setPurchaseQty((q) => Math.min(Math.max(1, q), stockQty));
+  }, [stockQty]);
 
   const thumbImages = displayImages.length ? displayImages : ["/images/mockProduct/1.png"];
 
@@ -712,11 +732,44 @@ export default function ProductPageClient({ params }) {
                 </li>
               ))}
             </ul>
-            {
-            inStock &&
-            <p className="text-sm text-gray-700 mt-2"><span className="text-green-600 font-bold">Availability:</span> {stockQty.toLocaleString("en-BD")} in stock</p>
-          }
-          <div className="mt-4 sm:mt-5 flex flex-wrap items-center gap-3">
+            {inStock && (
+              <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
+                
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm">
+                    <button
+                      type="button"
+                      aria-label="Decrease quantity"
+                      disabled={purchaseQty <= 1}
+                      onClick={() => setPurchaseQty((q) => Math.max(1, q - 1))}
+                      className="flex h-10 w-10 items-center justify-center text-lg font-semibold leading-none text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      −
+                    </button>
+                    <span className="min-w-[2.75rem] select-none px-2 text-center text-sm font-semibold tabular-nums text-gray-900">
+                      {purchaseQty}
+                    </span>
+                    <button
+                      type="button"
+                      aria-label="Increase quantity"
+                      disabled={purchaseQty >= stockQty}
+                      onClick={() =>
+                        setPurchaseQty((q) => Math.min(stockQty, q + 1))
+                      }
+                      className="flex h-10 w-10 items-center justify-center text-lg font-semibold leading-none text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-700">
+                  <span className="font-bold text-green-600">in stock: </span> {stockQty.toLocaleString("en-BD")}
+                </p>
+              </div>
+            )}
+          <div
+            className={`flex flex-wrap items-center gap-3 ${inStock ? "mt-3 sm:mt-4" : "mt-4 sm:mt-5"}`}
+          >
             {inStock ? (
               <>
                 <button
@@ -1074,7 +1127,30 @@ export default function ProductPageClient({ params }) {
       {/* Fixed CTA — only after scrolling 500px (inline buttons stay at top) */}
       {showFloatingCta && inStock && (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 pb-[max(0.2rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none">
-          <div className="pointer-events-auto flex w-full max-w-[min(100%,20rem)] gap-1 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm sm:max-w-[22rem]">
+          <div className="pointer-events-auto flex w-full max-w-[min(100%,26rem)] items-center gap-1.5 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm">
+            <div className="flex shrink-0 items-center overflow-hidden rounded-lg border border-gray-300 bg-gray-50">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                disabled={purchaseQty <= 1}
+                onClick={() => setPurchaseQty((q) => Math.max(1, q - 1))}
+                className="flex h-8 w-7 items-center justify-center text-sm font-semibold leading-none text-gray-800 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                −
+              </button>
+              <span className="min-w-[1.375rem] select-none px-0.5 text-center text-[11px] font-semibold tabular-nums text-gray-900">
+                {purchaseQty}
+              </span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                disabled={purchaseQty >= stockQty}
+                onClick={() => setPurchaseQty((q) => Math.min(stockQty, q + 1))}
+                className="flex h-8 w-7 items-center justify-center text-sm font-semibold leading-none text-gray-800 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+            </div>
             <button
               type="button"
               onClick={handleAddToCart}
