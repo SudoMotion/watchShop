@@ -82,6 +82,9 @@ export default function HomeMagazineSection() {
           })}
         </div>
       ) : null}
+      <div className="w-full flex items-center justify-end mt-2 md:mt-3 lg:mt-4 xl:mt-5">
+        <Link href="/blog" className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all duration-200 text-xs md:text-sm lg:text-base xl:text-sm">VIEW ALL</Link>
+      </div>
     </div>
   );
 }
