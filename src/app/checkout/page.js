@@ -1391,7 +1391,7 @@ export default function CheckoutPage() {
                         Cash on delivery (COD)
                       </span>
                     </label>
-                    <label
+                    {/* <label
                       className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
                         formData.payment_type === "bkash"
                           ? "border-blue-500 bg-sky-50"
@@ -1419,7 +1419,7 @@ export default function CheckoutPage() {
                         ) : null}
                       </span>
                       <span className="text-sm font-medium text-gray-900">bKash</span>
-                    </label>
+                    </label> */}
                     <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50">
                       <input
                         type="radio"
@@ -1487,7 +1487,11 @@ export default function CheckoutPage() {
                       otpSent &&
                       !otpVerified)
                   }
-                  className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                  className={
+                    formData.payment_type === "bkash"
+                      ? "w-full bg-[#df156a] text-white py-3 rounded-lg font-semibold hover:bg-[#c4125f] disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                      : "w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
+                  }
                 >
                   {submitting
                     ? "Placing order…"
