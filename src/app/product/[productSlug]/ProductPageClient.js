@@ -117,6 +117,7 @@ export default function ProductPageClient({ params }) {
   const specificationRef = useRef(null);
   const collectionRef = useRef(null);
   const movementRef = useRef(null);
+  const reviewRef = useRef(null);
 
   const product = productData?.product ?? null;
   const toNum = (v) => {
@@ -230,6 +231,7 @@ export default function ProductPageClient({ params }) {
       "specification": specificationRef,
       "collection": collectionRef,
       "movement": movementRef,
+      review: reviewRef,
     };
 
     const sectionRef = sectionMap[sectionId];
@@ -430,6 +432,7 @@ export default function ProductPageClient({ params }) {
         { id: "specification", ref: specificationRef },
         { id: "collection", ref: collectionRef },
         { id: "movement", ref: movementRef },
+        { id: "review", ref: reviewRef },
       ];
 
       const scrollPosition = window.scrollY + 200; // Offset for better detection
@@ -838,6 +841,31 @@ export default function ProductPageClient({ params }) {
               </a>
               <span>{WHATSAPP_NUMBER}</span>
             </div>
+            <div className="grid grid-cols-2 bg-black gap-px text-center my-5 mb-5 w-2/3">
+              {authentics.length > 0
+                ? authentics.map((a) => (
+                    <div key={a.id} className="flex flex-col items-center bg-white p-2">
+                      {a.image && (
+                        <div className="w-10 h-10 sm:w-12 sm:h-12 relative mb-1">
+                          <Image
+                            src={imgUrl(a.image)}
+                            alt={a.title}
+                            fill
+                            className="object-contain"
+                          />
+                        </div>
+                      )}
+                      <div className="font-semibold text-xs sm:text-sm">{a.title}</div>
+                    </div>
+                  ))
+                : (
+                  <>
+                    <div><div className="font-semibold text-xs sm:text-sm">100% Authentic</div></div>
+                    <div><div className="font-semibold text-xs sm:text-sm">Fast Delivery</div></div>
+                    <div><div className="font-semibold text-xs sm:text-sm">Secure Checkout</div></div>
+                  </>
+                )}
+            </div>
 
             {/* <div className="grid grid-cols-2 gap-2 sm:gap-3">
               <div className="border rounded-lg overflow-hidden flex items-center justify-center border p-2 sm:p-3">
@@ -859,32 +887,8 @@ export default function ProductPageClient({ params }) {
 
       {/* DESCRIPTION */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8">
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 md:gap-5 text-center border-y border-gray-300 py-5 mb-5">
-        {authentics.length > 0
-          ? authentics.map((a) => (
-              <div key={a.id} className="flex flex-col items-center">
-                {a.image && (
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 relative mb-1">
-                    <Image
-                      src={imgUrl(a.image)}
-                      alt={a.title}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
-                )}
-                <div className="font-semibold text-xs sm:text-sm">{a.title}</div>
-              </div>
-            ))
-          : (
-            <>
-              <div><div className="font-semibold text-xs sm:text-sm">100% Authentic</div></div>
-              <div><div className="font-semibold text-xs sm:text-sm">Fast Delivery</div></div>
-              <div><div className="font-semibold text-xs sm:text-sm">Secure Checkout</div></div>
-            </>
-          )}
-      </div>
-        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 sticky top-0 bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+      
+        <div className="flex items-center gap-2 sm:gap-4 md:gap-6 sticky top-[70px] bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button
               onClick={() => scrollToSection("editor-note")}
               className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
@@ -924,6 +928,16 @@ export default function ProductPageClient({ params }) {
               }`}
             >
               MOVEMENT
+            </button>
+            <button
+              onClick={() => scrollToSection("review")}
+              className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${
+                activeTab === "review"
+                  ? "border-b-2 border-red-600 text-black"
+                  : "border-b-2 border-transparent text-gray-600 hover:text-black"
+              }`}
+            >
+              REVIEW
             </button>
         </div>
         <div className="bg-gray-100 mt-3 sm:mt-4 p-3 sm:p-4 md:p-6">
@@ -1064,7 +1078,11 @@ export default function ProductPageClient({ params }) {
       </div>
 
       {/* REVIEWS */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10">
+      <div
+        id="review"
+        ref={reviewRef}
+        className="max-w-7xl mx-auto scroll-mt-[120px] px-3 sm:px-4 md:px-6 mt-6 sm:mt-8 md:mt-10"
+      >
         <h3 className="mb-4 text-center text-base sm:mb-5 sm:text-lg md:text-xl font-semibold">
           Customer Reviews
         </h3>
