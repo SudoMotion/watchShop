@@ -28,12 +28,9 @@ export default async function SearchPage({ searchParams }) {
 
   return (
     <div className="max-w-7xl mx-auto px-2 md:px-0 py-10 md:py-16">
-      <h1 className="title font-semibold">Search Results</h1>
-      <p className="text-sm text-gray-600 mt-1">
-        Keyword: <span className="font-semibold text-gray-800">{keyword || "-"}</span>
-      </p>
+      <h1 className="title font-semibold">Search By: {keyword || "-"} </h1>
 
-      {relatedKeywords.length > 0 && (
+      {/* {relatedKeywords.length > 0 && (
         <div className="mt-4 mb-6">
           <p className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
             Related keywords
@@ -50,7 +47,7 @@ export default async function SearchPage({ searchParams }) {
             ))}
           </div>
         </div>
-      )}
+      )} */}
 
       {products.length > 0 ? (
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-x-5 gap-y-10">
