@@ -688,7 +688,7 @@ export default function ProductPageClient({ params }) {
           ) : 'Bangladesho'} */}
               <ul className="space-y-1.5 text-sm text-gray-700 mt-1 md:mt-3">
                 <li className="flex items-start gap-2">
-                  <span className="text-red-500 mt-0.5 shrink-0">●</span>
+                  <span className="text-black mt-0.5 shrink-0">●</span>
                   <span>
                     <span className="font-medium text-gray-800">Model:</span>
                     <span className="text-gray-600">{modelText}</span>
