@@ -7,6 +7,7 @@ import ProductCard2 from '@/component/ProductCard2';
 import ProductFilter from '@/component/ProductFilter';
 import { ProductGridSkeleton } from '@/component/ProductGridSkeleton';
 import { NEXT_PUBLIC_API_URL } from '@/config';
+import { getSubcategoryByCategoryId } from '@/stores/HomeAPI';
 import { getProductsByCategory } from '@/stores/ProductAPI';
 import { useEffect, useMemo, useState } from 'react';
 import { BRAND_SORT_VALUES, buildBrandFilterParams } from '@/hooks/useBrandProducts';
@@ -69,8 +70,14 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
       if (sortBy && BRAND_SORT_VALUES.has(sortBy)) {
         params.sortBy = sortBy;
       }
+      if (categoryId) {
+        params.category_id = categoryId;
+      }
 
       const baseCountParams = buildBrandFilterParams(getQuantityAgnosticFilters(parsedFilters));
+      if (categoryId) {
+        baseCountParams.category_id = categoryId;
+      }
       const [response, stockInResponse, stockOutResponse] = await Promise.all([
         getProductsByCategory(categorySlug, params),
         getProductsByCategory(categorySlug, { ...baseCountParams, stock_in: '1', page: 1 }),
@@ -111,6 +118,18 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
   useEffect(() => {
     setCurrentPage(1);
   }, [categorySlug, categoryId, filtersKey, sortBy]);
+
+  useEffect(() => {
+    if (!categoryId) return;
+    let cancelled = false;
+    getSubcategoryByCategoryId(categoryId).then((result) => {
+      if (cancelled) return;
+      console.log("[getSubcategoryByCategoryId]", { categoryId, result });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [categoryId]);
 
   const categoryNameFromSlug = useMemo(
     () =>

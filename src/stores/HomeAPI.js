@@ -65,7 +65,8 @@ export const getHomeMetaContents = async () => {
 };
 export const getSubcategoryByCategoryId = async (categoryId) => {
   try {
-    const response = await apiRequest(`/api/subcategories?category_id=${categoryId}`, 'GET');
+    const id = encodeURIComponent(String(categoryId));
+    const response = await apiRequest(`/api/subcategories?category_id=${id}`, 'GET');
     const payload = response?.data?.data ?? response?.data ?? null;
     if (response?.status >= 400 || payload == null) return null;
     return payload;
