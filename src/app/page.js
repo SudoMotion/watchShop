@@ -9,7 +9,7 @@ import HomeSeoExpandable from '@/component/HomeSeoExpandable';
 import SectionArea from '@/component/SectionArea';
 import TwoBanners from '@/component/TwoBanners';
 import { Backend_Base_Url } from '@/config';
-import { getBannerContent, getHome } from '@/stores/HomeAPI';
+import { getBannerContent, getHome, getHomeMetaContents } from '@/stores/HomeAPI';
 import { getTopBrands } from '@/stores/homeSpecification';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,6 +24,7 @@ export const dynamic = 'force-dynamic';
 export default async function page() {
   const home = await getHome() || {};
   const bannerResponse = await getBannerContent();
+  const homeMetaContents = await getHomeMetaContents();
   const bannersByType =
     bannerResponse?.banners_by_type ??
     bannerResponse?.data?.banners_by_type ??

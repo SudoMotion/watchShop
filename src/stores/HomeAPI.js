@@ -52,10 +52,20 @@ export const getBannerContent = async (slug) => {
     return null;
   }
 };
+export const getHomeMetaContents = async (slug) => {
+  try {
+    const response = await apiRequest(`/api/home-page-content`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching product by slug:', error);
+    return null;
+  }
+};
 
 export default {
   getHome,
   getPopup,
   getNewDynamicSection,
   getBannerContent,
+  getHomeMetaContents,
 };
