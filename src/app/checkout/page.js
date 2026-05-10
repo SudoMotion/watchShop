@@ -11,13 +11,7 @@ import {
   useSendOtpMutation,
   useVerifyOtpMutation,
 } from "@/stores/AuthAPI";
-import {
-  getCheckoutData,
-  checkoutStore,
-  getPathaoCities,
-  getPathaoZones,
-  getPathaoAreas,
-} from "@/stores/CustomerAPI";
+import { getCheckoutData, checkoutStore } from "@/stores/CustomerAPI";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -41,37 +35,8 @@ function strFilled(v) {
 const SHIPPING_INSIDE_DHAKA = 70;
 const SHIPPING_OUTSIDE_DHAKA = 130;
 
-function normalizePathaoList(res) {
-  const raw = res?.data;
-  const arr = Array.isArray(raw)
-    ? raw
-    : Array.isArray(raw?.items)
-      ? raw.items
-      : Array.isArray(raw?.data)
-        ? raw.data
-        : Array.isArray(raw?.cities)
-          ? raw.cities
-          : Array.isArray(raw?.zones)
-            ? raw.zones
-            : Array.isArray(raw?.areas)
-              ? raw.areas
-              : [];
-  return arr
-    .map((item) => ({
-      id: item.id ?? item.city_id ?? item.zone_id ?? item.area_id,
-      name:
-        item.name ??
-        item.city_name ??
-        item.zone_name ??
-        item.area_name ??
-        (item.id != null ? String(item.id) : ""),
-    }))
-    .filter((x) => x.id != null && x.name !== "");
-}
-
 export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState([]);
-  const [districts, setDistricts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
@@ -99,8 +64,6 @@ export default function CheckoutPage() {
     b_address: "",
   });
 
-  const [districtId, setDistrictId] = useState("");
-  const [shippingDistrictId, setShippingDistrictId] = useState("");
   const [shippingMethod, setShippingMethod] = useState("inside_dhaka");
   const [shipCharge, setShipCharge] = useState(SHIPPING_INSIDE_DHAKA);
   const [couponCode, setCouponCode] = useState("");
@@ -108,15 +71,6 @@ export default function CheckoutPage() {
   const [couponMessage, setCouponMessage] = useState("");
   const [couponApplied, setCouponApplied] = useState(false);
 
-  const [pathaoEnabled, setPathaoEnabled] = useState(false);
-  const [pathaoLocationsRequired, setPathaoLocationsRequired] = useState(false);
-  const [pathaoCities, setPathaoCities] = useState([]);
-  const [pathaoZones, setPathaoZones] = useState([]);
-  const [pathaoAreas, setPathaoAreas] = useState([]);
-  const [pathaoCityId, setPathaoCityId] = useState("");
-  const [pathaoZoneId, setPathaoZoneId] = useState("");
-  const [pathaoAreaId, setPathaoAreaId] = useState("");
-  const [pathaoLoading, setPathaoLoading] = useState(false);
   const [existingCustomerMode, setExistingCustomerMode] = useState(false);
   const [otpSending, setOtpSending] = useState(false);
   const [otpSent, setOtpSent] = useState(false);
@@ -132,7 +86,6 @@ export default function CheckoutPage() {
     email: false,
     address: false,
   });
-  const token = typeof window !== "undefined" ? getAuthToken() : null;
 
   const subtotal = cartItems.reduce(
     (sum, item) => sum + getNumericPrice(item.price) * item.quantity,
@@ -171,9 +124,6 @@ export default function CheckoutPage() {
     getCheckoutData({}, getAuthToken())
       .then((res) => {
         const data = res?.data;
-        if (data?.districts && Array.isArray(data.districts)) {
-          setDistricts(data.districts);
-        }
         const apiCustomer = data?.customer;
         if (apiCustomer && typeof apiCustomer === "object") {
           setFormData((f) => ({
@@ -210,55 +160,9 @@ export default function CheckoutPage() {
             address: false,
           });
         }
-        const pe = !!data?.pathao_enabled;
-        const pr = !!data?.pathao_locations_required;
-        setPathaoEnabled(pe);
-        setPathaoLocationsRequired(pr);
-        if (pe) {
-          setPathaoLoading(true);
-          getPathaoCities()
-            .then((r) => setPathaoCities(normalizePathaoList(r)))
-            .catch(() => setPathaoCities([]))
-            .finally(() => setPathaoLoading(false));
-        } else {
-          setPathaoCities([]);
-          setPathaoZones([]);
-          setPathaoAreas([]);
-          setPathaoCityId("");
-          setPathaoZoneId("");
-          setPathaoAreaId("");
-        }
       })
       .catch(() => {});
   }, [cartItems.length]);
-
-  useEffect(() => {
-    if (!pathaoCityId) {
-      setPathaoZones([]);
-      setPathaoAreas([]);
-      setPathaoZoneId("");
-      setPathaoAreaId("");
-      return;
-    }
-    setPathaoLoading(true);
-    getPathaoZones(pathaoCityId)
-      .then((r) => setPathaoZones(normalizePathaoList(r)))
-      .catch(() => setPathaoZones([]))
-      .finally(() => setPathaoLoading(false));
-  }, [pathaoCityId]);
-
-  useEffect(() => {
-    if (!pathaoZoneId) {
-      setPathaoAreas([]);
-      setPathaoAreaId("");
-      return;
-    }
-    setPathaoLoading(true);
-    getPathaoAreas(pathaoZoneId)
-      .then((r) => setPathaoAreas(normalizePathaoList(r)))
-      .catch(() => setPathaoAreas([]))
-      .finally(() => setPathaoLoading(false));
-  }, [pathaoZoneId]);
 
   useEffect(() => {
     if (formData.customer_pickup) {
@@ -403,6 +307,147 @@ export default function CheckoutPage() {
     }
   };
 
+  const validateNewCustomerRegistration = () => {
+    const name = String(formData.name || "").trim();
+    const email = String(formData.email || "").trim();
+    const phone = String(formData.phone || "").replace(/\D/g, "");
+    const address = String(formData.address || "").trim();
+    if (!name || !email || !phone || !address) {
+      return "Name, Email, Phone and Address are required.";
+    }
+    if (phone.length !== 11) {
+      return "Enter a valid 11-digit mobile number.";
+    }
+    return null;
+  };
+
+  const validateCheckoutShipping = () => {
+    if (formData.ship_to_different_address) {
+      if (
+        !String(formData.s_name || "").trim() ||
+        !String(formData.s_phone || "").trim() ||
+        !String(formData.s_address || "").trim()
+      ) {
+        return "Please complete the shipping address (name, phone, and address).";
+      }
+    }
+    return null;
+  };
+
+  const buildOrderPayload = () => {
+    const isNewSignupMode = !isLoggedIn() && !existingCustomerMode;
+    const billingAreaName =
+      String(formData.area || formData.district || "").trim() ||
+      (isNewSignupMode ? String(formData.address || "").trim() : "");
+
+    const shippingAreaName = String(
+      formData.s_area || formData.s_district || ""
+    ).trim();
+
+    let deliveryAddress = formData.address.trim();
+    let deliveryArea = billingAreaName;
+    let deliveryDistrict = (formData.district || billingAreaName || "").trim();
+
+    if (formData.ship_to_different_address) {
+      deliveryAddress = String(formData.s_address || "").trim();
+      deliveryArea = String(shippingAreaName);
+      deliveryDistrict = (formData.s_district || shippingAreaName || "").trim();
+    }
+
+    const productIds = cartItems
+      .map((item) => item.id ?? item.product_id)
+      .filter((id) => id != null && id !== "");
+
+    const payload = {
+      name: formData.name.trim(),
+      phone: formData.phone.trim(),
+      address: deliveryAddress,
+      order_total: Number(orderTotal),
+      total_amount: Number(totalAmount),
+      area: String(deliveryArea),
+      district: deliveryDistrict,
+      order_note: formData.order_note?.trim() || undefined,
+      payment_type:
+        formData.payment_type === "bkash" ? "bkash" : "cod",
+      ship_charge: Number(shipCharge) || 0,
+      email: formData.email?.trim() || undefined,
+      customer_pickup: Boolean(formData.customer_pickup),
+      shipping_method: shippingMethod,
+      product_ids: productIds,
+    };
+
+    if (formData.ship_to_different_address) {
+      payload.shipping_name = String(formData.s_name || "").trim();
+      payload.shipping_phone = String(formData.s_phone || "").trim();
+      payload.b_address = formData.address.trim();
+      payload.b_district = (formData.district || billingAreaName || "").trim();
+    }
+
+    if (couponDiscount > 0) {
+      payload.couponDiscount = Number(couponDiscount);
+    }
+
+    payload.pathao_city_id = 1;
+    payload.pathao_zone_id = 1;
+    payload.pathao_area_id = 1;
+
+    const bName = formData.b_name?.trim();
+    const bEmail = formData.b_email?.trim();
+    const bPhone = formData.b_phone?.trim();
+    const bDistrict = formData.b_district?.trim();
+    const bAddress = formData.b_address?.trim();
+    if (bName) payload.b_name = bName;
+    if (bEmail) payload.b_email = bEmail;
+    if (bPhone) payload.b_phone = bPhone;
+    if (!formData.ship_to_different_address) {
+      if (bDistrict) payload.b_district = bDistrict;
+      if (bAddress) payload.b_address = bAddress;
+    }
+
+    return payload;
+  };
+
+  const placeOrder = async () => {
+    const payload = buildOrderPayload();
+    setSubmitting(true);
+    try {
+      const authToken = typeof window !== "undefined" ? getAuthToken() : null;
+      const res = await checkoutStore(payload, authToken);
+      const data = res?.data;
+
+      if (res?.status === 201 && data?.success && data?.order) {
+        const orderId = data.order?.id;
+        setCart([]);
+        if (data.payment_redirect_url) {
+          window.location.href = data.payment_redirect_url;
+          return true;
+        }
+        if (orderId) {
+          window.location.href = `/order/success?id=${orderId}`;
+        } else {
+          window.location.href = "/order/success";
+        }
+        return true;
+      }
+
+      const msg =
+        data?.message ||
+        (res?.status === 401 ? "Please log in to place an order." : null) ||
+        (res?.status === 422 ? "Invalid form data." : null) ||
+        "Could not place order.";
+      setError(msg);
+      toast.error(msg);
+      return false;
+    } catch {
+      const msg = "Could not place order. Please try again.";
+      setError(msg);
+      toast.error(msg);
+      return false;
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   const handleVerifyOtp = async () => {
     const phone = String(formData.phone || "").replace(/\D/g, "");
     const otp = String(otpCode || "").trim();
@@ -449,11 +494,11 @@ export default function CheckoutPage() {
         return;
       }
 
-      const token = payload?.token ?? payload?.access_token;
+      const tokenAuth = payload?.token ?? payload?.access_token;
       const customer = payload?.customer ?? payload?.user;
       const token_type = payload?.token_type ?? "Bearer";
 
-      if (token == null || !customer) {
+      if (tokenAuth == null || !customer) {
         toast.error("Could not complete sign-in. Missing token or profile.");
         return;
       }
@@ -461,7 +506,7 @@ export default function CheckoutPage() {
       try {
         localStorage.setItem(
           "watchshop_auth",
-          JSON.stringify({ token, customer, token_type })
+          JSON.stringify({ token: tokenAuth, customer, token_type })
         );
         document.cookie =
           "watchshop_logged_in=1; path=/; max-age=2592000";
@@ -483,12 +528,17 @@ export default function CheckoutPage() {
 
       setOtpVerified(true);
       setOtpCode("");
-      const msg = payload?.message ?? raw?.message;
-      toast.success(
-        typeof msg === "string" && msg.trim()
-          ? msg
-          : "Signed in. Complete your delivery details below."
-      );
+      const welcomeMsg = payload?.message ?? raw?.message;
+      if (typeof welcomeMsg === "string" && welcomeMsg.trim()) {
+        toast.success(welcomeMsg);
+      }
+
+      const shipErr = validateCheckoutShipping();
+      if (shipErr) {
+        toast.info("Signed in. " + shipErr);
+        return;
+      }
+      await placeOrder();
     } catch {
       toast.error("Could not verify OTP. Try again.");
     } finally {
@@ -537,164 +587,47 @@ export default function CheckoutPage() {
       toast.error(msg);
       return;
     }
-    if (!isLoggedIn() && !otpVerified) {
-      const msg =
-        !otpSent
-          ? existingCustomerMode
-            ? "Send OTP to your phone first."
-            : "Sign up and send OTP first."
-          : "Enter and verify the OTP code first.";
+
+    if (!isLoggedIn() && existingCustomerMode && !otpVerified) {
+      const msg = otpSent
+        ? "Verify OTP to continue."
+        : "Send OTP to your phone first.";
       setError(msg);
       toast.error(msg);
       return;
     }
-    if (
-      pathaoEnabled &&
-      pathaoLocationsRequired &&
-      (!pathaoCityId || !pathaoZoneId || !pathaoAreaId)
-    ) {
-      const msg = "Please select Pathao city, zone, and area for delivery.";
+
+    if (!isLoggedIn() && !existingCustomerMode && !otpVerified) {
+      if (!otpSent) {
+        const regErr = validateNewCustomerRegistration();
+        if (regErr) {
+          setError(regErr);
+          toast.error(regErr);
+          return;
+        }
+        const shipErr = validateCheckoutShipping();
+        if (shipErr) {
+          setError(shipErr);
+          toast.error(shipErr);
+          return;
+        }
+        await handleSignupAndSendOtp();
+        return;
+      }
+      const msg =
+        "Enter and verify the OTP sent to your phone.";
       setError(msg);
       toast.error(msg);
       return;
     }
-    if (formData.ship_to_different_address) {
-      if (
-        !String(formData.s_name || "").trim() ||
-        !String(formData.s_phone || "").trim() ||
-        !String(formData.s_address || "").trim()
-      ) {
-        const msg = "Please complete the shipping address (name, phone, and address).";
-        setError(msg);
-        toast.error(msg);
-        return;
-      }
-      if (districts.length > 0) {
-        if (!shippingDistrictId) {
-          const msg = "Please select a shipping district.";
-          setError(msg);
-          toast.error(msg);
-          return;
-        }
-      } else if (!String(formData.s_area || "").trim()) {
-        const msg = "Please enter the shipping district or area.";
-        setError(msg);
-        toast.error(msg);
-        return;
-      }
+
+    const shipErr = validateCheckoutShipping();
+    if (shipErr) {
+      setError(shipErr);
+      toast.error(shipErr);
+      return;
     }
-
-    const billingDistrict = districts.find((d) => String(d.id) === String(districtId));
-    const isNewSignupMode = !isLoggedIn() && !existingCustomerMode;
-    const billingAreaName =
-      billingDistrict?.name ||
-      formData.area ||
-      formData.district ||
-      (isNewSignupMode ? String(formData.address || "").trim() : "");
-
-    const shippingDistrict = districts.find(
-      (d) => String(d.id) === String(shippingDistrictId)
-    );
-    const shippingAreaName = shippingDistrict
-      ? shippingDistrict.name
-      : String(formData.s_area || formData.s_district || "").trim();
-
-    let deliveryAddress = formData.address.trim();
-    let deliveryArea = billingAreaName;
-    let deliveryDistrict = (formData.district || billingAreaName || "").trim();
-
-    if (formData.ship_to_different_address) {
-      deliveryAddress = String(formData.s_address || "").trim();
-      deliveryArea = String(shippingAreaName);
-      deliveryDistrict = (formData.s_district || shippingAreaName || "").trim();
-    }
-
-    const productIds = cartItems
-      .map((item) => item.id ?? item.product_id)
-      .filter((id) => id != null && id !== "");
-
-    const payload = {
-      name: formData.name.trim(),
-      phone: formData.phone.trim(),
-      address: deliveryAddress,
-      order_total: Number(orderTotal),
-      total_amount: Number(totalAmount),
-      area: String(deliveryArea),
-      district: deliveryDistrict,
-      order_note: formData.order_note?.trim() || undefined,
-      payment_type:
-        formData.payment_type === "bkash" ? "bkash" : "cod",
-      ship_charge: Number(shipCharge) || 0,
-      email: formData.email?.trim() || undefined,
-      customer_pickup: Boolean(formData.customer_pickup),
-      shipping_method: shippingMethod,
-      product_ids: productIds,
-    };
-
-    if (formData.ship_to_different_address) {
-      payload.shipping_name = String(formData.s_name || "").trim();
-      payload.shipping_phone = String(formData.s_phone || "").trim();
-      payload.b_address = formData.address.trim();
-      payload.b_district = (formData.district || billingAreaName || "").trim();
-    }
-
-    if (couponDiscount > 0) {
-      payload.couponDiscount = Number(couponDiscount);
-    }
-
-    if (pathaoEnabled && pathaoCityId && pathaoZoneId && pathaoAreaId) {
-      payload.pathao_city_id = Number(pathaoCityId) || pathaoCityId;
-      payload.pathao_zone_id = Number(pathaoZoneId) || pathaoZoneId;
-      payload.pathao_area_id = Number(pathaoAreaId) || pathaoAreaId;
-    }
-
-    const bName = formData.b_name?.trim();
-    const bEmail = formData.b_email?.trim();
-    const bPhone = formData.b_phone?.trim();
-    const bDistrict = formData.b_district?.trim();
-    const bAddress = formData.b_address?.trim();
-    if (bName) payload.b_name = bName;
-    if (bEmail) payload.b_email = bEmail;
-    if (bPhone) payload.b_phone = bPhone;
-    if (!formData.ship_to_different_address) {
-      if (bDistrict) payload.b_district = bDistrict;
-      if (bAddress) payload.b_address = bAddress;
-    }
-
-    setSubmitting(true);
-    try {
-      const res = await checkoutStore(payload, token);
-      const data = res?.data;
-
-      if (res?.status === 201 && data?.success && data?.order) {
-        const orderId = data.order?.id;
-        setCart([]);
-        if (data.payment_redirect_url) {
-          window.location.href = data.payment_redirect_url;
-          return;
-        }
-        if (orderId) {
-          window.location.href = `/order/success?id=${orderId}`;
-        } else {
-          window.location.href = "/order/success";
-        }
-        return;
-      }
-
-      const msg =
-        data?.message ||
-        (res?.status === 401 ? "Please log in to place an order." : null) ||
-        (res?.status === 422 ? "Invalid form data." : null) ||
-        "Could not place order.";
-      setError(msg);
-      toast.error(msg);
-    } catch (err) {
-      const msg = "Could not place order. Please try again.";
-      setError(msg);
-      toast.error(msg);
-    } finally {
-      setSubmitting(false);
-    }
+    await placeOrder();
   };
 
   if (loading) {
@@ -762,7 +695,10 @@ export default function CheckoutPage() {
     isLoggedIn() ||
     !existingCustomerMode ||
     (existingCustomerMode && otpVerified);
-  const showAdvancedCheckoutFields = isLoggedIn() || existingCustomerMode;
+  const showAdvancedCheckoutFields =
+    isLoggedIn() ||
+    !existingCustomerMode ||
+    (existingCustomerMode && otpVerified);
 
   return (
     <div className="bg-gray-50 py-4">
@@ -1095,11 +1031,12 @@ export default function CheckoutPage() {
                     ? "Billing Address"
                     : existingCustomerMode
                       ? "Existing Customer Verification"
-                      : "Create Account"}
+                      : "Delivery & account"}
                 </h2>
-                {!isLoggedIn() && (
+                {!isLoggedIn() && !existingCustomerMode && (
                   <p className="mb-4 text-sm text-gray-600">
-                    New customer: complete signup details, then verify OTP to continue checkout.
+                    Fill in all details below. Use <span className="font-semibold">Continue to verification</span>{" "}
+                    to create your account and receive an OTP. After you confirm the code, we sign you in and place your order.
                   </p>
                 )}
                 <div className="space-y-4">
@@ -1113,7 +1050,7 @@ export default function CheckoutPage() {
                       }
                       className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
                     />
-                    <span className="text-sm font-semibold text-gray-900">
+                    <span className="font-bold text-gray-900">
                       Click Only For Existing/Old Customer
                     </span>
                   </label>
@@ -1168,10 +1105,10 @@ export default function CheckoutPage() {
                     </div>
                   )}
 
-                  {!isLoggedIn() && existingCustomerMode && otpSent && !otpVerified && (
+                  {!isLoggedIn() && otpSent && !otpVerified && (
                     <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
                       <p className="text-sm text-gray-600">
-                        {hasExistingCode ? (
+                        {existingCustomerMode && hasExistingCode ? (
                           <>
                             Enter the code you received for{" "}
                             <span className="font-medium text-gray-900">
@@ -1185,7 +1122,7 @@ export default function CheckoutPage() {
                             <span className="font-medium text-gray-900">
                               {formData.phone || "your number"}
                             </span>
-                            .
+                            . We will sign you in and complete your order.
                           </>
                         )}
                       </p>
@@ -1211,142 +1148,28 @@ export default function CheckoutPage() {
                         <button
                           type="button"
                           onClick={handleVerifyOtp}
-                          disabled={otpVerifying}
+                          disabled={otpVerifying || submitting}
                           className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
-                          {otpVerifying ? "Verifying…" : "Confirm OTP"}
+                          {otpVerifying || submitting
+                            ? "Processing…"
+                            : "Confirm OTP & place order"}
                         </button>
                         <button
                           type="button"
                           onClick={handleOtpBackToPhone}
-                          disabled={otpVerifying}
+                          disabled={otpVerifying || submitting}
                           className="text-sm font-medium text-gray-600 underline hover:text-gray-900"
                         >
-                          ← Change phone number
+                          ← Edit details / change phone
                         </button>
                       </div>
-                    </div>
-                  )}
-
-                  {!isLoggedIn() && !existingCustomerMode && otpSent && !otpVerified && (
-                    <div className="space-y-4 rounded-lg border border-gray-200 bg-gray-50/80 p-4">
-                      <p className="text-sm text-gray-600">
-                        Enter the OTP sent to{" "}
-                        <span className="font-medium text-gray-900">
-                          {formData.phone || "your number"}
-                        </span>
-                        .
-                      </p>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          OTP code <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          inputMode="numeric"
-                          autoComplete="one-time-code"
-                          value={otpCode}
-                          onChange={(e) => {
-                            setOtpCode(e.target.value);
-                            setError(null);
-                          }}
-                          placeholder="Enter 6-digit code"
-                          maxLength={12}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent tracking-widest"
-                        />
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleVerifyOtp}
-                        disabled={otpVerifying}
-                        className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-                      >
-                        {otpVerifying ? "Verifying…" : "Confirm OTP"}
-                      </button>
                     </div>
                   )}
 
                   {showFullCheckoutFields && (
                     <>
-                  {!isLoggedIn() && !existingCustomerMode && !otpSent && !otpVerifying && (
-                    <div className="space-y-4 rounded-lg border border-blue-200 bg-blue-50 p-3">
-                      <p className="text-sm font-semibold text-blue-900">Register Form</p>
-                      <p className="mt-1 text-xs text-blue-800">
-                        Fill Name, Email, Phone, Address and Password, then press
-                        {" "}
-                        <span className="font-semibold">Sign up & Send OTP</span>.
-                      </p>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Name <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="name"
-                          value={formData.name}
-                          onChange={handleInputChange}
-                          required
-                          maxLength={60}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Phone (11 digits) <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="tel"
-                          name="phone"
-                          value={formData.phone}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="01XXXXXXXXX"
-                          maxLength={11}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Email <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="email"
-                          name="email"
-                          value={formData.email}
-                          onChange={handleInputChange}
-                          required
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Address <span className="text-red-600">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          name="address"
-                          value={formData.address}
-                          onChange={handleInputChange}
-                          required
-                          maxLength={191}
-                          placeholder="House/Flat, Road, Area"
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent bg-white"
-                        />
-                      </div>
-                      {!otpSent && (
-                        <button
-                          type="button"
-                          onClick={handleSignupAndSendOtp}
-                          disabled={registering}
-                          className="w-full rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
-                        >
-                          {registering ? "Creating account…" : "Sign up & Send OTP"}
-                        </button>
-                      )}
-                    </div>
-                  )}
                   {/* name */}
-                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Name <span className="text-red-600">*</span>
@@ -1364,9 +1187,7 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
-                  )}
                   {/* phone */}
-                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Phone (11 digits) <span className="text-red-600">*</span>
@@ -1385,26 +1206,28 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
-                  )}
                   {/* email */}
-                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      Email{" "}
+                      {!isLoggedIn() && !existingCustomerMode ? (
+                        <span className="text-red-600">*</span>
+                      ) : null}
+                    </label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInputChange}
                       readOnly={apiReadOnly.email}
+                      required={!isLoggedIn() && !existingCustomerMode}
                       className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent ${
                         apiReadOnly.email ? readOnlyInputClass : ""
                       }`}
                     />
                   </div>
-                  )}
 
                   {/* address */}
-                  {(!isLoggedIn() && !existingCustomerMode) ? null : (
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
                       Address <span className="text-red-600">*</span>
@@ -1423,7 +1246,6 @@ export default function CheckoutPage() {
                       }`}
                     />
                   </div>
-                  )}
                   {/* <div className="pt-2 border-t border-gray-100">
                     <p className="text-sm font-medium text-gray-800 mb-3">Billing address (optional)</p>
                     <div className="space-y-3">
@@ -1472,50 +1294,6 @@ export default function CheckoutPage() {
                       />
                     </div>
                   </div> */}
-
-                  {isLoggedIn() && (
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      District / Area <span className="text-red-600">*</span>
-                    </label>
-                    {districts.length > 0 ? (
-                      <select
-                        name="area"
-                        value={districtId}
-                        onChange={(e) => {
-                          setDistrictId(e.target.value);
-                          const d = districts.find(
-                            (x) => String(x.id) === String(e.target.value)
-                          );
-                          setFormData((f) => ({
-                            ...f,
-                            area: d?.name || "",
-                            district: d?.name || "",
-                          }));
-                        }}
-                        required
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      >
-                        <option value="">Select district</option>
-                        {districts.map((d) => (
-                          <option key={d.id} value={d.id}>
-                            {d.name} {d.amount != null ? `(৳${d.amount})` : ""}
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <input
-                        type="text"
-                        name="area"
-                        value={formData.area}
-                        onChange={handleInputChange}
-                        required
-                        placeholder="e.g. Dhaka"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                      />
-                    )}
-                  </div>
-                  )}
 
                   {/* <label className="flex items-start gap-3 p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50">
                     <input
@@ -1613,72 +1391,6 @@ export default function CheckoutPage() {
                   </div>
                   )}
 
-                  {showAdvancedCheckoutFields && pathaoEnabled && (
-                    <div className="pt-2 border-t border-gray-200">
-                      <p className="text-sm font-medium text-gray-800 mb-1">
-                        Pathao delivery location
-                        {pathaoLocationsRequired && (
-                          <span className="text-red-600"> *</span>
-                        )}
-                      </p>
-                      <p className="text-xs text-gray-500 mb-3">
-                        Select city, zone, and area for courier delivery.
-                      </p>
-                      <div className="space-y-3">
-                        <select
-                          value={pathaoCityId}
-                          onChange={(e) => {
-                            const v = e.target.value;
-                            setPathaoCityId(v);
-                            setPathaoZoneId("");
-                            setPathaoAreaId("");
-                          }}
-                          required={pathaoLocationsRequired}
-                          disabled={pathaoLoading && pathaoCities.length === 0}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select city</option>
-                          {pathaoCities.map((c) => (
-                            <option key={c.id} value={c.id}>
-                              {c.name}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          value={pathaoZoneId}
-                          onChange={(e) => {
-                            setPathaoZoneId(e.target.value);
-                            setPathaoAreaId("");
-                          }}
-                          required={pathaoLocationsRequired}
-                          disabled={!pathaoCityId}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select zone</option>
-                          {pathaoZones.map((z) => (
-                            <option key={z.id} value={z.id}>
-                              {z.name}
-                            </option>
-                          ))}
-                        </select>
-                        <select
-                          value={pathaoAreaId}
-                          onChange={(e) => setPathaoAreaId(e.target.value)}
-                          required={pathaoLocationsRequired}
-                          disabled={!pathaoZoneId}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                        >
-                          <option value="">Select area</option>
-                          {pathaoAreas.map((a) => (
-                            <option key={a.id} value={a.id}>
-                              {a.name}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                    </div>
-                  )}
-
                   {/* note */}
                   {showAdvancedCheckoutFields && (
                   <div>
@@ -1703,9 +1415,6 @@ export default function CheckoutPage() {
                       checked={!!formData.ship_to_different_address}
                       onChange={(e) => {
                         const checked = e.target.checked;
-                        if (!checked) {
-                          setShippingDistrictId("");
-                        }
                         setFormData((prev) => ({
                           ...prev,
                           ship_to_different_address: checked,
@@ -1778,47 +1487,6 @@ export default function CheckoutPage() {
                           placeholder="House/Flat, Road, Area"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
                         />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Shipping district / area <span className="text-red-600">*</span>
-                        </label>
-                        {districts.length > 0 ? (
-                          <select
-                            value={shippingDistrictId}
-                            onChange={(e) => {
-                              setShippingDistrictId(e.target.value);
-                              const d = districts.find(
-                                (x) => String(x.id) === String(e.target.value)
-                              );
-                              setFormData((f) => ({
-                                ...f,
-                                s_area: d?.name || "",
-                                s_district: d?.name || "",
-                              }));
-                            }}
-                            required={formData.ship_to_different_address}
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                          >
-                            <option value="">Select district</option>
-                            {districts.map((d) => (
-                              <option key={d.id} value={d.id}>
-                                {d.name}{" "}
-                                {d.amount != null ? `(৳${d.amount})` : ""}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <input
-                            type="text"
-                            name="s_area"
-                            value={formData.s_area}
-                            onChange={handleInputChange}
-                            required={formData.ship_to_different_address}
-                            placeholder="e.g. Dhaka"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-                          />
-                        )}
                       </div>
                     </div>
                   )}
@@ -2000,11 +1668,27 @@ export default function CheckoutPage() {
                   type="submit"
                   disabled={
                     submitting ||
-                    (!isLoggedIn() && !otpVerified)
+                    registering ||
+                    (!isLoggedIn() &&
+                      existingCustomerMode &&
+                      !otpVerified) ||
+                    (!isLoggedIn() &&
+                      !existingCustomerMode &&
+                      otpSent &&
+                      !otpVerified)
                   }
                   className="w-full bg-black text-white py-3 rounded-lg font-semibold hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed mb-4"
                 >
-                  {submitting ? "Placing order…" : "Complete Your Order"}
+                  {submitting
+                    ? "Placing order…"
+                    : registering
+                      ? "Sending OTP…"
+                      : !isLoggedIn() &&
+                          !existingCustomerMode &&
+                          !otpVerified &&
+                          !otpSent
+                        ? "Continue to verification"
+                        : "Place order"}
                 </button>
 
                 <Link
