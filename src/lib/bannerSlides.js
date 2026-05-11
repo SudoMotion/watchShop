@@ -79,3 +79,8 @@ export function bannerSectionTitle(banners, fallback = "") {
   if (typeof t === "string" && t.trim()) return t.trim();
   return typeof fallback === "string" ? fallback : "";
 }
+
+/** Use on banner UI to disable the default context (right-click) menu. */
+export function blockBannerContextMenu(e) {
+  e.preventDefault();
+}

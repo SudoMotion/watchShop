@@ -9,6 +9,7 @@ import "swiper/css/pagination";
 import { getMobileSliders, getSliders } from "@/stores/homeSpecification";
 import { NEXT_PUBLIC_API_URL } from "@/config";
 import Image from "next/image";
+import { blockBannerContextMenu } from "@/lib/bannerSlides";
 
 export default function HeroSlider() {
   const [mounted, setMounted] = useState(false);
@@ -67,7 +68,10 @@ export default function HeroSlider() {
           >
             {desktopSlides.map((slide, index) => (
               <SwiperSlide key={index}>
-                <div className="relative w-full h-full overflow-hidden">
+                <div
+                  className="relative w-full h-full overflow-hidden select-none"
+                  onContextMenu={blockBannerContextMenu}
+                >
                   
                   {/* Zoom Effect Wrapper */}
                   <div className="absolute inset-0 hero-zoom">
@@ -78,6 +82,7 @@ export default function HeroSlider() {
                       priority={index === 0}
                       sizes="100vw"
                       className="object-cover"
+                      onContextMenu={blockBannerContextMenu}
                     />
                   </div>
 
@@ -129,7 +134,10 @@ export default function HeroSlider() {
           >
             {phoneSlides.map((slide, index) => (
               <SwiperSlide key={index}>
-                <div className="relative w-full h-full overflow-hidden">
+                <div
+                  className="relative w-full h-full overflow-hidden select-none"
+                  onContextMenu={blockBannerContextMenu}
+                >
                   
                   <div className="absolute inset-0 hero-zoom">
                     <Image
@@ -137,6 +145,7 @@ export default function HeroSlider() {
                       alt={slide.title || "slider image"}
                       fill
                       className="object-cover"
+                      onContextMenu={blockBannerContextMenu}
                     />
                   </div>
 

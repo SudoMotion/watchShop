@@ -9,6 +9,7 @@ import "swiper/css/pagination";
 import {
   mapBannerItemsToSlides,
   mapBannerResponseToSlides,
+  blockBannerContextMenu,
 } from "@/lib/bannerSlides";
 import { getBannerContent } from "@/stores/HomeAPI";
 
@@ -37,7 +38,6 @@ export default function SecoundaryProductSlider({ data }) {
   }, [fromProps.length]);
 
   const resolvedSlides = fromProps.length > 0 ? fromProps : fetchedSlides;
-  console.log('resolvedSlides', resolvedSlides)
 
   useEffect(() => {
     setMounted(true);
@@ -87,7 +87,10 @@ export default function SecoundaryProductSlider({ data }) {
             key={slide.id ?? `${slide.image}-${index}`}
             className="h-full w-full"
           >
-            <div className="relative h-full w-full overflow-hidden">
+            <div
+              className="relative h-full w-full overflow-hidden select-none"
+              onContextMenu={blockBannerContextMenu}
+            >
               <div
                 className="hero-bg absolute inset-0 bg-cover bg-center"
                 style={{ backgroundImage: `url(${slide.image})` }}

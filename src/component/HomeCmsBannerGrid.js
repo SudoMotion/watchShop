@@ -1,6 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { resolveBannerImageUrl, normalizeBannerLink } from "@/lib/bannerSlides";
+import {
+  resolveBannerImageUrl,
+  normalizeBannerLink,
+  blockBannerContextMenu,
+} from "@/lib/bannerSlides";
 
 function isVideoAsset(path) {
   return /\.(mp4|webm|ogg)(\?|$)/i.test(String(path || ""));
@@ -40,7 +46,8 @@ export default function HomeCmsBannerGrid({
             <Link
               key={item?.id ?? index}
               href={href}
-              className="block overflow-hidden rounded-lg bg-gray-50 ring-1 ring-gray-100 transition hover:opacity-95"
+              onContextMenu={blockBannerContextMenu}
+              className="block overflow-hidden rounded-lg bg-gray-50 ring-1 ring-gray-100 transition hover:opacity-95 select-none"
             >
               {video && src ? (
                 <video
@@ -51,6 +58,7 @@ export default function HomeCmsBannerGrid({
                   playsInline
                   autoPlay
                   preload="metadata"
+                  onContextMenu={blockBannerContextMenu}
                 />
               ) : src ? (
                 <Image
@@ -62,6 +70,7 @@ export default function HomeCmsBannerGrid({
                   placeholder="blur"
                   blurDataURL={blurSvg}
                   unoptimized
+                  onContextMenu={blockBannerContextMenu}
                 />
               ) : null}
             </Link>
