@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { formatTaka, formatPriceView } from '@/lib/formatPriceView';
 
 export default function DashboardPage() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -239,7 +240,7 @@ export default function DashboardPage() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
                         </svg>
                       </div>
-                      <p className="text-3xl font-light text-gray-900">৳{dashboardStats.totalSpent.toLocaleString()}</p>
+                      <p className="text-3xl font-light text-gray-900">{formatTaka(dashboardStats.totalSpent)}</p>
                     </div>
                   </div>
 
@@ -263,7 +264,7 @@ export default function DashboardPage() {
                               <p className="text-sm text-gray-500">{order.date}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-medium text-gray-900 mb-2">৳{order.total.toLocaleString()}</p>
+                              <p className="font-medium text-gray-900 mb-2">{formatTaka(order.total)}</p>
                               <span className={`inline-block px-3 py-1 text-xs font-medium ${
                                 order.status === 'Delivered' ? 'bg-gray-100 text-gray-700' :
                                 order.status === 'Processing' ? 'bg-amber-50 text-amber-700' :
@@ -298,7 +299,7 @@ export default function DashboardPage() {
                           </div>
                           <div className="flex items-center gap-4">
                             <div className="text-right">
-                              <p className="font-medium text-gray-900">৳{order.total.toLocaleString()}</p>
+                              <p className="font-medium text-gray-900">{formatTaka(order.total)}</p>
                             </div>
                             <span className={`inline-block px-3 py-1.5 text-xs font-medium ${
                               order.status === 'Delivered' ? 'bg-gray-100 text-gray-700' :
@@ -316,7 +317,7 @@ export default function DashboardPage() {
                             {order.items.map((item, index) => (
                               <div key={index} className="flex items-center justify-between text-sm">
                                 <span className="text-gray-600">{item.name} × {item.quantity}</span>
-                                <span className="text-gray-900 font-medium">৳{item.price.toLocaleString()}</span>
+                                <span className="text-gray-900 font-medium">{formatPriceView(item.price)}</span>
                               </div>
                             ))}
                           </div>

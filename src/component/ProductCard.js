@@ -1,4 +1,5 @@
 import { Backend_Base_Url } from "@/config";
+import { formatPriceView } from "@/lib/formatPriceView";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCardWishlistOverlay from "@/component/ProductCardWishlistOverlay";
@@ -60,7 +61,7 @@ export default function ProductCard({ item }) {
         <h3 className="font-medium line-clamp-2">{item.name}</h3>
       </Link>
       <p className="text-sm text-gray-500">{item.brand?.name}</p>
-      <p className="font-semibold">{item.price}</p>
+      <p className="font-semibold">{formatPriceView(item.price)}</p>
     </div>
   );
 }

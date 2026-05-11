@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { getCart, setCart } from "@/lib/cartStorage";
+import { formatPriceView, formatTaka } from "@/lib/formatPriceView";
 
 export default function CartPage() {
   const [cartItems, setCartItems] = useState([]);
@@ -157,9 +158,9 @@ export default function CartPage() {
 
                     {/* Price */}
                     <div className="flex items-center gap-3 mb-4">
-                      <span className="text-xl font-bold text-red-600">{item.price}</span>
+                      <span className="text-xl font-bold text-red-600">{formatPriceView(item.price)}</span>
                       {item.originalPrice && (
-                        <span className="text-sm text-gray-500 line-through">{item.originalPrice}</span>
+                        <span className="text-sm text-gray-500 line-through">{formatPriceView(item.originalPrice)}</span>
                       )}
                       {roundedDiscountLabel(item.discount) && (
                         <span className="text-xs bg-red-100 text-red-600 px-2 py-1 rounded">{roundedDiscountLabel(item.discount)}</span>
@@ -199,7 +200,7 @@ export default function CartPage() {
                     <div className="mt-4 pt-4 border-t">
                       <span className="text-sm text-gray-600">Item Total: </span>
                       <span className="text-lg font-semibold">
-                        ৳{(getNumericPrice(item.price) * item.quantity).toLocaleString('en-US')}
+                        {formatTaka(getNumericPrice(item.price) * item.quantity)}
                       </span>
                     </div>
                   </div>
@@ -229,13 +230,13 @@ export default function CartPage() {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between text-gray-700">
                   <span>Subtotal</span>
-                  <span className="font-medium">৳{subtotal.toLocaleString('en-US')}</span>
+                  <span className="font-medium">{formatTaka(subtotal)}</span>
                 </div>
                 
                 {discount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span className="font-medium">-৳{discount.toLocaleString('en-US')}</span>
+                    <span className="font-medium">-{formatTaka(discount)}</span>
                   </div>
                 )}
                 
@@ -245,7 +246,7 @@ export default function CartPage() {
                     {shipping === 0 ? (
                       <span className="text-green-600">Free</span>
                     ) : (
-                      `৳${shipping.toLocaleString('en-US')}`
+                      formatTaka(shipping)
                     )}
                   </span>
                 </div>
@@ -253,7 +254,7 @@ export default function CartPage() {
                 <div className="border-t pt-4 mt-4">
                   <div className="flex justify-between text-lg font-bold">
                     <span>Total</span>
-                    <span className="text-red-600">৳{total.toLocaleString('en-US')}</span>
+                    <span className="text-red-600">{formatTaka(total)}</span>
                   </div>
                 </div>
               </div>
@@ -282,8 +283,8 @@ export default function CartPage() {
               <div className="mt-6 p-4 bg-blue-50 rounded-lg">
                 <p className="text-sm font-semibold text-gray-800 mb-2">EMI Available</p>
                 <div className="text-xs text-gray-600 space-y-1">
-                  <p>3 Months: ৳{Math.round(total / 3).toLocaleString('en-US')}/month</p>
-                  <p>6 Months: ৳{Math.round(total / 6).toLocaleString('en-US')}/month</p>
+                  <p>3 Months: {formatTaka(Math.round(total / 3))}/month</p>
+                  <p>6 Months: {formatTaka(Math.round(total / 6))}/month</p>
                 </div>
               </div>
             </div>

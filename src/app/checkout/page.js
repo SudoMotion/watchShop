@@ -13,6 +13,7 @@ import {
 } from "@/stores/AuthAPI";
 import { getCheckoutData, checkoutStore } from "@/stores/CustomerAPI";
 import { ToastContainer, toast } from "react-toastify";
+import { formatTaka } from "@/lib/formatPriceView";
 import "react-toastify/dist/ReactToastify.css";
 
 const cartImageUrl = (path) => {
@@ -1145,7 +1146,7 @@ export default function CheckoutPage() {
                           </span>
                         </span>
                         <span className="shrink-0 text-sm font-medium text-gray-900 tabular-nums">
-                          ৳70.00
+                          {formatTaka(70)}
                         </span>
                       </label>
                       <label
@@ -1181,7 +1182,7 @@ export default function CheckoutPage() {
                           </span>
                         </span>
                         <span className="shrink-0 text-sm font-medium text-gray-900 tabular-nums">
-                          ৳130.00
+                          {formatTaka(130)}
                         </span>
                       </label>
                     </div>
@@ -1321,7 +1322,7 @@ export default function CheckoutPage() {
                         <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
                         <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
                         <p className="text-sm font-semibold text-red-600">
-                          ৳{(getNumericPrice(item.price) * item.quantity).toLocaleString("en-BD")}
+                          {formatTaka(getNumericPrice(item.price) * item.quantity)}
                         </p>
                       </div>
                     </div>
@@ -1331,7 +1332,7 @@ export default function CheckoutPage() {
                 <div className="space-y-2 mb-4">
                   <div className="flex justify-between text-gray-700">
                     <span>Subtotal</span>
-                    <span className="font-medium">৳{orderTotal.toLocaleString("en-BD")}</span>
+                    <span className="font-medium">{formatTaka(orderTotal)}</span>
                   </div>
                   <div className="flex justify-between text-gray-700 text-sm">
                     <span>Customer pickup</span>
@@ -1342,18 +1343,18 @@ export default function CheckoutPage() {
                   {shipCharge > 0 && (
                     <div className="flex justify-between text-gray-700">
                       <span>Shipping</span>
-                      <span className="font-medium">৳{shipCharge.toLocaleString("en-BD")}</span>
+                      <span className="font-medium">{formatTaka(shipCharge)}</span>
                     </div>
                   )}
                   {couponDiscount > 0 && (
                     <div className="flex justify-between text-green-600">
                       <span>Coupon</span>
-                      <span className="font-medium">-৳{couponDiscount.toLocaleString("en-BD")}</span>
+                      <span className="font-medium">-{formatTaka(couponDiscount)}</span>
                     </div>
                   )}
                   <div className="flex justify-between text-lg font-bold pt-2 border-t">
                     <span>Total</span>
-                    <span className="text-red-600">৳{totalAmount.toLocaleString("en-BD")}</span>
+                    <span className="text-red-600">{formatTaka(totalAmount)}</span>
                   </div>
                 </div>
 

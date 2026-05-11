@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { getAuthToken } from "@/lib/auth";
 import { getOrderSuccess } from "@/stores/CustomerAPI";
+import { formatTaka } from "@/lib/formatPriceView";
 
 function OrderSuccessContent() {
   const searchParams = useSearchParams();
@@ -60,7 +61,7 @@ function OrderSuccessContent() {
           )}
           {order?.total_amount != null && (
             <p className="text-gray-600 mb-6">
-              Total: ৳{Number(order.total_amount).toLocaleString("en-BD")}
+              Total: {formatTaka(Number(order.total_amount))}
             </p>
           )}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">

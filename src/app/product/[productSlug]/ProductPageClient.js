@@ -15,6 +15,7 @@ import { useRouter } from "next/navigation";
 import Loading from "@/component/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { formatBdt, formatNumberGrouped, formatTaka } from "@/lib/formatPriceView";
 
 /** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
 const productImagePath = (path) => {
@@ -248,8 +249,8 @@ export default function ProductPageClient({ params }) {
     try {
       const slug = product?.slug || productSlug;
       const image = imgUrl(getProductMainImage(product));
-      const priceStr = `৳${sellingPriceNum.toLocaleString("en-BD")}`;
-      const originalPriceStr = `৳${originalPriceNum.toLocaleString("en-BD")}`;
+      const priceStr = formatTaka(sellingPriceNum);
+      const originalPriceStr = formatTaka(originalPriceNum);
       const stock = Number(product?.quantity || 0);
       const cap = Math.max(1, stock);
       const addQty = Math.min(Math.max(1, purchaseQty), cap);
@@ -308,8 +309,8 @@ export default function ProductPageClient({ params }) {
         title: product?.name || product?.meta_title || "Product",
         slug,
         brand: product?.brand?.name || "",
-        price: `৳${sellingPriceNum.toLocaleString("en-BD")}`,
-        originalPrice: `৳${originalPriceNum.toLocaleString("en-BD")}`,
+        price: formatTaka(sellingPriceNum),
+        originalPrice: formatTaka(originalPriceNum),
         discount: originalPriceNum > sellingPriceNum
           ? `${Math.round(((originalPriceNum - sellingPriceNum) / originalPriceNum) * 100)}% OFF`
           : "",
@@ -330,8 +331,8 @@ export default function ProductPageClient({ params }) {
     try {
       const slug = product?.slug || productSlug;
       const image = imgUrl(getProductMainImage(product));
-      const priceStr = `৳${sellingPriceNum.toLocaleString("en-BD")}`;
-      const originalPriceStr = `৳${originalPriceNum.toLocaleString("en-BD")}`;
+      const priceStr = formatTaka(sellingPriceNum);
+      const originalPriceStr = formatTaka(originalPriceNum);
       const stock = Number(product?.quantity || 0);
       const cap = Math.max(1, stock);
       const addQty = Math.min(Math.max(1, purchaseQty), cap);
@@ -661,7 +662,7 @@ export default function ProductPageClient({ params }) {
           <div className="mt-2 sm:mt-3 flex flex-wrap items-baseline gap-2 sm:gap-3">
             {sellingPriceNum > 0 && (
               <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl">
-                BDT {sellingPriceNum.toLocaleString("en-BD")}
+                {formatBdt(sellingPriceNum)}
               </span>
             )}
             {discountPercent > 0 && (
@@ -671,7 +672,7 @@ export default function ProductPageClient({ params }) {
             )}
             {originalPriceNum > 0 && originalPriceNum > sellingPriceNum && (
               <del className="text-sm sm:text-base text-gray-500">
-                BDT {originalPriceNum.toLocaleString("en-BD")}
+                {formatBdt(originalPriceNum)}
               </del>
             )}
           </div>
@@ -782,7 +783,8 @@ export default function ProductPageClient({ params }) {
                   </div>
                 </div>
                 <p className="text-sm text-gray-700">
-                  <span className="font-bold text-green-600">in stock: </span> {stockQty.toLocaleString("en-BD")}
+                  <span className="font-bold text-green-600">in stock: </span>{" "}
+                  {formatNumberGrouped(stockQty)}
                 </p>
               </div>
             )}
@@ -1081,8 +1083,10 @@ export default function ProductPageClient({ params }) {
               slug: r.slug,
               name: r.name,
               meta_title: r.meta_title || r.name,
-              price: `৳${Number(r.price || 0).toLocaleString("en-BD")}`,
-              discount_price: `৳${Number(r.selling_price || r.discount_price || r.price || 0).toLocaleString("en-BD")}`,
+              price: formatTaka(Number(r.price || 0)),
+              discount_price: formatTaka(
+                Number(r.selling_price || r.discount_price || r.price || 0)
+              ),
               discount: toNum(r.discount) > 0 ? `${Math.round(toNum(r.discount))}% OFF` : "",
               image: r.image || r.thumb_image,
               otherimage: r.otherimage || r.image,

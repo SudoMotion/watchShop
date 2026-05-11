@@ -1,6 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { Backend_Base_Url } from "@/config";
+import { formatBdt } from "@/lib/formatPriceView";
 
 export default function DesktopSearch({
   open,
@@ -166,7 +167,7 @@ export default function DesktopSearch({
                             </p>
                             <div className="flex flex-wrap items-center gap-1.5 text-xs">
                               <span className="font-semibold text-gray-800">
-                                BDT {discounted.toLocaleString("en-BD")}
+                                {formatBdt(discounted)}
                               </span>
                               {discountPercent > 0 && (
                                 <>
@@ -174,7 +175,7 @@ export default function DesktopSearch({
                                     {Math.round(discountPercent)}% OFF
                                   </span>
                                   <span className="text-gray-400 line-through">
-                                    BDT {original.toLocaleString("en-BD")}
+                                    {formatBdt(original)}
                                   </span>
                                 </>
                               )}

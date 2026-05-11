@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getWishlist, setWishlist } from "@/lib/wishlistStorage";
 import { getCart, setCart } from "@/lib/cartStorage";
 import { NEXT_PUBLIC_API_URL } from "@/config";
+import { formatPriceView } from "@/lib/formatPriceView";
 
 /** Ensure image URL is absolute. */
 const wishlistImageUrl = (path) => {
@@ -186,9 +187,9 @@ export default function WishlistPage() {
 
                 {/* Price */}
                 <div className="flex items-center gap-2 mb-3">
-                  <span className="text-lg font-bold text-red-600">{item.price}</span>
+                  <span className="text-lg font-bold text-red-600">{formatPriceView(item.price)}</span>
                   {item.originalPrice && (
-                    <span className="text-sm text-gray-500 line-through">{item.originalPrice}</span>
+                    <span className="text-sm text-gray-500 line-through">{formatPriceView(item.originalPrice)}</span>
                   )}
                 </div>
 

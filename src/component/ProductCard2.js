@@ -1,4 +1,5 @@
 import { Backend_Base_Url } from "@/config";
+import { formatPriceView } from "@/lib/formatPriceView";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCardWishlistOverlay from "@/component/ProductCardWishlistOverlay";
@@ -96,8 +97,8 @@ export default function ProductCard2({ item }) {
       </div>
       <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg line-clamp-2">{item.name}</Link>
       <div className="flex items-center justify-center gap-x-2 text-base md:text-lg font-semibold">
-      <p className="line-through text-gray-500">{item.price}</p>
-      <p className="text-red-600">{item.discount_price}</p>
+      <p className="line-through text-gray-500">{formatPriceView(item.price)}</p>
+      <p className="text-red-600">{formatPriceView(item.discount_price)}</p>
       </div>
     </div>
   );
