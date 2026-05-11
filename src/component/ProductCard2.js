@@ -1,5 +1,5 @@
 import { Backend_Base_Url } from "@/config";
-import { formatPriceView } from "@/lib/formatPriceView";
+import { formatPriceView, parsePriceNumber } from "@/lib/formatPriceView";
 import Image from "next/image";
 import Link from "next/link";
 import ProductCardWishlistOverlay from "@/component/ProductCardWishlistOverlay";
@@ -36,6 +36,17 @@ export default function ProductCard2({ item }) {
   const mainImageSrc = mainImage.startsWith("http") ? mainImage : Backend_Base_Url + "/" + productImagePath(mainImage);
   const hoverImageSrc = hoverImage.startsWith("http") ? hoverImage : Backend_Base_Url + "/" + productImagePath(hoverImage);
   const hasHoverSwap = Boolean(hoverImage && hoverImage !== mainImage);
+
+  const discountedCandidate =
+    item.discount_price ?? item.selling_price ?? item.after_discount_price ?? item.price;
+
+  const originalNum = parsePriceNumber(item.price);
+  const discountedNum = parsePriceNumber(discountedCandidate);
+  const hasDiscount =
+    Number.isFinite(originalNum) &&
+    Number.isFinite(discountedNum) &&
+    discountedNum > 0 &&
+    originalNum > discountedNum;
 
   return (
     <div className="flex flex-col gap-y-2 items-center text-center">
@@ -97,8 +108,12 @@ export default function ProductCard2({ item }) {
       </div>
       <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg line-clamp-2">{item.name}</Link>
       <div className="flex items-center justify-center gap-x-2 text-base md:text-lg font-semibold">
-      <p className="line-through text-gray-500">{formatPriceView(item.price)}</p>
-      <p className="text-red-600">{formatPriceView(item.discount_price)}</p>
+      {hasDiscount ? (
+        <p className="line-through text-gray-500">{formatPriceView(item.price)}</p>
+      ) : null}
+      <p className="text-red-600">
+        {formatPriceView(hasDiscount ? discountedCandidate : item.price)}
+      </p>
       </div>
     </div>
   );
