@@ -13,6 +13,7 @@ import { getNotice, getSections } from '@/stores/sectionsAPI';
 import BannerSection from '@/component/BannerSection';
 import HomeMagazineSection from '@/component/HomeMagazineSection';
 import HomeCmsBannerGrid from '@/component/HomeCmsBannerGrid';
+import { bannerSectionTitle } from '@/lib/bannerSlides';
 
 export const dynamic = 'force-dynamic';
 
@@ -48,6 +49,11 @@ export default async function page() {
   const limitedEditionBanners = bannersByType?.limited_edition_banner ?? [];
   const dealBanners = bannersByType?.deal_banner ?? [];
 
+  const recommendedSectionTitle = bannerSectionTitle(recommendedBannerList, 'Recommended');
+  const newArrivalSectionTitle = bannerSectionTitle(newArrivalBanners, 'New Arrival');
+  const limitedEditionSectionTitle = bannerSectionTitle(limitedEditionBanners, 'Limited Edition');
+  const dealSectionTitle = bannerSectionTitle(dealBanners, 'Deals');
+
   const sectionsResponse = await getSections();
   const sections = sectionsResponse?.sections ?? [];
   const firstSection = sections.slice(0, 1);
@@ -78,16 +84,16 @@ export default async function page() {
       <SectionArea sections={firstSection} />
       <div className='grid grid-cols-1 md:grid-cols-2 px-2'>
         <SecoundaryProductSlider data={recommendedBannerList} />
-        <RecomendedProducts/>
+        <RecomendedProducts sectionTitle={recommendedSectionTitle} />
       </div>
-      <HomeCmsBannerGrid title="New Arrival" banners={newArrivalBanners} columns={2} />
+      <HomeCmsBannerGrid title={newArrivalSectionTitle} banners={newArrivalBanners} columns={2} />
       <SectionArea sections={secondSection} className="py-0 md:py-0" />
       <HomeCmsBannerGrid title="Trending Now" banners={trendingNow12Banners} columns={2} />
       <SectionArea sections={thirdSection} className="py-0 md:py-0" />
-      <HomeCmsBannerGrid title="Limited Edition" banners={limitedEditionBanners} columns={2} />
+      <HomeCmsBannerGrid title={limitedEditionSectionTitle} banners={limitedEditionBanners} columns={2} />
       <SectionArea sections={fourthSection} className="py-0 md:py-0" />
       <SectionArea sections={remainingSections} className="py-0 md:py-0" />
-      <HomeCmsBannerGrid title="Deals" banners={dealBanners} columns={2} />
+      <HomeCmsBannerGrid title={dealSectionTitle} banners={dealBanners} columns={2} />
       <HomeMagazineSection />
       <div className='max-w-7xl mx-auto mb-10 px-2'>
         <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-21/9">

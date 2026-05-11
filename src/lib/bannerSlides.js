@@ -69,3 +69,13 @@ export function mapBannerResponseToSlides(raw) {
   const arr = Array.isArray(list) ? list : [];
   return mapBannerItemsToSlides(arr);
 }
+
+/**
+ * Section heading from CMS: first row's `banner_type` (e.g. "Recommended Banner").
+ */
+export function bannerSectionTitle(banners, fallback = "") {
+  const first = Array.isArray(banners) ? banners[0] : null;
+  const t = first?.banner_type;
+  if (typeof t === "string" && t.trim()) return t.trim();
+  return typeof fallback === "string" ? fallback : "";
+}
