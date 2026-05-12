@@ -12,6 +12,7 @@ import DynamicSection from '@/component/DynamicSection';
 import { getNotice, getSections } from '@/stores/sectionsAPI';
 import BannerSection from '@/component/BannerSection';
 import HomeMagazineSection from '@/component/HomeMagazineSection';
+import HomeSocialMediaSection from '@/component/HomeSocialMediaSection';
 import HomeCmsBannerGrid from '@/component/HomeCmsBannerGrid';
 import { bannerSectionTitle } from '@/lib/bannerSlides';
 
@@ -94,6 +95,7 @@ export default async function page() {
       <SectionArea sections={fourthSection} className="py-0 md:py-0" />
       <SectionArea sections={remainingSections} className="py-0 md:py-0" />
       <HomeCmsBannerGrid title={dealSectionTitle} banners={dealBanners} columns={2} />
+      <HomeSocialMediaSection />
       <HomeMagazineSection />
       <div className="mx-auto mb-10 max-w-3xl px-2">
         <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
