@@ -15,7 +15,7 @@ export default function HomeMagazineSection() {
 
   const magazinePosts = useMemo(() => {
     if (!Array.isArray(blogs)) return [];
-    return blogs.filter((post) => isMagazinePost(post));
+    return blogs.filter((post) => isMagazinePost(post)).slice(0, 3);
   }, [blogs]);
   return (
     <div className="max-w-7xl mx-auto mb-10 px-2">
