@@ -654,8 +654,16 @@ export default function ProductPageClient({ params }) {
               ))}
             </div>
             <span className="text-sm sm:text-base text-gray-600">
-              {ratingScoreDisplay.toFixed(1)} ({ratingCountDisplay}{" "}
-              {ratingCountDisplay === 1 ? "review" : "reviews"})
+              {ratingScoreDisplay.toFixed(1)}{" "}
+              <button
+                type="button"
+                onClick={() => scrollToSection("review")}
+                className="cursor-pointer rounded underline-offset-2 transition-colors hover:text-gray-900 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-1"
+                aria-label="Jump to customer reviews"
+              >
+                ({ratingCountDisplay}{" "}
+                {ratingCountDisplay === 1 ? "review" : "reviews"})
+              </button>
             </span>
           </div>
 
@@ -859,7 +867,7 @@ export default function ProductPageClient({ params }) {
               </a>
               <span>{WHATSAPP_NUMBER}</span>
             </div>
-            <div className="grid grid-cols-2 bg-black gap-px text-center my-5 mb-5 w-2/3">
+            <div className="grid grid-cols-2 bg-black gap-px text-center my-5 mb-5 w-2/3 border border-black">
               {authentics.length > 0
                 ? authentics.map((a) => (
                     <div key={a.id} className="flex flex-col items-center bg-white p-2">
