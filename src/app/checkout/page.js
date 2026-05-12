@@ -76,6 +76,8 @@ export default function CheckoutPage() {
   const [cartItems, setCartItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
+  /** Must be true to place order (submit or OTP verify → place). */
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState(null);
 
   const [formData, setFormData] = useState({
@@ -482,6 +484,12 @@ export default function CheckoutPage() {
   };
 
   const placeOrder = async () => {
+    if (!acceptedTerms) {
+      const msg = "Please accept the terms and conditions to place your order.";
+      setError(msg);
+      toast.error(msg);
+      return false;
+    }
     const payload = buildOrderPayload();
     setSubmitting(true);
     try {
@@ -942,11 +950,17 @@ export default function CheckoutPage() {
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent tracking-widest"
                         />
                       </div>
+                      {!acceptedTerms ? (
+                        <p className="text-xs text-amber-800">
+                          In the <span className="font-semibold">Order Summary</span>, check{" "}
+                          <span className="font-semibold">Terms and Conditions</span> to enable placing your order.
+                        </p>
+                      ) : null}
                       <div className="flex flex-col sm:flex-row sm:items-center gap-3">
                         <button
                           type="button"
                           onClick={handleVerifyOtp}
-                          disabled={otpVerifying || submitting}
+                          disabled={otpVerifying || submitting || !acceptedTerms}
                           className="w-full sm:w-auto rounded-lg bg-black px-6 py-2.5 text-sm font-semibold text-white hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-50"
                         >
                           {otpVerifying || submitting
@@ -1474,11 +1488,37 @@ export default function CheckoutPage() {
                   </div>
                 )}
 
+                <label className="mb-4 flex cursor-pointer items-start gap-3 rounded-lg border border-gray-200 bg-gray-50/80 p-3 text-sm text-gray-800">
+                  <input
+                    type="checkbox"
+                    checked={acceptedTerms}
+                    onChange={(e) => {
+                      setAcceptedTerms(e.target.checked);
+                      setError(null);
+                    }}
+                    className="mt-0.5 h-4 w-4 shrink-0 rounded border-gray-300 text-black focus:ring-black"
+                  />
+                  <span>
+                    I have read and agree to the{" "}
+                    <Link
+                      href="/terms-and-conditions"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-semibold text-black underline underline-offset-2 hover:text-gray-700"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Terms and Conditions
+                    </Link>
+                    .
+                  </span>
+                </label>
+
                 <button
                   type="submit"
                   disabled={
                     submitting ||
                     registering ||
+                    !acceptedTerms ||
                     (!isLoggedIn() &&
                       existingCustomerMode &&
                       !otpVerified) ||

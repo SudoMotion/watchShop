@@ -904,27 +904,16 @@ export default function ProductPageClient({ params }) {
                 href={WHATSAPP_CHAT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-1.5 rounded-md bg-[#25D366] hover:bg-[#1EBE57] text-white px-3 py-1.5 text-xs sm:text-sm font-semibold"
+                className="relative border inline-flex h-9 w-9 shrink-0 overflow-hidden rounded-full shadow-md ring-2 ring-white/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 sm:h-10 sm:w-10"
                 aria-label="Chat on WhatsApp with our support team"
               >
-                <span className="inline-flex items-center justify-center w-6 h-6 rounded-full bg-white text-[#25D366]">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 32 32"
-                    className="w-4 h-4"
-                    aria-hidden="true"
-                  >
-                    <path
-                      d="M16 3C9.925 3 5 7.925 5 14c0 2.016.59 3.89 1.61 5.48L5 27l7.78-1.57C14.3 25.78 15.13 26 16 26c6.075 0 11-4.925 11-11S22.075 3 16 3z"
-                      fill="currentColor"
-                    />
-                    <path
-                      d="M20.37 18.19c-.34-.17-2.01-.99-2.32-1.1-.31-.11-.54-.17-.77.17-.23.34-.89 1.1-1.09 1.33-.2.23-.4.26-.74.09-.34-.17-1.43-.53-2.72-1.7-.99-.88-1.66-1.97-1.86-2.3-.2-.34-.02-.52.15-.69.16-.16.34-.4.51-.6.17-.2.23-.34.34-.57.11-.23.06-.43-.03-.6-.09-.17-.77-1.85-1.06-2.53-.28-.68-.57-.59-.77-.6-.2-.01-.43-.01-.66-.01-.23 0-.6.09-.92.43-.31.34-1.21 1.18-1.21 2.88 0 1.69 1.24 3.33 1.41 3.56.17.23 2.44 3.72 5.9 5.22 3.46 1.5 3.46 1 4.09.94.63-.06 2.01-.82 2.3-1.61.28-.79.28-1.47.2-1.61-.09-.14-.31-.23-.66-.4z"
-                      fill="#ffffff"
-                    />
-                  </svg>
-                </span>
-                <span>WhatsApp</span>
+                <Image
+                  src="/images/sticky-whatsApp-button.jpg"
+                  alt=""
+                  fill
+                  className="object-cover"
+                  sizes="40px"
+                />
               </a>
               <span>{WHATSAPP_NUMBER}</span>
             </div>
