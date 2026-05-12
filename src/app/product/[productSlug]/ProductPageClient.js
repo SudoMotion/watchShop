@@ -16,6 +16,7 @@ import Loading from "@/component/Loading";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { formatBdt, formatNumberGrouped, formatTaka } from "@/lib/formatPriceView";
+import { getYouTubeEmbedFromUrl } from "@/lib/youtubeEmbed";
 
 /** API returns image as filename (e.g. "Fossil_ES4093 (1).webp") or path ("uploads/product/..."). */
 const productImagePath = (path) => {
@@ -32,12 +33,23 @@ const getProductMainImage = (p) => {
   return fromGallery || fromThumb || "";
 };
 
+/** True if HTML has visible text after stripping tags (for CMS fields). */
+function htmlHasBody(html) {
+  if (html == null) return false;
+  const text = String(html)
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .trim();
+  return text.length > 0;
+}
+
 export default function ProductPageClient({ params }) {
   const router = useRouter();
   const productSlug = params?.productSlug ?? "";
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [mainImg, setMainImg] = useState("");
+  /** Selected index in gallery (images + optional YouTube as last item). */
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [addToCartLoading, setAddToCartLoading] = useState(false);
   const [buyNowLoading, setBuyNowLoading] = useState(false);
   const [isInWishlist, setIsInWishlist] = useState(false);
@@ -103,8 +115,7 @@ export default function ProductPageClient({ params }) {
         setProductData(data);
         const p = data?.product;
         if (p) {
-          const first = getProductMainImage(p);
-          setMainImg(imgUrl(first));
+          setGalleryIndex(0);
           setIsInWishlist(getWishlist().some((item) => item.id === p.id));
         }
       })
@@ -161,7 +172,7 @@ export default function ProductPageClient({ params }) {
   const emi3Months = calculateEMI(sellingPriceNum, 3);
   const emi6Months = calculateEMI(sellingPriceNum, 6);
 
-  const images = product
+  const imageUrls = product
     ? [
         imgUrl(getProductMainImage(product)),
         ...(product.product_image || product.productImages || []).map((img) =>
@@ -169,7 +180,26 @@ export default function ProductPageClient({ params }) {
         ).filter(Boolean),
       ].filter(Boolean)
     : [];
-  const displayImages = images.length ? images : (mainImg ? [mainImg] : []);
+  const youtubeEmbedSrc = product?.video_url
+    ? getYouTubeEmbedFromUrl(String(product.video_url))
+    : "";
+  const galleryItems = [
+    ...imageUrls.map((src) => ({ type: "image", src })),
+    ...(youtubeEmbedSrc ? [{ type: "video", embedUrl: youtubeEmbedSrc }] : []),
+  ];
+  const thumbGallery =
+    galleryItems.length > 0
+      ? galleryItems
+      : [{ type: "image", src: "/images/mockProduct/1.png" }];
+
+  useEffect(() => {
+    if (thumbGallery.length === 0) return;
+    setGalleryIndex((i) =>
+      Math.min(Math.max(0, i), thumbGallery.length - 1)
+    );
+  }, [thumbGallery.length, product?.id]);
+
+  const activeGalleryItem = thumbGallery[galleryIndex] ?? thumbGallery[0];
   const authentics = productData?.authentics ?? [];
   const related = productData?.related ?? [];
 
@@ -199,6 +229,18 @@ export default function ProductPageClient({ params }) {
   const productItem = productData?.productItem || product?.productItem || [];
   const brand = product?.brand || null;
   const category = product?.category || null;
+  const aboutCollectionHtml = product?.about_collection;
+  const hasAboutCollection = htmlHasBody(aboutCollectionHtml);
+  const collectionImageSrc = product?.collection_image
+    ? imgUrl(product.collection_image)
+    : "/images/collection.jpg";
+  const fallbackCollectionText =
+    brand?.meta_description || category?.meta_description || "";
+  const movementHtml = product?.movement;
+  const hasMovementHtml = htmlHasBody(movementHtml);
+  const movementImageSrc = product?.movement_image
+    ? imgUrl(product.movement_image)
+    : "/images/circular.avif";
   const modelText =
     product?.model ||
     productItem.find((item) => item.label === "Model")?.value ||
@@ -464,8 +506,6 @@ export default function ProductPageClient({ params }) {
     setPurchaseQty((q) => Math.min(Math.max(1, q), stockQty));
   }, [stockQty]);
 
-  const thumbImages = displayImages.length ? displayImages : ["/images/mockProduct/1.png"];
-
   if (loading) {
     return (
       <Loading/>
@@ -518,20 +558,31 @@ export default function ProductPageClient({ params }) {
             <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
           </div>
           <div className="relative aspect-square w-full border rounded-xl bg-gray-50 overflow-hidden">
-            {(mainImg || displayImages[0]) ? (
+            {activeGalleryItem ? (
               <>
-                <Image
-                  src={mainImg || displayImages[0]}
-                  fill
-                  alt={
-                    product?.name ||
-                    product?.meta_title ||
-                    product?.on_page_meta_title ||
-                    "Product image"
-                  }
-                  className="object-cover"
-                  unoptimized
-                />
+                {activeGalleryItem.type === "video" ? (
+                  <iframe
+                    title="Product video"
+                    src={activeGalleryItem.embedUrl}
+                    className="absolute inset-0 h-full w-full border-0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    allowFullScreen
+                    referrerPolicy="strict-origin-when-cross-origin"
+                  />
+                ) : (
+                  <Image
+                    src={activeGalleryItem.src}
+                    fill
+                    alt={
+                      product?.name ||
+                      product?.meta_title ||
+                      product?.on_page_meta_title ||
+                      "Product image"
+                    }
+                    className="object-cover"
+                    unoptimized
+                  />
+                )}
                 {!inStock ? (
                   <div className="pointer-events-none absolute right-3 top-3 z-10 max-w-[calc(100%-1.5rem)]">
                     <span className="inline-block rounded-full bg-black px-4 py-2 text-center text-xs font-bold uppercase tracking-wider text-amber-400 shadow-lg">
@@ -605,21 +656,31 @@ export default function ProductPageClient({ params }) {
                 className="flex gap-2 sm:gap-3 overflow-x-auto scrollbar-hide flex-1"
                 style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
-                {thumbImages.map((img, i) => (
+                {thumbGallery.map((item, i) => (
                 <button
-                    key={i}
-                    onClick={() => setMainImg(img)}
+                    key={item.type === "video" ? "video-thumb" : `${item.src}-${i}`}
+                    type="button"
+                    onClick={() => setGalleryIndex(i)}
                     className={`border rounded-lg p-1.5 sm:p-2 min-w-[60px] sm:min-w-[70px] md:min-w-20 flex-shrink-0 ${
-                    (mainImg || thumbImages[0]) === img ? "border-red-500" : "border-gray-300"
+                    galleryIndex === i ? "border-red-500" : "border-gray-300"
                     }`}
+                    aria-label={item.type === "video" ? "Product video" : "Product image thumbnail"}
                 >
+                    {item.type === "video" ? (
+                      <div className="flex h-12 w-12 items-center justify-center rounded-md bg-neutral-900 sm:h-16 sm:w-16 md:h-20 md:w-20">
+                        <svg viewBox="0 0 24 24" className="h-6 w-6 text-white sm:h-8 sm:w-8" fill="currentColor" aria-hidden>
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    ) : (
                     <Image
-                    src={img}
+                    src={item.src}
                     width={90}
                     height={90}
-                    alt="Thumb"
+                    alt=""
                     className="w-12 h-12 sm:w-16 sm:h-16 md:w-20 md:h-20 object-contain"
                     />
+                    )}
                 </button>
                 ))}
             </div>
@@ -1006,9 +1067,16 @@ export default function ProductPageClient({ params }) {
                     : "ABOUT THE COLLECTION"}
                 </h2>
 
-                {brand?.meta_description || category?.meta_description ? (
+                {hasAboutCollection ? (
+                  <div
+                    className="mb-4 text-xs leading-relaxed text-gray-700 sm:mb-6 sm:text-sm prose prose-sm max-w-none [&_img]:h-auto [&_img]:max-w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: String(aboutCollectionHtml),
+                    }}
+                  />
+                ) : fallbackCollectionText ? (
                   <p className="text-xs sm:text-sm mb-4 sm:mb-6">
-                    {brand?.meta_description || category?.meta_description}
+                    {fallbackCollectionText}
                   </p>
                 ) : (
                   <p className="text-xs sm:text-sm mb-4 sm:mb-6 text-gray-500">
@@ -1020,11 +1088,12 @@ export default function ProductPageClient({ params }) {
               {/* RIGHT IMAGE */}
               <div className="w-full order-1 lg:order-2">
                 <Image
-                  src="/images/collection.jpg"
+                  src={collectionImageSrc}
                   width={600}
                   height={800}
                   alt={brand?.name ? `${brand.name} collection` : "Watch collection"}
                   className="rounded-lg object-cover w-full h-auto"
+                  unoptimized={Boolean(product?.collection_image)}
                 />
               </div>
 
@@ -1038,6 +1107,15 @@ export default function ProductPageClient({ params }) {
                 <h2 className="text-xs sm:text-sm font-semibold tracking-widest text-red-600 mb-2 sm:mb-3">
                   ABOUT THE MOVEMENT
                 </h2>
+
+                {hasMovementHtml ? (
+                  <div
+                    className="mb-4 text-xs leading-relaxed text-gray-700 sm:mb-6 sm:text-sm prose prose-sm max-w-none [&_img]:h-auto [&_img]:max-w-full"
+                    dangerouslySetInnerHTML={{
+                      __html: String(movementHtml),
+                    }}
+                  />
+                ) : null}
 
                 {movementSpecs.length > 0 ? (
                   <>
@@ -1058,21 +1136,22 @@ export default function ProductPageClient({ params }) {
                       ))}
                     </div>
                   </>
-                ) : (
+                ) : !hasMovementHtml ? (
                   <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
                     Movement information is not available for this product.
                   </p>
-                )}
+                ) : null}
               </div>
 
               {/* RIGHT IMAGE */}
               <div className="flex justify-center order-1 lg:order-2">
                 <Image
-                  src="/images/circular.avif"
+                  src={movementImageSrc}
                   width={500}
                   height={500}
                   alt={movementSummary ? `${movementSummary} movement` : "Watch movement"}
                   className="object-contain w-full h-auto max-w-xs sm:max-w-sm md:max-w-md"
+                  unoptimized={Boolean(product?.movement_image)}
                 />
               </div>
             </div>
