@@ -764,17 +764,17 @@ export default function ProductPageClient({ params }) {
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
                 
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center overflow-hidden rounded-lg border border-gray-300 bg-white shadow-sm">
+                  <div className="inline-flex items-center overflow-hidden rounded-full border border-gray-300 bg-white shadow-sm">
                     <button
                       type="button"
                       aria-label="Decrease quantity"
                       disabled={purchaseQty <= 1}
                       onClick={() => setPurchaseQty((q) => Math.max(1, q - 1))}
-                      className="flex h-10 w-10 items-center justify-center text-lg font-semibold leading-none text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 sm:h-8 sm:w-8 sm:text-base"
                     >
                       −
                     </button>
-                    <span className="min-w-[2.75rem] select-none px-2 text-center text-sm font-semibold tabular-nums text-gray-900">
+                    <span className="min-w-7 select-none px-1 text-center text-xs font-semibold tabular-nums text-gray-900 sm:min-w-8 sm:px-1.5 sm:text-sm">
                       {purchaseQty}
                     </span>
                     <button
@@ -784,7 +784,7 @@ export default function ProductPageClient({ params }) {
                       onClick={() =>
                         setPurchaseQty((q) => Math.min(stockQty, q + 1))
                       }
-                      className="flex h-10 w-10 items-center justify-center text-lg font-semibold leading-none text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40"
+                      className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-700 transition hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-40 sm:h-8 sm:w-8 sm:text-base"
                     >
                       +
                     </button>
@@ -1175,17 +1175,17 @@ export default function ProductPageClient({ params }) {
       {showFloatingCta && inStock && (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 pb-[max(0.2rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none">
           <div className="pointer-events-auto flex w-full max-w-[min(100%,26rem)] items-center gap-1.5 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm">
-            <div className="flex shrink-0 items-center overflow-hidden rounded-lg border border-gray-300 bg-gray-50">
+            <div className="inline-flex shrink-0 items-center overflow-hidden rounded-full border border-gray-300 bg-gray-50">
               <button
                 type="button"
                 aria-label="Decrease quantity"
                 disabled={purchaseQty <= 1}
                 onClick={() => setPurchaseQty((q) => Math.max(1, q - 1))}
-                className="flex h-8 w-7 items-center justify-center text-sm font-semibold leading-none text-gray-800 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 −
               </button>
-              <span className="min-w-[1.375rem] select-none px-0.5 text-center text-[11px] font-semibold tabular-nums text-gray-900">
+              <span className="min-w-7 select-none px-1 text-center text-[11px] font-semibold tabular-nums text-gray-900">
                 {purchaseQty}
               </span>
               <button
@@ -1193,7 +1193,7 @@ export default function ProductPageClient({ params }) {
                 aria-label="Increase quantity"
                 disabled={purchaseQty >= stockQty}
                 onClick={() => setPurchaseQty((q) => Math.min(stockQty, q + 1))}
-                className="flex h-8 w-7 items-center justify-center text-sm font-semibold leading-none text-gray-800 hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+                className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
               >
                 +
               </button>
