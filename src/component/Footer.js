@@ -1,8 +1,8 @@
 "use client";
-import { WHATSAPP_CHAT_URL } from '@/config';
 import Image from 'next/image';
 import Link from 'next/link';
 import React, { useState } from 'react';
+import { SOCIAL_MEDIA_LINKS } from '@/lib/socialMedia';
 
 export default function Footer() {
   const [openSections, setOpenSections] = useState({
@@ -27,23 +27,20 @@ export default function Footer() {
             <p className="mt-2 text-sm font-semibold">Never pay Retail ®</p>
 
             {/* Social Icons */}
-            <div className="flex items-center space-x-4 mt-5">
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="bg-white rounded-full hover:opacity-80 transition-opacity" aria-label="Facebook">
-                <img src="/social-media/facebook.png" alt="" className="w-8 h-8" />
-              </a>
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="Instagram">
-                <img src="/social-media/instagram.png" alt="" className="w-8 h-8" />
-              </a>
-              <a href="https://x.com" target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="X (Twitter)">
-                <img src="/social-media/x.png" alt="" className="w-8 h-8" />
-              </a>
-              <a href={WHATSAPP_CHAT_URL} target="_blank" rel="noopener noreferrer" className="rounded-full hover:opacity-80 transition-opacity" aria-label="WhatsApp">
-                <img src="/social-media/whatsapp.png" alt="WhatsApp" className="w-8 h-8 rounded-full" />
-              </a>
-              <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" className="rounded-full overflow-hidden hover:opacity-80 transition-opacity" aria-label="YouTube">
-                <img src="/social-media/youtube.jpeg" alt="YouTube" className="h-10" />
-              </a>
-            </div>
+            {/* <div className="flex items-center space-x-4 mt-5">
+              {SOCIAL_MEDIA_LINKS.map((item) => (
+                <a
+                  key={item.key}
+                  href={item.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={item.linkClassName}
+                  aria-label={item.label}
+                >
+                  <img src={item.src} alt="" className={item.imgClassName} />
+                </a>
+              ))}
+            </div> */}
 
             {/* App Buttons */}
             <div className="flex space-x-3 mt-5">
