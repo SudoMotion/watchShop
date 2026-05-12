@@ -69,7 +69,7 @@ export default function HeroSlider() {
             {desktopSlides.map((slide, index) => (
               <SwiperSlide key={index}>
                 <div
-                  className="relative w-full h-full overflow-hidden select-none"
+                  className="group relative w-full h-full overflow-hidden select-none"
                   onContextMenu={blockBannerContextMenu}
                 >
                   
@@ -98,7 +98,7 @@ export default function HeroSlider() {
                           href={slide.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block border border-white px-8 py-3 text-xs font-semibold tracking-widest uppercase text-white hover:bg-white hover:text-black transition"
+                          className="inline-block border border-white px-8 py-3 text-xs font-semibold tracking-widest uppercase text-white transition group-hover:bg-white group-hover:text-black"
                         >
                           Show More
                         </a>
@@ -135,7 +135,7 @@ export default function HeroSlider() {
             {phoneSlides.map((slide, index) => (
               <SwiperSlide key={index}>
                 <div
-                  className="relative w-full h-full overflow-hidden select-none"
+                  className="group relative w-full h-full overflow-hidden select-none"
                   onContextMenu={blockBannerContextMenu}
                 >
                   
@@ -160,9 +160,9 @@ export default function HeroSlider() {
                           href={slide.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-block border border-white px-5 py-2 text-[10px] font-semibold tracking-widest uppercase text-white hover:bg-white hover:text-black transition"
+                          className="inline-block border border-white px-5 py-2 text-[10px] font-semibold tracking-widest uppercase text-white group-hover:bg-white group-hover:text-black transition"
                         >
-                          Show More
+                          Shop Now
                         </a>
                       </div>
                     </div>
