@@ -95,8 +95,8 @@ export default async function page() {
       <SectionArea sections={remainingSections} className="py-0 md:py-0" />
       <HomeCmsBannerGrid title={dealSectionTitle} banners={dealBanners} columns={2} />
       <HomeMagazineSection />
-      <div className='max-w-7xl mx-auto mb-10 px-2'>
-        <div className="relative w-full overflow-hidden rounded-lg bg-black aspect-21/9">
+      <div className="mx-auto mb-10 max-w-3xl px-2">
+        <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black">
           <iframe className="absolute inset-0 h-full w-full" src="https://www.youtube.com/embed/YXCApv8CbzY?si=pSTVmkm-iQnDOu60" title="YouTube video player" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen></iframe>
         </div>
       </div>
