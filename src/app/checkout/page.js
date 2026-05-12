@@ -828,7 +828,7 @@ export default function CheckoutPage() {
               }
               className="mt-0.5 w-4 h-4 rounded border-gray-300 text-black focus:ring-black"
             />
-            <span className="font-bold text-gray-900">
+            <span className="font-bold text-lg text-gray-900">
               Click only for existing or old Customer
             </span>
           </label>
@@ -1034,7 +1034,6 @@ export default function CheckoutPage() {
                       name="address"
                       value={formData.address}
                       onChange={handleInputChange}
-                      readOnly={apiReadOnly.address}
                       required
                       rows={3}
                       maxLength={191}
