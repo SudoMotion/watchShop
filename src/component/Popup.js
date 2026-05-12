@@ -192,7 +192,7 @@ export default function Popup() {
           {title ? (
             <h2
               id={titleId}
-              className="pr-10 font-light tracking-tight text-neutral-900 text-[1.65rem] leading-snug sm:text-[1.85rem]"
+              className="pr-10 font-light tracking-tight font-bold text-neutral-900 text-[1.65rem] leading-snug sm:text-[1.85rem]"
             >
               {title}
             </h2>
@@ -200,31 +200,25 @@ export default function Popup() {
           {description ? (
             <p
               id={!title ? messageId : undefined}
-              className={`whitespace-pre-line text-neutral-600 leading-relaxed ${
+              className={`whitespace-pre-line font-extrabold text-neutral-600 leading-relaxed ${
                 title
                   ? "mt-3 text-[0.9375rem] sm:text-base"
                   : "pr-10 text-[1.0625rem] font-normal text-neutral-800 sm:text-lg"
               }`}
+              style={{ fontWeight: 600 }}
             >
               {description}
             </p>
           ) : null}
 
-          <div className="mt-8 flex flex-col gap-2.5 sm:mt-9 sm:flex-row sm:items-stretch sm:gap-3">
+          <div className="mt-8 flex items-center justify-center gap-2.5 sm:mt-9 sm:flex-row sm:items-stretch sm:gap-3">
             <Link
               href={href}
               onClick={dismiss}
-              className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-xl bg-neutral-900 px-5 text-center text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 active:scale-[0.99]"
+              className="inline-flex min-h-[2.75rem] max-w-56 whitespace-nowrap flex-1 items-center justify-center rounded-xl bg-neutral-900 px-5 text-center text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 active:scale-[0.99]"
             >
               {btnText}
             </Link>
-            <button
-              type="button"
-              onClick={dismiss}
-              className="inline-flex min-h-[2.75rem] flex-1 items-center justify-center rounded-xl border border-neutral-200/90 bg-neutral-50/80 px-5 text-sm font-medium text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-900 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400 sm:max-w-[9.5rem] sm:flex-none"
-            >
-              Not now
-            </button>
           </div>
         </div>
       </div>
