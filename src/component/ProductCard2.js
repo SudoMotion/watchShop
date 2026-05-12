@@ -98,13 +98,13 @@ export default function ProductCard2({ item }) {
             {item.brand.name}
           </div>
         )}
-        {mainImage && (
+        {/* {mainImage && (
           <ProductCardWishlistOverlay
             item={item}
             mainImageUrl={mainImageSrc}
             hoverImageUrl={hoverImageSrc}
           />
-        )}
+        )} */}
       </div>
       <Link href={`/product/${item.slug}`} className="font-semibold text-base md:text-lg line-clamp-2">{item.name}</Link>
       <div className="flex items-center justify-center gap-x-2 text-base md:text-lg font-semibold">
