@@ -303,18 +303,18 @@ export const postSearchProducts = async (body = {}) => {
     return null;
   }
 };
-export const getCategoryLabels = async (body = {}) => {
+export const getCategoryLabels = async (params = {}) => {
   try {
-    const response = await apiRequest('/api/category-labels',);
+    const response = await apiRequest('/api/category-labels', 'GET', null, params);
     return response.data;
   } catch (error) {
     console.error('Error fetching search products:', error);
     return null;
   }
 };
-export const getbrandLabels = async (body = {}) => {
+export const getbrandLabels = async (params = {}) => {
   try {
-    const response = await apiRequest('/api/brand-labels',);
+    const response = await apiRequest('/api/brand-labels', 'GET', null, params);
     return response.data;
   } catch (error) {
     console.error('Error fetching search products:', error);
