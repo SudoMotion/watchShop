@@ -222,7 +222,7 @@ export default function ProductFilter({
         {open === "movement" && (
           <div className="mt-2 ml-4 flex flex-col gap-y-2">
             {movementOptions.length === 0 ? (
-              <p className="text-sm text-gray-500">Loading movements…</p>
+              <p className="text-sm text-gray-500">No movement available</p>
             ) : (
               movementOptions.map(({ value, label }) => (
                 <label key={value} className="flex items-center gap-x-2">
@@ -298,7 +298,7 @@ export default function ProductFilter({
         {open === "brands" && (
           <div className="mt-2 ml-1 max-h-56 overflow-y-auto flex flex-col gap-y-2">
             {brandList.length === 0 ? (
-              <p className="text-sm text-gray-500">Loading brands…</p>
+              <p className="text-sm text-gray-500">No brands available</p>
             ) : (
               brandList.map((b) => {
                 const slug = brandSlug(b);

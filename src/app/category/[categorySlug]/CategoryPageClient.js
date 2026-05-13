@@ -164,6 +164,7 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
     [categorySlug]
   );
   const categoryName = categoryTitle || categoryNameFromSlug;
+  const resolvedCategoryId = categoryId || categoryIdFromApi;
 
   return (
     <div>
@@ -181,6 +182,7 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
           setFilters={setFilters}
           stockCounts={stockCounts}
           subcategoryOptions={subcategoryOptions}
+          category_id={resolvedCategoryId || undefined}
         />
         <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
           <div
