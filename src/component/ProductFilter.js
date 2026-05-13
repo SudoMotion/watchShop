@@ -43,6 +43,8 @@ export default function ProductFilter({
   stockCounts,
   /** Category page: subcategories from API; omit or empty = hide Subcategory block */
   subcategoryOptions = null,
+  category_id,
+  brand_id
 }) {
   const [open, setOpen] = useState("quantity");
   const [localFilters, setLocalFilters] = useState({
@@ -61,7 +63,11 @@ export default function ProductFilter({
 
   useEffect(() => {
     let cancelled = false;
-    getbrandLabels()
+    const params =
+      brand_id != null && String(brand_id).trim() !== ""
+        ? { brand_id }
+        : {};
+    getbrandLabels(params)
       .then((res) => {
         if (cancelled) return;
         const list = normalizeBrandLabelsList(res);
@@ -71,20 +77,18 @@ export default function ProductFilter({
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [brand_id]);
 
   useEffect(() => {
     let cancelled = false;
-    getCategoryLabels()
+    getCategoryLabels({ category_id })
       .then((res) => {
         if (cancelled) return;
-        setMovementOptions(normalizeMovementsList(res));
+        setMovementOptions(normalizeMovementsList(res, category_id));
       })
       .catch(() => setMovementOptions([]));
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    return () => { cancelled = true; };
+  }, [category_id]);
 
   const toggle = (key) => {
     setOpen((prev) => (prev === key ? null : key));
@@ -307,7 +311,7 @@ export default function ProductFilter({
                       onChange={() =>
                         setFilters((prev) => ({
                           ...mergeDefaults(prev),
-                          brands: toggleBrandSlug(prev.brands, slug),
+                          brands: toggleBrandSlug(mergeDefaults(prev).brands, slug),
                         }))
                       }
                     />
