@@ -28,6 +28,17 @@ export default function BrandPageClient({ brandId, initialBrand = null }) {
     useBrandProducts(brandId, filters, sortBy);
   const activeFilterCount = getActiveFilterChipCount(filters);
 
+  /** Numeric (or string) brand id for `/api/brand-labels` — URL `brandId` is the slug. */
+  const apiBrandId = useMemo(() => {
+    const fromInitial = initialBrand?.id;
+    const fromResponse =
+      response?.brand?.id ?? response?.data?.brand?.id ?? response?.brand_id;
+    const raw = fromInitial ?? fromResponse;
+    if (raw == null || raw === "") return undefined;
+    const n = Number(raw);
+    return Number.isFinite(n) && n > 0 ? n : raw;
+  }, [initialBrand, response]);
+
   const brandForSchema = useMemo(() => {
     if (initialBrand && typeof initialBrand === "object") return initialBrand;
     const fromApi = response?.brand ?? response?.data?.brand;
@@ -119,6 +130,7 @@ export default function BrandPageClient({ brandId, initialBrand = null }) {
       <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:mt-4 px-2 mt-2">
         <ProductFilter
           brandId={brandId}
+          brand_id={apiBrandId}
           filters={filters}
           setFilters={setFilters}
           stockCounts={stockCounts}
@@ -129,7 +141,7 @@ export default function BrandPageClient({ brandId, initialBrand = null }) {
               activeFilterCount > 0 ? 'sm:justify-between' : 'sm:justify-end'
             }`}
           >
-            <FilterIndicator filters={filters} setFilters={setFilters} />
+            <FilterIndicator filters={filters} setFilters={setFilters} brandId={brandId} />
             <div className="flex w-full flex-col gap-2 sm:w-auto sm:min-w-[14rem] sm:shrink-0 sm:flex-row sm:items-center">
               <label htmlFor="brand-sort" className="text-sm font-medium text-gray-700 shrink-0">
                 Sort by
