@@ -1,10 +1,23 @@
 "use client";
 
 import Image from "next/image";
-import { useCallback } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { WHATSAPP_CHAT_URL } from "@/config";
 
+const SCROLL_SHOW_BACK_TO_TOP = 500;
+
 export default function FixedFloatingActions() {
+  const [showBackToTop, setShowBackToTop] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => {
+      setShowBackToTop(window.scrollY >= SCROLL_SHOW_BACK_TO_TOP);
+    };
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   const scrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
@@ -14,7 +27,11 @@ export default function FixedFloatingActions() {
       <button
         type="button"
         onClick={scrollToTop}
-        className="flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-900 shadow-lg transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 sm:h-12 sm:w-12"
+        aria-hidden={!showBackToTop}
+        tabIndex={showBackToTop ? 0 : -1}
+        className={`flex h-8 w-8 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-900 shadow-lg transition-colors hover:bg-gray-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 sm:h-12 sm:w-12 ${
+          showBackToTop ? "visible" : "invisible pointer-events-none"
+        }`}
         aria-label="Back to top"
       >
         <svg
