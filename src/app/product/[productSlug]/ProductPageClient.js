@@ -904,16 +904,10 @@ export default function ProductPageClient({ params }) {
                 href={WHATSAPP_CHAT_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative border inline-flex h-9 w-9 shrink-0 overflow-hidden rounded-full shadow-md ring-2 ring-white/30 transition-transform hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#25D366] focus-visible:ring-offset-2 sm:h-10 sm:w-10"
+                className="px-4 py-2 bg-green-600 font-medium text-white overflow-hidden rounded-full shadow-md transition-transform hover:scale-105"
                 aria-label="Chat on WhatsApp with our support team"
               >
-                <Image
-                  src="/images/sticky-whatsApp-button.jpg"
-                  alt=""
-                  fill
-                  className="object-cover"
-                  sizes="40px"
-                />
+                WhatsApp
               </a>
               <span>{WHATSAPP_NUMBER}</span>
             </div>
