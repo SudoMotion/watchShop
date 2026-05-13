@@ -33,7 +33,7 @@ export default function HomeCmsBannerGrid({
 
   return (
     <div className={`max-w-7xl mx-auto my-10 px-2 ${className}`.trim()}>
-      {title ? <h2 className="title mb-4 md:mb-5">{title}</h2> : null}
+      {title ? <h2 className="title mb-0 md:mb-5">{title}</h2> : null}
       <div className={`grid ${gridCols} gap-5`}>
         {banners.map((item, index) => {
           const href = normalizeBannerLink(item?.link);
