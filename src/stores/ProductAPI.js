@@ -357,6 +357,15 @@ export const getTrendingNow2 = async (body = {}) => {
     return null;
   }
 };
+export const getRecommendedProducts = async (body = {}) => {
+  try {
+    const response = await apiRequest('/api/page-product-lists/recommended-product',);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching recomended products:', error);
+    return null;
+  }
+};
 
 export default {
   getMensProducts,
@@ -382,4 +391,5 @@ export default {
   getLimitedEdition,
   getTrendingNow1,
   getTrendingNow2,
+  getRecommendedProducts,
 };
