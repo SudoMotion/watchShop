@@ -1372,16 +1372,7 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mb-4">
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className="text-sm font-semibold text-gray-900 mb-2">Payment method</p>
-                    <Image
-                      src="/icons/paymentMethod.png"
-                      alt="Payment By SSL"
-                      width={100}
-                      height={100}
-                      className="w-5 h-5"
-                    />
-                  </div>
+                  <p className="mb-2 text-sm font-semibold text-gray-900">Payment method</p>
                   <div className="space-y-2">
                     <label
                       className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
@@ -1414,7 +1405,7 @@ export default function CheckoutPage() {
                         Cash on delivery (COD)
                       </span>
                     </label>
-                    {/* <label
+                    <label
                       className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
                         formData.payment_type === "bkash"
                           ? "border-blue-500 bg-sky-50"
@@ -1442,19 +1433,51 @@ export default function CheckoutPage() {
                         ) : null}
                       </span>
                       <span className="text-sm font-medium text-gray-900">bKash</span>
-                    </label> */}
-                    <label className="flex items-center p-4 border-2 rounded-lg cursor-pointer hover:bg-gray-50">
+                      <Image
+                        src="/icons/bKash.png"
+                        alt=""
+                        width={80}
+                        height={28}
+                        className="h-5 w-auto shrink-0 object-contain"
+                      />
+                    </label>
+                    <label
+                      className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
+                        formData.payment_type === "sslcommerz"
+                          ? "border-blue-500 bg-sky-50"
+                          : "border-gray-200 bg-white hover:bg-gray-50/80"
+                      }`}
+                    >
                       <input
                         type="radio"
                         name="payment_type"
                         value="sslcommerz"
                         checked={formData.payment_type === "sslcommerz"}
                         onChange={handleInputChange}
-                        className="w-4 h-4 text-black focus:ring-black"
+                        className="sr-only"
                       />
-                      <span className="ml-3 font-medium">
+                      <span
+                        className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-full border-2 ${
+                          formData.payment_type === "sslcommerz"
+                            ? "border-blue-500 bg-blue-500"
+                            : "border-gray-300 bg-white"
+                        }`}
+                        aria-hidden
+                      >
+                        {formData.payment_type === "sslcommerz" ? (
+                          <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                        ) : null}
+                      </span>
+                      <span className="text-sm font-medium text-gray-900">
                         Online Payment (SSL Commerz)
                       </span>
+                      <Image
+                        src="/icons/ssl.webp"
+                        alt=""
+                        width={120}
+                        height={36}
+                        className="h-6 w-auto max-w-28 shrink-0 object-contain sm:max-w-34"
+                      />
                     </label>
                   </div>
                 </div>
