@@ -812,6 +812,15 @@ export default function CheckoutPage() {
     (!guestAwaitingOtp &&
       (!existingCustomerMode || (existingCustomerMode && otpVerified)));
 
+  const billingCardHeading = guestAwaitingOtp
+    ? "Verify your phone"
+    : isLoggedIn()
+      ? "Billing Address"
+      : existingCustomerMode
+        ? "Existing Customer Verification"
+        : "Billing Address For New Customer";
+  const showBillingLocationIcon = billingCardHeading.includes("Billing Address");
+
   return (
     <div className="bg-gray-50 py-4">
       <div className="w-full sm:max-w-7xl mx-auto px-4">
@@ -845,14 +854,17 @@ export default function CheckoutPage() {
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="min-w-0 lg:col-span-1 space-y-6">
               <div className="bg-white rounded-lg shadow-sm p-6">
-                <h2 className="text-2xl font-semibold mb-4">
-                  {guestAwaitingOtp
-                    ? "Verify your phone"
-                    : isLoggedIn()
-                      ? "Billing Address"
-                      : existingCustomerMode
-                        ? "Existing Customer Verification"
-                        : "Billing Address For New Customer"}
+                <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
+                  {showBillingLocationIcon ? (
+                    <Image
+                      src="/icons/location.png"
+                      alt=""
+                      width={28}
+                      height={28}
+                      className="h-7 w-7 shrink-0 object-contain"
+                    />
+                  ) : null}
+                  <span>{billingCardHeading}</span>
                 </h2>
                 {/* {!isLoggedIn() && !existingCustomerMode && !guestAwaitingOtp && (
                   <p className="mb-4 text-sm text-gray-600">
