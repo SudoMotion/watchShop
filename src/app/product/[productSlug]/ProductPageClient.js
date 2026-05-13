@@ -260,6 +260,14 @@ export default function ProductPageClient({ params }) {
   const movementSummary =
     movementSpecs.find((item) => item.label === "Movement")?.value || "";
 
+  /** CMS bullet HTML — render as returned (e.g. `<ul><li>1</li>…</li></ul>`). */
+  const bulletHtml =
+    product?.bullet_point ??
+    product?.bulletPoint ??
+    productData?.bullet_point ??
+    "";
+  const hasBulletPoint = htmlHasBody(bulletHtml);
+
   const scrollLeft = () => {
     scrollRef.current?.scrollBy({ left: -120, behavior: "smooth" });
   };
@@ -777,50 +785,54 @@ export default function ProductPageClient({ params }) {
               <span className="text-red-500">●</span> Secure Checkout
               </li>
               </ul> */}
-              {/* bullet points */}
-              {/* {(String(product?.bullet_point || "").trim() || modelText) && (
-                <div className="mt-3 rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm leading-relaxed text-gray-700 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:space-y-1 [&_li]:leading-relaxed">
-                  {modelText && (
-                    <ul className="mb-1 list-disc pl-5">
-                      <li>Model: {modelText}</li>
+              {hasBulletPoint ? (
+                <div className="mt-1 md:mt-3">
+                  {modelText ? (
+                    <ul className="mb-2 space-y-1.5 text-sm text-gray-700">
+                      <li className="flex items-start gap-2">
+                        <span className="mt-0.5 shrink-0 text-black">●</span>
+                        <span>
+                          <span className="font-medium text-gray-800">Model:</span>{" "}
+                          <span className="text-gray-600">{modelText}</span>
+                        </span>
+                      </li>
                     </ul>
-                  )}
-                  {String(product?.bullet_point || "").trim() && (
-                    <div dangerouslySetInnerHTML={{ __html: String(product.bullet_point) }} />
-                  )}
+                  ) : null}
+                  <div
+                    className="product-bullet-point text-sm leading-relaxed text-gray-700 [&_ul]:my-0 [&_ul]:list-none [&_ul]:space-y-1.5 [&_ul]:pl-0 [&_ol]:my-0 [&_ol]:list-decimal [&_ol]:space-y-1.5 [&_ol]:pl-5 [&_li]:flex [&_li]:items-start [&_li]:gap-2 [&_li]:before:mt-0.5 [&_li]:before:shrink-0 [&_li]:before:text-black [&_li]:before:content-['●'] [&_li]:before:font-normal [&_p]:my-1"
+                    dangerouslySetInnerHTML={{ __html: String(bulletHtml) }}
+                  />
                 </div>
-              )} */}
-
-          {/* {productItem.filter((item) => item.value != null && item.value !== "").length > 0 ? (
-            <div className="mt-4 sm:mt-5 pt-4 border-t border-gray-200">
-              Bangladesho
-            </div>
-          ) : 'Bangladesho'} */}
-              <ul className="space-y-1.5 text-sm text-gray-700 mt-1 md:mt-3">
-                <li className="flex items-start gap-2">
-                  <span className="text-black mt-0.5 shrink-0">●</span>
-                  <span>
-                    <span className="font-medium text-gray-800">Model:</span>
-                    <span className="text-gray-600">{modelText}</span>
-                  </span>
-                </li>
-              {productItem.filter(
-                (item) =>
-                  item?.value != null &&
-                  String(item.value).trim() !== "" &&
-                  String(item?.label || "").trim().toLowerCase() !== "model"
-              )
-              .slice(0, 6)
-              .map((item) => (
-                <li key={item.id ?? item.label} className="flex items-start gap-2">
-                  <span className="text-black mt-0.5 shrink-0">●</span>
-                  <span>
-                    <span className="font-medium text-gray-800">{item.label}:</span>{" "}
-                    <span className="text-gray-600">{item.value}</span>
-                  </span>
-                </li>
-              ))}
-            </ul>
+              ) : (
+                <ul className="mt-1 space-y-1.5 text-sm text-gray-700 md:mt-3">
+                  {modelText ? (
+                    <li className="flex items-start gap-2">
+                      <span className="mt-0.5 shrink-0 text-black">●</span>
+                      <span>
+                        <span className="font-medium text-gray-800">Model:</span>{" "}
+                        <span className="text-gray-600">{modelText}</span>
+                      </span>
+                    </li>
+                  ) : null}
+                  {productItem
+                    .filter(
+                      (item) =>
+                        item?.value != null &&
+                        String(item.value).trim() !== "" &&
+                        String(item?.label || "").trim().toLowerCase() !== "model"
+                    )
+                    .slice(0, 6)
+                    .map((item) => (
+                      <li key={item.id ?? item.label} className="flex items-start gap-2">
+                        <span className="mt-0.5 shrink-0 text-black">●</span>
+                        <span>
+                          <span className="font-medium text-gray-800">{item.label}:</span>{" "}
+                          <span className="text-gray-600">{item.value}</span>
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              )}
             {inStock && (
               <div className="mt-2 flex flex-wrap items-center gap-x-4 gap-y-2 sm:gap-x-6">
                 
