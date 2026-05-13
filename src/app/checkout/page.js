@@ -1372,7 +1372,16 @@ export default function CheckoutPage() {
                 </div>
 
                 <div className="mb-4">
-                  <p className="text-sm font-semibold text-gray-900 mb-2">Payment method</p>
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-sm font-semibold text-gray-900 mb-2">Payment method</p>
+                    <Image
+                      src="/icons/paymentMethod.png"
+                      alt="Payment By SSL"
+                      width={100}
+                      height={100}
+                      className="w-5 h-5"
+                    />
+                  </div>
                   <div className="space-y-2">
                     <label
                       className={`flex cursor-pointer items-center gap-3 rounded-lg border-2 px-3 py-2.5 transition-colors focus-within:ring-2 focus-within:ring-blue-400/50 focus-within:ring-offset-1 ${
