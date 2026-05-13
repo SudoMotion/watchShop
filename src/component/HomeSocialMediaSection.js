@@ -3,7 +3,7 @@ import { SOCIAL_MEDIA_LINKS } from "@/lib/socialMedia";
 
 export default function HomeSocialMediaSection() {
   return (
-    <section className="border-y border-gray-200 bg-gray-50 py-6 md:py-12">
+    <section className="border-y border-gray-200 bg-gray-50 py-6 md:py-12 mb-5">
       <div className="mx-auto max-w-7xl px-2">
         <h2 className="text-center text-xl font-semibold tracking-tight text-gray-900 md:text-3xl">
           Watch Shop BD Social Media Activity

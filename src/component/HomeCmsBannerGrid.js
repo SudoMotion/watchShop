@@ -22,7 +22,7 @@ export default function HomeCmsBannerGrid({
   className = "",
 }) {
   if (!Array.isArray(banners) || banners.length === 0) return null;
-
+  console.log('banners', banners);
   const effectiveColumns = banners.length === 1 ? 1 : columns;
   const gridCols =
     effectiveColumns === 1
@@ -33,7 +33,7 @@ export default function HomeCmsBannerGrid({
 
   return (
     <div className={`max-w-7xl mx-auto my-10 px-2 ${className}`.trim()}>
-      {title ? <h2 className="title mb-0 md:mb-5">{title}</h2> : null}
+      <h2 className="title mb-0 md:mb-5">{banners[0]?.title ?? title}</h2>
       <div className={`grid ${gridCols} gap-5`}>
         {banners.map((item, index) => {
           const href = normalizeBannerLink(item?.link);
