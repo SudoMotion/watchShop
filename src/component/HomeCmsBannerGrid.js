@@ -22,7 +22,6 @@ export default function HomeCmsBannerGrid({
   className = "",
 }) {
   if (!Array.isArray(banners) || banners.length === 0) return null;
-  console.log('banners', banners);
   const effectiveColumns = banners.length === 1 ? 1 : columns;
   const gridCols =
     effectiveColumns === 1
