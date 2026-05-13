@@ -170,7 +170,7 @@ export default function CheckoutPage() {
             name: strFilled(apiCustomer.name),
             phone: strFilled(apiCustomer.phone),
             email: apiCustomer.email != null && String(apiCustomer.email).trim() !== "",
-            address: strFilled(apiCustomer.address),
+            address: false,
           });
         } else {
           const c = typeof window !== "undefined" ? getCustomer() : null;
@@ -213,7 +213,7 @@ export default function CheckoutPage() {
 
   const handleInputChange = (e) => {
     const { name, type, checked, value } = e.target;
-    if (apiReadOnly[name]) return;
+    if (apiReadOnly[name] && name !== "address") return;
     const next = type === "checkbox" ? checked : value;
     setFormData((prev) => ({ ...prev, [name]: next }));
     setError(null);
@@ -1064,9 +1064,7 @@ export default function CheckoutPage() {
                       rows={3}
                       maxLength={191}
                       placeholder="House/Flat, Road, Area"
-                      className={`w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent resize-y min-h-[5.5rem] ${
-                        apiReadOnly.address ? readOnlyInputClass : ""
-                      }`}
+                      className="w-full resize-y rounded-lg border border-gray-300 px-4 py-2 min-h-[5.5rem] focus:border-transparent focus:ring-2 focus:ring-black"
                     />
                   </div>
                   {/* <div className="pt-2 border-t border-gray-100">
