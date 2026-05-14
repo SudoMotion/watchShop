@@ -1175,14 +1175,14 @@ export default function ProductPageClient({ params }) {
                     )}
 
                     {/* SPECS GRID */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 sm:gap-y-6 md:gap-y-8 gap-x-4 sm:gap-x-6 md:gap-x-10 mt-4 sm:mt-6 md:mt-8 text-xs sm:text-sm text-gray-700">
+                    {/* <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-4 sm:gap-y-6 md:gap-y-8 gap-x-4 sm:gap-x-6 md:gap-x-10 mt-4 sm:mt-6 md:mt-8 text-xs sm:text-sm text-gray-700">
                       {movementSpecs.map((spec) => (
                         <div key={spec.id}>
                           <p className="text-gray-400">{spec.label}</p>
                           <p className="font-medium">{spec.value || "-"}</p>
                         </div>
                       ))}
-                    </div>
+                    </div> */}
                   </>
                 ) : !hasMovementHtml ? (
                   <p className="text-xs sm:text-sm text-gray-500 leading-relaxed">
