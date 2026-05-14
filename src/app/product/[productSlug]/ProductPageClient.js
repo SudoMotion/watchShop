@@ -529,6 +529,24 @@ export default function ProductPageClient({ params }) {
   }
   const productJsonLd = product ? buildProductJsonLd(product, productSlug) : null;
 
+  const cat = product?.category;
+  const brandObj = product?.brand;
+  const categorySlug =
+    cat?.slug != null && String(cat.slug).trim() !== "" ? String(cat.slug).trim() : "";
+  const categoryId =
+    cat?.id != null && cat.id !== "" ? String(cat.id) : "";
+  const categoryHref =
+    categorySlug !== ""
+      ? `/category/${categorySlug}${
+          categoryId ? `?category_id=${encodeURIComponent(categoryId)}` : ""
+        }`
+      : "/";
+  const brandSlug =
+    brandObj?.slug != null && String(brandObj.slug).trim() !== ""
+      ? String(brandObj.slug).trim()
+      : "";
+  const brandHref = brandSlug !== "" ? `/brand/${brandSlug}` : "/";
+
   return (
     <div
       className={`w-full bg-white text-gray-800 ${
@@ -549,22 +567,57 @@ export default function ProductPageClient({ params }) {
 
         {/* LEFT: IMAGES */}
         <div className="order-1 lg:order-1">
-          <div className="mb-3 flex min-w-0 items-center gap-1.5 overflow-hidden">
-            <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-house-icon lucide-house"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <nav
+            aria-label="Breadcrumb"
+            className="mb-3 w-full min-w-0 break-words"
+          >
+            <Link
+              href="/"
+              className="inline-flex shrink-0 items-center gap-2 font-semibold"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="shrink-0"
+                aria-hidden
+              >
+                <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8" />
+                <path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+              </svg>
               <span>Home</span>
             </Link>
-            /
-            <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold">
-              <span>{productData.product?.category.name}</span>
+            <span className="mx-1 inline select-none" aria-hidden>
+              /
+            </span>
+            <Link
+              href={categoryHref}
+              className="inline-flex shrink-0 items-center gap-2 font-semibold"
+            >
+              <span>{cat?.name ?? "Category"}</span>
             </Link>
-            /
-            <Link href="/" className="flex shrink-0 items-center gap-2 font-semibold">
-              <span>{productData.product?.brand.name}</span>
+            <span className="mx-1 inline select-none" aria-hidden>
+              /
+            </span>
+            <Link
+              href={brandHref}
+              className="inline-flex shrink-0 items-center gap-2 font-semibold"
+            >
+              <span>{brandObj?.name ?? "Brand"}</span>
             </Link>
-            /
-            <span className="min-w-0 truncate" title={productData.product?.name}>{productData.product?.name}</span>
-          </div>
+            <span className="mx-1 inline select-none" aria-hidden>
+              /
+            </span>
+            <span className="inline min-w-0" title={product?.name}>
+              {product?.name}
+            </span>
+          </nav>
           <div className="relative aspect-square w-full border rounded-xl bg-gray-50 overflow-hidden">
             {activeGalleryItem ? (
               <>
