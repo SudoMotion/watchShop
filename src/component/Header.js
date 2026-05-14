@@ -232,17 +232,16 @@ export default function Header() {
             }),
         );
 
-        const navItems = parentCategories.map((cat) => {
-          const isLimitedEditionBrand = isLimitedEditionCat(cat);
+        const navItems = parentCategories
+          .filter((cat) => !isLimitedEditionCat(cat))
+          .map((cat) => {
+            const categoryHref =
+              cat.id != null && cat.id !== ''
+                ? `/category/${cat.slug}?category_id=${encodeURIComponent(String(cat.id))}`
+                : `/category/${cat.slug}`;
 
-          const categoryHref =
-            cat.id != null && cat.id !== ''
-              ? `/category/${cat.slug}?category_id=${encodeURIComponent(String(cat.id))}`
-              : `/category/${cat.slug}`;
+            let submenu = [];
 
-          let submenu = [];
-
-          if (!isLimitedEditionBrand) {
             const subs = subcatByParentId[String(cat.id)] ?? [];
             if (subs.length > 0) {
               submenu = subs.map((sub) => {
@@ -263,17 +262,17 @@ export default function Header() {
                 };
               });
             }
-          }
 
-          return {
-            label: cat.name || '',
-            href: isLimitedEditionBrand ? `/brand/${cat.slug}` : categoryHref,
-            submenu,
-          };
-        });
+            return {
+              label: cat.name || '',
+              href: categoryHref,
+              submenu,
+            };
+          });
 
         setNavigationItems([
           ...navItems,
+          { label: 'Limited Edition', href: '/limited-edition', submenu: [] },
           { label: 'Best Deal', href: '/best-deal', submenu: [] },
           { label: 'Outlets', href: '/outlets', submenu: [] },
         ]);

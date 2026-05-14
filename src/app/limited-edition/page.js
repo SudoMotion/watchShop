@@ -5,6 +5,7 @@ export const dynamic = "force-dynamic";
 
 export default async function LimitedEditionPage() {
   const response = (await getLimitedEdition()) ?? {};
+  console.log('response', response)
   const products = Array.isArray(response?.products)
     ? response.products
     : Array.isArray(response?.data)
