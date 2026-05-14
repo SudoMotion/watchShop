@@ -976,7 +976,7 @@ export default function ProductPageClient({ params }) {
               </a>
               <span>{WHATSAPP_NUMBER}</span>
             </div>
-            <div className="grid grid-cols-2 bg-black gap-px text-center my-5 mb-5 w-2/3 border border-black">
+            <div className="grid grid-cols-2 bg-black gap-px text-center my-5 mb-5 w-full md:w-2/3 border border-black">
               {authentics.length > 0
                 ? authentics.map((a) => (
                     <div key={a.id} className="flex flex-col items-center bg-white p-2">
