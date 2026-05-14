@@ -566,7 +566,7 @@ export default function ProductPageClient({ params }) {
       ) : null}
 
       {/* CONTAINER */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8 lg:gap-10">
 
         {/* LEFT: IMAGES */}
         <div className="order-1 lg:order-1">
