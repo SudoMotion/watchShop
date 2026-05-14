@@ -1319,34 +1319,46 @@ export default function CheckoutPage() {
               <div className="min-w-0 bg-white rounded-lg shadow-sm p-6 lg:sticky lg:top-8">
                 <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
 
-                <div className="space-y-3 mb-4 border-b pb-4 max-h-48 overflow-y-auto">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="flex gap-3">
-                      <div className="w-16 h-16 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                        {cartImageUrl(item.image) ? (
-                          <Image
-                            src={cartImageUrl(item.image)}
-                            alt={item.title}
-                            width={64}
-                            height={64}
-                            className="object-contain w-full h-full"
-                            unoptimized
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-gray-400 text-xs">
-                            No img
+                <div className="space-y-4 mb-4 border-b pb-4 max-h-48 overflow-y-auto">
+                  {cartItems.map((item) => {
+                    const unit = getNumericPrice(item.price);
+                    return (
+                      <div
+                        key={item.id}
+                        className="flex items-start justify-between gap-3"
+                      >
+                        <div className="flex min-w-0 flex-1 items-start gap-3">
+                          <div className="h-12 w-12 shrink-0 overflow-hidden rounded bg-gray-100 sm:h-14 sm:w-14">
+                            {cartImageUrl(item.image) ? (
+                              <Image
+                                src={cartImageUrl(item.image)}
+                                alt=""
+                                width={56}
+                                height={56}
+                                className="h-full w-full object-contain"
+                                unoptimized
+                              />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center text-[10px] text-gray-400">
+                                No img
+                              </div>
+                            )}
                           </div>
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">{item.title}</p>
-                        <p className="text-xs text-gray-600">Qty: {item.quantity}</p>
-                        <p className="text-sm font-semibold text-red-600">
-                          {formatTaka(getNumericPrice(item.price) * item.quantity)}
+                          <p className="min-w-0 flex-1 text-sm leading-snug text-gray-900">
+                            {item.title}
+                          </p>
+                        </div>
+                        <p className="shrink-0 whitespace-nowrap pt-0.5 text-right text-sm tabular-nums">
+                          <span className="text-gray-900">
+                            {item.quantity} x{" "}
+                          </span>
+                          <span className="font-semibold text-red-600">
+                            {formatTaka(unit)}
+                          </span>
                         </p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 <div className="space-y-2 mb-4">
