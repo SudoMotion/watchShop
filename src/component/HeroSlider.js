@@ -100,7 +100,7 @@ export default function HeroSlider() {
                           rel="noopener noreferrer"
                           className="inline-block border border-white px-8 py-3 text-xs font-semibold tracking-widest uppercase text-white transition group-hover:bg-white group-hover:text-black"
                         >
-                          Show More
+                          Shop Now
                         </a>
                       </div>
                     </div>
