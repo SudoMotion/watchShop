@@ -20,7 +20,7 @@ const SORT_OPTIONS = [
   { value: 'nameZtoA', label: 'Name: Z -> A' },
 ];
 
-export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
+export default function CategoryPageClient({ categorySlug, categoryId = "", description = null }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -246,6 +246,9 @@ export default function CategoryPageClient({ categorySlug, categoryId = "" }) {
             </>
           )}
         </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-2 md:px-0 py-6 md:py-10 border-t mt-2">
+        <p>{description}</p>
       </div>
     </div>
   );
