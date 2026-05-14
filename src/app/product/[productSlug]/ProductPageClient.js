@@ -315,6 +315,7 @@ export default function ProductPageClient({ params }) {
         originalPrice: originalPriceStr,
         quantity: addQty,
         stock: cap,
+        is_emi_available: product?.is_emi_available,
       };
       const cart = getCart();
       const existing = cart.find((item) => item.id === product.id);
@@ -324,6 +325,7 @@ export default function ProductPageClient({ params }) {
               ? {
                   ...item,
                   quantity: Math.min(item.quantity + addQty, item.stock),
+                  is_emi_available: product?.is_emi_available,
                 }
               : item
           )
@@ -367,6 +369,7 @@ export default function ProductPageClient({ params }) {
           : "",
         stock,
         inStock: stock > 0,
+        is_emi_available: product?.is_emi_available,
       };
       setWishlist([...wishlist, newItem]);
       setIsInWishlist(true);
@@ -397,6 +400,7 @@ export default function ProductPageClient({ params }) {
         originalPrice: originalPriceStr,
         quantity: addQty,
         stock: cap,
+        is_emi_available: product?.is_emi_available,
       };
       const cart = getCart();
       const existing = cart.find((item) => item.id === product.id);
@@ -406,6 +410,7 @@ export default function ProductPageClient({ params }) {
               ? {
                   ...item,
                   quantity: Math.min(item.quantity + addQty, item.stock),
+                  is_emi_available: product?.is_emi_available,
                 }
               : item
           )

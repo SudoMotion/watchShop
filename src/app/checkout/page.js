@@ -1498,6 +1498,19 @@ export default function CheckoutPage() {
                   </div>
                 </div>
 
+                  <div className="mt-2 sm:mt-3 inline-flex flex-wrap items-center gap-x-2 gap-y-0.5 rounded-lg border border-indigo-100/80 bg-gradient-to-br from-blue-50 to-indigo-50 px-2.5 py-1.5 sm:px-3 sm:py-2">
+                    <span className="inline-flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold text-gray-800">
+                      <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-green-500 animate-pulse" aria-hidden />
+                      EMI Available
+                    </span>
+                    <Link
+                      href="/emi"
+                      className="text-[11px] sm:text-xs font-semibold text-indigo-700 underline underline-offset-2 hover:text-indigo-900"
+                    >
+                      View plan
+                    </Link>
+                  </div>
+
                 <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">Coupon code</label>
                   <div className="flex gap-2">

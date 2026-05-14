@@ -50,6 +50,9 @@ export default function WishlistPage() {
       originalPrice: item.originalPrice,
       quantity: 1,
       stock: Math.max(1, item.stock || 0),
+      ...(item.is_emi_available != null
+        ? { is_emi_available: item.is_emi_available }
+        : {}),
     };
     const nextCart = existing
       ? cart.map((c) =>
