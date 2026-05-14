@@ -330,12 +330,17 @@ export const getBestDeals = async (body = {}) => {
     return null;
   }
 };
-export const getLimitedEdition = async (body = {}) => {
+export const getLimitedEdition = async (params = {}) => {
   try {
-    const response = await apiRequest('/api/page-product-lists/limited-edition',);
+    const response = await apiRequest(
+      '/api/page-product-lists/limited-edition',
+      'GET',
+      null,
+      params,
+    );
     return response.data;
   } catch (error) {
-    console.error('Error fetching search products:', error);
+    console.error('Error fetching limited edition products:', error);
     return null;
   }
 };
