@@ -143,6 +143,28 @@ export default function Header() {
     };
   }, [pathname]);
 
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+        setMobileActiveDropdown(null);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+    setMobileActiveDropdown(null);
+  }, [pathname]);
+
   const [categories, setCategories] = useState([]);
   const [navigationItems, setNavigationItems] = useState([]);
 
@@ -863,11 +885,45 @@ export default function Header() {
 
       </div>
 
-      {/* Mobile Menu Dropdown (below main header) */}
-      {mobileMenuOpen && (
-        <div className="lg:hidden border-b border-white/15 bg-black/50 backdrop-blur-md px-4 pb-4">
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col space-y-1 pt-2">
+      {/* Mobile drawer: slides in from the left (70% width) */}
+      <div className="lg:hidden" aria-hidden={!mobileMenuOpen}>
+        <button
+          type="button"
+          className={`fixed inset-0 z-[100] bg-black/50 backdrop-blur-md transition-opacity duration-300 ease-out motion-reduce:transition-none ${
+            mobileMenuOpen ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+          }`}
+          onClick={() => {
+            setMobileMenuOpen(false);
+            setMobileActiveDropdown(null);
+          }}
+          aria-label="Close menu"
+        />
+        <aside
+          className={`fixed left-0 top-0 z-[101] flex h-dvh min-h-0 w-[70%] flex-col overflow-hidden border-r border-white/15 bg-black/50 backdrop-blur-md transition-transform duration-300 ease-out motion-reduce:transition-none ${
+            mobileMenuOpen ? "translate-x-0" : "-translate-x-full pointer-events-none"
+          }`}
+          role="dialog"
+          aria-modal={mobileMenuOpen}
+          aria-label="Mobile navigation"
+        >
+          <div className="flex shrink-0 items-center justify-between border-b border-white/15 px-4 py-3">
+            <span className="text-sm font-semibold tracking-wide text-white">Menu</span>
+            <button
+              type="button"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setMobileActiveDropdown(null);
+              }}
+              className="rounded-lg p-2 text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+              aria-label="Close menu"
+            >
+              <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 pb-6 pt-2">
+            <div className="flex flex-col space-y-1">
               {navigationItems.map((item, index) => {
                 const hasSubmenu = item.submenu && item.submenu.length > 0;
                 const isDropdownOpen = mobileActiveDropdown === index;
@@ -911,7 +967,7 @@ export default function Header() {
                           {item.highlight && !isBestDealNav && <span className="ml-1">🤝</span>}
                         </span>
                         <svg
-                          className={`w-5 h-5 transition-transform ${
+                          className={`w-5 h-5 shrink-0 transition-transform duration-200 ${
                             isDropdownOpen ? 'rotate-180' : ''
                           }`}
                           fill="none"
@@ -1018,8 +1074,8 @@ export default function Header() {
               })}
             </div>
           </div>
-        </div>
-      )}
+        </aside>
+      </div>
 
       {/* Search Modal */}
       {/* {open && (
