@@ -10,7 +10,7 @@ import { NEXT_PUBLIC_API_URL } from '@/config';
 import { getSubcategoryByCategoryId } from '@/stores/HomeAPI';
 import { getProductsByCategory } from '@/stores/ProductAPI';
 import { useEffect, useMemo, useState } from 'react';
-import { BRAND_SORT_VALUES, buildBrandFilterParams } from '@/hooks/useBrandProducts';
+import { BRAND_SORT_VALUES, buildBrandFilterParams, PRODUCT_LIST_PER_PAGE } from '@/hooks/useBrandProducts';
 
 const SORT_OPTIONS = [
   { value: '', label: 'Default (newest / stock first)' },
@@ -69,6 +69,7 @@ export default function CategoryPageClient({ categorySlug, categoryId = "", desc
       const params = {
         ...buildBrandFilterParams(parsedFilters),
         page: currentPage,
+        per_page: PRODUCT_LIST_PER_PAGE,
       };
       if (sortBy && BRAND_SORT_VALUES.has(sortBy)) {
         params.sortBy = sortBy;
@@ -84,8 +85,18 @@ export default function CategoryPageClient({ categorySlug, categoryId = "", desc
       }
       const [response, stockInResponse, stockOutResponse] = await Promise.all([
         getProductsByCategory(categorySlug, params),
-        getProductsByCategory(categorySlug, { ...baseCountParams, stock_in: '1', page: 1 }),
-        getProductsByCategory(categorySlug, { ...baseCountParams, stock_out: '1', page: 1 }),
+        getProductsByCategory(categorySlug, {
+          ...baseCountParams,
+          stock_in: '1',
+          page: 1,
+          per_page: 1,
+        }),
+        getProductsByCategory(categorySlug, {
+          ...baseCountParams,
+          stock_out: '1',
+          page: 1,
+          per_page: 1,
+        }),
       ]);
       if (!mounted) return;
       const paginated = response?.products;

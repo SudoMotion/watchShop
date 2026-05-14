@@ -8,6 +8,9 @@ export const BRAND_SORT_VALUES = new Set([
   'nameZtoA',
 ]);
 
+/** Page size for category & brand product listing API (`per_page` query). */
+export const PRODUCT_LIST_PER_PAGE = 100;
+
 export function buildBrandFilterParams(filters) {
   const out = {};
   if (!filters || typeof filters !== 'object') return out;
@@ -102,7 +105,11 @@ export function useBrandProducts(brandId, filters, sortBy = '') {
     } catch {
       parsedFilters = {};
     }
-    const params = buildBrandFilterParams(parsedFilters);
+    const params = {
+      ...buildBrandFilterParams(parsedFilters),
+      page: 1,
+      per_page: PRODUCT_LIST_PER_PAGE,
+    };
     if (sortBy && BRAND_SORT_VALUES.has(sortBy)) {
       params.sortBy = sortBy;
     }
