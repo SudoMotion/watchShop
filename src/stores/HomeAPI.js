@@ -75,14 +75,18 @@ export const getSubcategoryByCategoryId = async (categoryId) => {
     return null;
   }
 };
-export const getOutlets = async (categoryId) => {
+export const getOutlets = async () => {
   try {
-    const id = encodeURIComponent();
-    const response = await apiRequest(`/api/branches`);
-    const payload = response?.data?.data ?? response?.data ?? null;
-    return response;
+    const response = await apiRequest('/api/branches', 'GET');
+    if (response?.status >= 400) return null;
+    const raw = response?.data?.data ?? response?.data ?? null;
+    if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+      const branches = Array.isArray(raw.branches) ? raw.branches : [];
+      return { success: raw.success === true, branches };
+    }
+    return { success: false, branches: [] };
   } catch (error) {
-    console.error('Error fetching subcategories by category id:', error);
+    console.error('Error fetching branches/outlets:', error);
     return null;
   }
 };
