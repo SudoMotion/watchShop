@@ -437,6 +437,7 @@ export default function ProductPageClient({ params }) {
     const customer = getCustomer();
     const name = String(customer?.name || "").trim();
     const email = String(customer?.email || "").trim();
+    const phone = String(customer?.phone ?? "").trim();
     if (!name || !email) {
       toast.error("Customer name/email not found. Please log in first.");
       return;
@@ -447,6 +448,7 @@ export default function ProductPageClient({ params }) {
       customer_id: customer?.id ?? null,
       name,
       email,
+      phone,
       review: text,
     };
     setReviewSubmitting(true);
