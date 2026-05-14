@@ -2,7 +2,11 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { getAuthToken } from '@/lib/auth';
-import { getCustomerProfile, updateCustomerProfile } from '@/stores/UserAPI';
+import {
+  getCustomerProfile,
+  updateCustomerProfile,
+  getCustomerOrders,
+} from '@/stores/UserAPI';
 
 const AUTH_KEY = 'watchshop_auth';
 
@@ -110,4 +114,73 @@ export function useUpdateCustomerProfile() {
   const clearError = useCallback(() => setError(null), []);
 
   return { updateProfile, updating, error, clearError };
+}
+
+function normalizeOrdersResponse(res) {
+  const payload = res?.data ?? {};
+  const root = payload.orders ?? payload.data?.orders ?? payload;
+  const list = Array.isArray(root?.data)
+    ? root.data
+    : Array.isArray(root)
+      ? root
+      : [];
+  return {
+    list,
+    current_page: Math.max(1, Number(root?.current_page ?? 1)),
+    last_page: Math.max(1, Number(root?.last_page ?? 1)),
+    per_page: Number(root?.per_page ?? 15),
+    total: Number(root?.total ?? list.length),
+  };
+}
+
+/**
+ * GET /api/customer/orders — Laravel-style paginator under `orders` when present.
+ */
+export function useCustomerOrders(page = 1, perPage = 15) {
+  const [state, setState] = useState({
+    list: [],
+    current_page: 1,
+    last_page: 1,
+    total: 0,
+    loading: true,
+    error: null,
+  });
+
+  const load = useCallback(async () => {
+    const token = getAuthToken();
+    if (!token) {
+      setState((s) => ({
+        ...s,
+        loading: false,
+        list: [],
+        total: 0,
+        error: null,
+      }));
+      return;
+    }
+    setState((s) => ({ ...s, loading: true, error: null }));
+    const pp = Math.min(50, Math.max(1, Number(perPage) || 15));
+    const res = await getCustomerOrders(token, { page, per_page: pp });
+    if (res?.status === 200) {
+      const n = normalizeOrdersResponse(res);
+      setState({ ...n, loading: false, error: null });
+    } else {
+      const payload = res?.data ?? {};
+      setState((s) => ({
+        ...s,
+        loading: false,
+        list: [],
+        total: 0,
+        error:
+          payload?.message ||
+          (res?.status === 401 ? 'Sign in to view orders.' : 'Could not load orders.'),
+      }));
+    }
+  }, [page, perPage]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
+
+  return { ...state, refetch: load };
 }

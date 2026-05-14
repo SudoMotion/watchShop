@@ -22,3 +22,11 @@ export const getCustomerProfile = async (token, params = {}) =>
  */
 export const updateCustomerProfile = async (token, body, params = {}) =>
   apiRequest('/api/customer/profile', 'PATCH', body, params, authHeader(token));
+
+/**
+ * Paginated order history — GET /api/customer/orders
+ * Query: page, per_page (default 15, max 50)
+ * @see src/_lib/doc.txt §3
+ */
+export const getCustomerOrders = async (token, params = {}) =>
+  apiRequest('/api/customer/orders', 'GET', null, params, authHeader(token));

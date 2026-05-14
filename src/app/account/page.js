@@ -9,7 +9,9 @@ import { getAuthToken } from "@/lib/auth";
 import {
   useCustomerProfile,
   useUpdateCustomerProfile,
+  useCustomerOrders,
 } from "@/hooks/useCustomerProfile";
+import { formatBdt } from "@/lib/formatPriceView";
 
 const BD_PHONE = /^01[13-9][0-9]{8}$/;
 
@@ -18,6 +20,17 @@ export default function AccountPage() {
   const { customer, setCustomer, loading, error, refetch } = useCustomerProfile();
   const { updateProfile, updating, error: updateError, clearError } =
     useUpdateCustomerProfile();
+
+  const [ordersPage, setOrdersPage] = useState(1);
+  const {
+    list: orders,
+    loading: ordersLoading,
+    error: ordersError,
+    current_page: ordersCurrentPage,
+    last_page: ordersLastPage,
+    total: ordersTotal,
+    refetch: refetchOrders,
+  } = useCustomerOrders(ordersPage, 15);
 
   const [editOpen, setEditOpen] = useState(false);
   const [form, setForm] = useState({
@@ -96,6 +109,7 @@ export default function AccountPage() {
       toast.success("Profile updated successfully.");
       closeEdit();
       await refetch();
+      await refetchOrders();
     } else {
       toast.error(result.error || "Update failed");
     }
@@ -154,13 +168,13 @@ export default function AccountPage() {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <ToastContainer position="top-right" autoClose={2500} newestOnTop />
 
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <div className="mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
             My Account
           </h1>
           <p className="mt-1 text-gray-600 text-sm">
-            Your profile and contact details
+            Your profile, orders, and contact details
           </p>
           {error && (
             <p className="mt-2 text-amber-700 text-sm" role="status">
@@ -253,6 +267,114 @@ export default function AccountPage() {
               Log out
             </button>
           </div>
+        </div>
+
+        {/* Order history */}
+        <div className="mt-10 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+          <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <div>
+              <h2 className="text-lg font-semibold text-gray-900">My orders</h2>
+              <p className="text-sm text-gray-500 mt-0.5">
+                {ordersTotal > 0
+                  ? `${ordersTotal} order${ordersTotal === 1 ? "" : "s"} total`
+                  : ordersLoading
+                    ? "Loading…"
+                    : "No orders yet"}
+              </p>
+            </div>
+            {ordersLastPage > 1 && (
+              <div className="flex items-center gap-2 text-sm">
+                <button
+                  type="button"
+                  disabled={ordersCurrentPage <= 1 || ordersLoading}
+                  onClick={() => setOrdersPage((p) => Math.max(1, p - 1))}
+                  className="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Previous
+                </button>
+                <span className="text-gray-600 tabular-nums">
+                  Page {ordersCurrentPage} / {ordersLastPage}
+                </span>
+                <button
+                  type="button"
+                  disabled={ordersCurrentPage >= ordersLastPage || ordersLoading}
+                  onClick={() => setOrdersPage((p) => p + 1)}
+                  className="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  Next
+                </button>
+              </div>
+            )}
+          </div>
+
+          {ordersError && (
+            <div className="px-6 py-3 text-sm text-amber-800 bg-amber-50 border-b border-amber-100">
+              {ordersError}
+            </div>
+          )}
+
+          {ordersLoading && orders.length === 0 ? (
+            <div className="px-6 py-12 text-center text-gray-500 text-sm">Loading orders…</div>
+          ) : orders.length === 0 ? (
+            <div className="px-6 py-12 text-center text-gray-500 text-sm">
+              You have no orders to show.{" "}
+              <Link href="/" className="text-teal-600 font-medium hover:text-teal-700">
+                Continue shopping
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div className="hidden md:block overflow-x-auto">
+                <table className="min-w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 text-left text-gray-600 border-b border-gray-100">
+                      <th className="px-6 py-3 font-medium">Order</th>
+                      <th className="px-6 py-3 font-medium">Date</th>
+                      <th className="px-6 py-3 font-medium">Status</th>
+                      <th className="px-6 py-3 font-medium text-right">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {orders.map((row) => (
+                      <tr key={row.id} className="hover:bg-gray-50/80">
+                        <td className="px-6 py-3 font-medium text-gray-900 whitespace-nowrap">
+                          {row.order_number ?? `#${row.id}`}
+                        </td>
+                        <td className="px-6 py-3 text-gray-700 whitespace-nowrap">
+                          {row.order_date ?? "—"}
+                        </td>
+                        <td className="px-6 py-3 text-gray-700">{row.status ?? "—"}</td>
+                        <td className="px-6 py-3 text-right font-medium text-gray-900 whitespace-nowrap">
+                          {formatBdt(row.total_amount ?? row.amount ?? 0)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              <div className="md:hidden divide-y divide-gray-100">
+                {orders.map((row) => (
+                  <div key={row.id} className="px-6 py-4 space-y-1">
+                    <div className="flex justify-between gap-2">
+                      <span className="font-semibold text-gray-900">
+                        {row.order_number ?? `#${row.id}`}
+                      </span>
+                      <span className="font-medium text-gray-900 tabular-nums">
+                        {formatBdt(row.total_amount ?? row.amount ?? 0)}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">{row.order_date ?? "—"}</p>
+                    <p className="text-sm text-gray-700">{row.status ?? "—"}</p>
+                    {(row.payment_type || row.online_payment_status) && (
+                      <p className="text-xs text-gray-500">
+                        {[row.payment_type, row.online_payment_status].filter(Boolean).join(" · ")}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </>
+          )}
         </div>
 
         <p className="mt-6 text-center text-gray-500 text-sm">
