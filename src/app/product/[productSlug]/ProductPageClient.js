@@ -1301,30 +1301,8 @@ export default function ProductPageClient({ params }) {
       {/* Fixed CTA — only after scrolling 500px (inline buttons stay at top) */}
       {showFloatingCta && inStock && (
         <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-3 pb-[max(0.2rem,env(safe-area-inset-bottom))] pt-2 pointer-events-none">
-          <div className="pointer-events-auto flex w-full max-w-[min(100%,26rem)] items-center gap-1.5 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm">
-            <div className="inline-flex shrink-0 items-center overflow-hidden rounded-full border border-gray-300 bg-gray-50">
-              <button
-                type="button"
-                aria-label="Decrease quantity"
-                disabled={purchaseQty <= 1}
-                onClick={() => setPurchaseQty((q) => Math.max(1, q - 1))}
-                className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                −
-              </button>
-              <span className="min-w-7 select-none px-1 text-center text-[11px] font-semibold tabular-nums text-gray-900">
-                {purchaseQty}
-              </span>
-              <button
-                type="button"
-                aria-label="Increase quantity"
-                disabled={purchaseQty >= stockQty}
-                onClick={() => setPurchaseQty((q) => Math.min(stockQty, q + 1))}
-                className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                +
-              </button>
-            </div>
+          <div className="pointer-events-auto flex w-full max-w-2/3 md:max-w-[min(100%,26rem)] items-center gap-1.5 rounded-xl border border-gray-200/90 bg-white/98 px-2 py-1.5 shadow-md backdrop-blur-sm">
+            
             <button
               type="button"
               onClick={handleAddToCart}
@@ -1346,6 +1324,29 @@ export default function ProductPageClient({ params }) {
             >
               <span className="truncate">{buyNowLoading ? "Processing..." : "Buy Now"}</span>
             </button>
+            {/* <div className="inline-flex shrink-0 items-center overflow-hidden rounded-full border border-gray-300 bg-gray-50">
+              <button
+                type="button"
+                aria-label="Decrease quantity"
+                disabled={purchaseQty <= 1}
+                onClick={() => setPurchaseQty((q) => Math.max(1, q - 1))}
+                className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                −
+              </button>
+              <span className="min-w-7 select-none px-1 text-center text-[11px] font-semibold tabular-nums text-gray-900">
+                {purchaseQty}
+              </span>
+              <button
+                type="button"
+                aria-label="Increase quantity"
+                disabled={purchaseQty >= stockQty}
+                onClick={() => setPurchaseQty((q) => Math.min(stockQty, q + 1))}
+                className="flex h-7 w-7 shrink-0 items-center justify-center text-sm font-semibold leading-none text-gray-800 transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                +
+              </button>
+            </div> */}
           </div>
         </div>
       )}
