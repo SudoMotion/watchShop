@@ -207,7 +207,12 @@ export default function Header() {
 
         if (!Array.isArray(data)) return;
 
-        const parentCategories = data.filter((cat) => cat && cat.parent_id === 0);
+        const parentCategories = data.filter(
+          (cat) =>
+            cat &&
+            cat.parent_id === 0 &&
+            Number(cat.is_homepage) === 1,
+        );
 
         const isLimitedEditionCat = (cat) => {
           const slug = String(cat?.slug || '').toLowerCase();
