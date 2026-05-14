@@ -193,6 +193,7 @@ export default function CategoryPageClient({ categorySlug, categoryId = "", desc
           setFilters={setFilters}
           stockCounts={stockCounts}
           subcategoryOptions={subcategoryOptions}
+          categoryName={categoryName}
           category_id={resolvedCategoryId || undefined}
         />
         <div className="md:col-span-5">

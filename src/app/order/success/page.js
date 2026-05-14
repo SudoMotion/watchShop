@@ -50,7 +50,9 @@ function OrderSuccessContent() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900 mb-2">Order placed successfully</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">
+            Your Order Has Been Placed Successfully And Full Invoice For Details
+          </h1>
           <p className="text-gray-600 mb-6">
             Thank you for your order. We will process it shortly.
           </p>

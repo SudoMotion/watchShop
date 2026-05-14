@@ -43,6 +43,8 @@ export default function ProductFilter({
   stockCounts,
   /** Category page: subcategories from API; omit or empty = hide Subcategory block */
   subcategoryOptions = null,
+  /** Category page: accordion title for that block (replaces the word "Subcategory") */
+  categoryName = null,
   category_id,
   brand_id
 }) {
@@ -181,7 +183,11 @@ export default function ProductFilter({
             }`}
             onClick={() => toggle("subcategory")}
           >
-            <span>Subcategory</span>
+            <span className="min-w-0 truncate">
+              {typeof categoryName === "string" && categoryName.trim() !== ""
+                ? categoryName.trim()
+                : "Subcategory"}
+            </span>
             {expandIcon("subcategory")}
           </button>
           {open === "subcategory" && (

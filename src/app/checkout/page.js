@@ -509,11 +509,8 @@ export default function CheckoutPage() {
         if (data.success && data.order) {
           setCart([]);
           setCartItems([]);
-          const orderId = data.order?.id;
           toast.success(
-            orderId
-              ? `Order #${orderId} placed successfully.`
-              : "Order placed successfully."
+            "Your Order Has Been Placed Successfully And Full Invoice For Details",
           );
           return true;
         }
