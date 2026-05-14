@@ -12,6 +12,7 @@ import {
   useCustomerOrders,
 } from "@/hooks/useCustomerProfile";
 import { formatBdt } from "@/lib/formatPriceView";
+import { Pagination } from "@/component/Pagination";
 
 const BD_PHONE = /^01[13-9][0-9]{8}$/;
 
@@ -271,7 +272,7 @@ export default function AccountPage() {
 
         {/* Order history */}
         <div className="mt-10 bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+          <div className="px-6 py-4 border-b border-gray-100">
             <div>
               <h2 className="text-lg font-semibold text-gray-900">My orders</h2>
               <p className="text-sm text-gray-500 mt-0.5">
@@ -282,29 +283,6 @@ export default function AccountPage() {
                     : "No orders yet"}
               </p>
             </div>
-            {ordersLastPage > 1 && (
-              <div className="flex items-center gap-2 text-sm">
-                <button
-                  type="button"
-                  disabled={ordersCurrentPage <= 1 || ordersLoading}
-                  onClick={() => setOrdersPage((p) => Math.max(1, p - 1))}
-                  className="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </button>
-                <span className="text-gray-600 tabular-nums">
-                  Page {ordersCurrentPage} / {ordersLastPage}
-                </span>
-                <button
-                  type="button"
-                  disabled={ordersCurrentPage >= ordersLastPage || ordersLoading}
-                  onClick={() => setOrdersPage((p) => p + 1)}
-                  className="px-3 py-1.5 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  Next
-                </button>
-              </div>
-            )}
           </div>
 
           {ordersError && (
@@ -373,6 +351,21 @@ export default function AccountPage() {
                   </div>
                 ))}
               </div>
+              {ordersLastPage > 1 && (
+                <div className="px-6 py-4 border-t border-gray-100 bg-gray-50/50">
+                  <p className="text-sm text-gray-600 text-center mb-2">
+                    Page {ordersCurrentPage} of {ordersLastPage}
+                    {ordersTotal > 0 ? ` (${ordersTotal} orders)` : ""}
+                  </p>
+                  <div className="flex justify-center">
+                    <Pagination
+                      currentPage={ordersCurrentPage}
+                      lastPage={ordersLastPage}
+                      onPageChange={(page) => setOrdersPage(page)}
+                    />
+                  </div>
+                </div>
+              )}
             </>
           )}
         </div>
