@@ -601,7 +601,7 @@ export default function ProductPageClient({ params }) {
                   <button
                     type="button"
                     onClick={handleWishlistToggle}
-                    className={`absolute right-3 top-3 z-10 flex h-11 w-11 items-center justify-center rounded-full shadow-md ring-1 ring-black/10 transition hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 ${
+                    className={`absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full shadow-md ring-1 ring-black/10 transition hover:scale-105 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 ${
                       isInWishlist
                         ? "bg-red-50 text-red-600"
                         : "bg-white/95 text-gray-700 hover:bg-white"
@@ -618,7 +618,7 @@ export default function ProductPageClient({ params }) {
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                         fill="currentColor"
-                        className="h-6 w-6"
+                        className="h-5 w-5"
                         aria-hidden
                       >
                         <path d="m11.645 20.91-.007-.003-.022-.012a15.247 15.247 0 01-.383-.218 25.18 25.18 0 01-4.244-3.17C4.688 15.36 2.25 12.174 2.25 8.25 2.25 5.322 4.714 3 7.688 3A5.5 5.5 0 0112 5.052 5.5 5.5 0 0116.313 3c2.973 0 5.437 2.322 5.437 5.25 0 3.925-2.438 7.111-4.739 9.256a25.175 25.175 0 01-4.244 3.17 15.247 15.247 0 01-.383.218l-.022.012-.007.004-.003.001a.75.75 0 01-.704 0l-.003-.001z" />
@@ -630,7 +630,7 @@ export default function ProductPageClient({ params }) {
                         viewBox="0 0 24 24"
                         strokeWidth={1.75}
                         stroke="currentColor"
-                        className="h-6 w-6"
+                        className="h-5 w-5"
                         aria-hidden
                       >
                         <path
