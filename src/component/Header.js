@@ -12,6 +12,20 @@ import { Backend_Base_Url } from '@/config';
 import { formatBdt } from '@/lib/formatPriceView';
 import DesktopSearch from './DesktopSearch';
 
+function mapSubcategoryBrandsToChildren(brandList) {
+  if (!Array.isArray(brandList)) return [];
+  return brandList
+    .map((brand) => {
+      const slug = String(brand?.slug ?? brand?.brand_slug ?? '').trim();
+      if (!slug) return null;
+      return {
+        label: String(brand?.name ?? '').trim() || slug,
+        href: `/brand/${slug}`,
+      };
+    })
+    .filter(Boolean);
+}
+
 export default function Header() {
   
   const [open, setOpen] = useState(false); // search modal
@@ -20,6 +34,8 @@ export default function Header() {
   const [relatedKeywords, setRelatedKeywords] = useState([]);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [activeDropdown, setActiveDropdown] = useState(null);
+  /** Desktop: hovered subcategory index → show brands fly-out */
+  const [navFlyoutSubIndex, setNavFlyoutSubIndex] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [mobileActiveDropdown, setMobileActiveDropdown] = useState(null);
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -83,7 +99,11 @@ export default function Header() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [showUserMenu, activeDropdown, open, mobileSearchOpen]);
-  
+
+  useEffect(() => {
+    setNavFlyoutSubIndex(null);
+  }, [activeDropdown]);
+
   // Mock data - in real app, get from context/state
   useEffect(() => {
     const syncWishlistCount = (event) => {
@@ -178,61 +198,80 @@ export default function Header() {
     router.push(`/search?keyword=${encodeURIComponent(keyword)}`);
   };
 
-  // Fetch categories once (for debugging / future use)
+  // Fetch categories + subcategories for nav (submenus)
   useEffect(() => {
     const fetchCategories = async () => {
       try {
         const data = await getCategories();
         setCategories(data);
 
-        // Build navigation items from real category data
-        if (Array.isArray(data)) {
-          const navItems = data
-            .filter((cat) => cat && cat.parent_id === 0)
-            .map((cat) => {
-              const slug = String(cat.slug || '').toLowerCase();
-              const name = String(cat.name || '').toLowerCase().trim();
-              const isLimitedEditionBrand =
-                slug === 'limited-edition' || name === 'limited edition';
+        if (!Array.isArray(data)) return;
 
-              const categoryHref =
-                cat.id != null && cat.id !== ''
-                  ? `/category/${cat.slug}?category_id=${encodeURIComponent(String(cat.id))}`
-                  : `/category/${cat.slug}`;
+        const parentCategories = data.filter((cat) => cat && cat.parent_id === 0);
 
-              return {
-                label: cat.name || '',
-                href: isLimitedEditionBrand ? `/brand/${cat.slug}` : categoryHref,
-                submenu:
-                  isLimitedEditionBrand || !Array.isArray(cat.brands)
-                    ? []
-                    : cat.brands.map((brand) => ({
-                        label: brand.name || '',
-                        href: `/brand/${brand.slug}`,
-                      })),
-              };
-            });
+        const isLimitedEditionCat = (cat) => {
+          const slug = String(cat?.slug || '').toLowerCase();
+          const name = String(cat?.name || '').toLowerCase().trim();
+          return slug === 'limited-edition' || name === 'limited edition';
+        };
 
-          setNavigationItems([
-            ...navItems,
-            { label: 'Best Deal', href: '/best-deal', submenu: [] },
-            { label: 'Outlets', href: '/outlets', submenu: [] },
-          ]);
-
-          const categoryIds = [
-            ...new Set(
-              data
-                .filter((cat) => cat && cat.id != null && cat.id !== '')
-                .map((cat) => String(cat.id)),
-            ),
-          ];
-          await Promise.all(
-            categoryIds.map(async (categoryId) => {
-              const subcategoryResponse = await getSubcategoryByCategoryId(categoryId);
-              console.log('getSubcategoryByCategoryId', { categoryId, response: subcategoryResponse });
+        const subcatByParentId = {};
+        await Promise.all(
+          parentCategories
+            .filter((cat) => !isLimitedEditionCat(cat) && cat.id != null && cat.id !== '')
+            .map(async (cat) => {
+              const key = String(cat.id);
+              const res = await getSubcategoryByCategoryId(key);
+              const list = res?.subcategories ?? res?.data?.subcategories;
+              subcatByParentId[key] = Array.isArray(list) ? list : [];
             }),
-          );
-        }
+        );
+
+        const navItems = parentCategories.map((cat) => {
+          const isLimitedEditionBrand = isLimitedEditionCat(cat);
+
+          const categoryHref =
+            cat.id != null && cat.id !== ''
+              ? `/category/${cat.slug}?category_id=${encodeURIComponent(String(cat.id))}`
+              : `/category/${cat.slug}`;
+
+          let submenu = [];
+
+          if (!isLimitedEditionBrand) {
+            const subs = subcatByParentId[String(cat.id)] ?? [];
+            if (subs.length > 0) {
+              submenu = subs.map((sub) => {
+                const raw = sub.brands ?? sub.brand;
+                const brandList = Array.isArray(raw) ? raw : [];
+                return {
+                  label: sub.name || '',
+                  href: `/category/${sub.slug}?category_id=${encodeURIComponent(String(sub.id))}`,
+                  children: mapSubcategoryBrandsToChildren(brandList),
+                };
+              });
+            } else if (Array.isArray(cat.brands) && cat.brands.length > 0) {
+              submenu = cat.brands.map((brand) => {
+                const slug = String(brand?.slug ?? brand?.brand_slug ?? '').trim();
+                return {
+                  label: brand.name || '',
+                  href: slug ? `/brand/${slug}` : '#',
+                };
+              });
+            }
+          }
+
+          return {
+            label: cat.name || '',
+            href: isLimitedEditionBrand ? `/brand/${cat.slug}` : categoryHref,
+            submenu,
+          };
+        });
+
+        setNavigationItems([
+          ...navItems,
+          { label: 'Best Deal', href: '/best-deal', submenu: [] },
+          { label: 'Outlets', href: '/outlets', submenu: [] },
+        ]);
       } catch (error) {
         console.error('Error loading categories in Header:', error);
       }
@@ -364,7 +403,7 @@ export default function Header() {
                         isBestDealNav
                           ? 'text-red-500 hover:text-red-400'
                           : item.highlight
-                            ? 'text-green-300 hover:text-green-200'
+                            ? 'text-white/90 hover:text-white'
                             : 'text-white hover:text-red-400'
                       }`}
                     >
@@ -397,8 +436,89 @@ export default function Header() {
                       )}
                     </Link>
 
-                    {/* Dropdown Menu */}
+                    {/* Dropdown: subcategories + nested brands, or flat brand list */}
                     {hasSubmenu && isDropdownOpen && (() => {
+                      const submenuNested = item.submenu.some(
+                        (s) => Array.isArray(s.children) && s.children.length > 0,
+                      );
+                      if (submenuNested) {
+                        const flyoutSub =
+                          navFlyoutSubIndex != null ? item.submenu[navFlyoutSubIndex] : null;
+                        const flyoutChildren = Array.isArray(flyoutSub?.children)
+                          ? flyoutSub.children
+                          : [];
+                        return (
+                          <div className="absolute left-0 top-full z-50 pt-1">
+                            <div
+                              className="flex max-h-[min(70vh,28rem)] flex-row rounded-lg border border-gray-200 bg-white shadow-lg"
+                              onMouseLeave={() => setNavFlyoutSubIndex(null)}
+                            >
+                              <div className="min-w-52 shrink-0 overflow-y-auto border-r border-gray-200 py-2">
+                                {item.submenu.map((subItem, subIndex) => {
+                                  const hasChildMenu =
+                                    Array.isArray(subItem.children) && subItem.children.length > 0;
+                                  const isActiveFlyout = navFlyoutSubIndex === subIndex;
+                                  return (
+                                    <Link
+                                      key={subIndex}
+                                      href={subItem.href}
+                                      onMouseEnter={() =>
+                                        hasChildMenu
+                                          ? setNavFlyoutSubIndex(subIndex)
+                                          : setNavFlyoutSubIndex(null)
+                                      }
+                                      onClick={() => setActiveDropdown(null)}
+                                      className={`flex items-center justify-between gap-2 px-4 py-2.5 text-sm font-semibold transition-colors ${
+                                        isActiveFlyout
+                                          ? 'bg-gray-100 text-gray-900'
+                                          : 'text-gray-900 hover:bg-gray-50 hover:text-gray-950'
+                                      }`}
+                                    >
+                                      <span className="min-w-0 truncate">{subItem.label}</span>
+                                      {hasChildMenu ? (
+                                        <span
+                                          className="inline-flex shrink-0 rounded p-0.5 text-gray-400"
+                                          aria-hidden
+                                        >
+                                          <svg
+                                            className="h-4 w-4"
+                                            fill="none"
+                                            viewBox="0 0 24 24"
+                                            stroke="currentColor"
+                                          >
+                                            <path
+                                              strokeLinecap="round"
+                                              strokeLinejoin="round"
+                                              strokeWidth={2}
+                                              d="M9 5l7 7-7 7"
+                                            />
+                                          </svg>
+                                        </span>
+                                      ) : null}
+                                    </Link>
+                                  );
+                                })}
+                              </div>
+                              {navFlyoutSubIndex != null && flyoutChildren.length > 0 ? (
+                                <div className="min-w-48 max-w-xs shrink-0 overflow-y-auto border-l border-gray-200 bg-white py-2">
+                                  <div className="flex flex-col py-1">
+                                    {flyoutChildren.map((child, ci) => (
+                                      <Link
+                                        key={ci}
+                                        href={child.href}
+                                        className="px-4 py-2.5 text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-950"
+                                        onClick={() => setActiveDropdown(null)}
+                                      >
+                                        {child.label}
+                                      </Link>
+                                    ))}
+                                  </div>
+                                </div>
+                              ) : null}
+                            </div>
+                          </div>
+                        );
+                      }
                       const len = item.submenu.length;
                       const isCol1 = len <= 7;
                       const isCol2 = len <= 16;
@@ -410,40 +530,52 @@ export default function Header() {
                           ? 'w-80 md:w-96 min-w-[20rem] max-w-[32rem]'
                           : isCol3
                             ? 'w-64 md:w-[28rem] lg:w-[650px] min-w-[36rem] max-w-[650px]'
-                          : 'w-64 md:w-[28rem] min-w-[36rem] lg:min-w-[55rem] max-w-[650px]';
-
-                          // if(isCol1 || isCol2){
-                          // }
-                          return (
-                            <div className={`absolute grid grid-flow-col z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${rowsClass} ${widthClass}`}>
-                              {item.submenu.map((subItem, subIndex) => (
-                                <Link
-                                  key={subIndex}
-                                  href={subItem.href}
-                                  className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
-                                  onClick={() => setActiveDropdown(null)}
+                            : 'w-64 md:w-[28rem] min-w-[36rem] lg:min-w-[55rem] max-w-[650px]';
+                      return (
+                        <div
+                          className={`absolute grid grid-flow-col z-50 top-full left-0 bg-white rounded-lg shadow-lg border border-gray-200 py-2 ${rowsClass} ${widthClass}`}
+                        >
+                          {item.submenu.map((subItem, subIndex) => {
+                            const isBrandRow =
+                              typeof subItem.href === 'string' &&
+                              subItem.href.startsWith('/brand/');
+                            const hasChildMenu =
+                              !isBrandRow &&
+                              Array.isArray(subItem.children) &&
+                              subItem.children.length > 0;
+                            return (
+                            <Link
+                              key={subIndex}
+                              href={subItem.href}
+                              className={`flex items-center justify-between gap-2 px-4 py-2 text-sm font-medium text-gray-700 transition-colors whitespace-nowrap min-w-0 hover:bg-gray-50 hover:text-gray-900`}
+                              onClick={() => setActiveDropdown(null)}
+                            >
+                              <span className="min-w-0 truncate">{subItem.label}</span>
+                              {hasChildMenu ? (
+                                <span
+                                  className="inline-flex shrink-0 rounded p-0.5 text-gray-400 hover:bg-gray-100"
+                                  aria-hidden
                                 >
-                                  {subItem.label}
-                                </Link>
-                              ))}
-                            </div>
-                          );
-                      // return (
-                      //   <div className='fixed top-[72px] bg-white shadow-lg border border-gray-200 w-screen left-0 flex justify-center items-center'>
-                      //     <div className={`grid z-50 top-full left-0 py-2 ${gridCols} w-64 md:w-[28rem] lg:w-[850px] min-w-[36rem] max-w-[850px]`}>
-                      //       {item.submenu.map((subItem, subIndex) => (
-                      //         <Link
-                      //           key={subIndex}
-                      //           href={subItem.href}
-                      //           className="block px-4 py-2 text-sm text-gray-700 hover:text-red-600 transition-colors whitespace-nowrap min-w-0"
-                      //           onClick={() => setActiveDropdown(null)}
-                      //         >
-                      //           {subItem.label}
-                      //         </Link>
-                      //       ))}
-                      //     </div>
-                      //   </div>
-                      // );
+                                  <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 5l7 7-7 7"
+                                    />
+                                  </svg>
+                                </span>
+                              ) : null}
+                            </Link>
+                            );
+                          })}
+                        </div>
+                      );
                     })()}
                   </div>
                 );
@@ -702,7 +834,7 @@ export default function Header() {
                             </span>
                             {discountPercent > 0 && (
                               <>
-                                <span className="rounded bg-green-100 px-1 py-0.5 text-[10px] font-semibold text-green-700">
+                                <span className="rounded bg-gray-200 px-1 py-0.5 text-[10px] font-semibold text-gray-800">
                                   {Math.round(discountPercent)}% OFF
                                 </span>
                                 <span className="text-gray-400 line-through">
@@ -754,7 +886,7 @@ export default function Header() {
                           isBestDealNav
                             ? 'text-red-500 hover:text-red-400'
                             : item.highlight
-                              ? 'text-green-300 hover:text-green-200'
+                              ? 'text-white/90 hover:text-white'
                               : 'text-white hover:text-red-400'
                         }`}
                         aria-label={`Toggle ${item.label} submenu`}
@@ -798,7 +930,7 @@ export default function Header() {
                           isBestDealNav
                             ? 'text-red-500 hover:text-red-400'
                             : item.highlight
-                              ? 'text-green-300 hover:text-green-200'
+                              ? 'text-white/90 hover:text-white'
                               : 'text-white hover:text-red-400'
                         }`}
                       >
@@ -817,22 +949,64 @@ export default function Header() {
                       </Link>
                     )}
 
-                    {/* Mobile Submenu */}
+                    {/* Mobile Submenu (optional nested brands under subcategory) */}
                     {hasSubmenu && isDropdownOpen && (
                       <div className="bg-white/5 pb-2">
-                        {item.submenu.map((subItem, subIndex) => (
-                          <Link
-                            key={subIndex}
-                            href={subItem.href}
-                            onClick={() => {
-                              setMobileActiveDropdown(null);
-                              setMobileMenuOpen(false);
-                            }}
-                            className="block py-2 px-6 text-sm text-gray-200 hover:text-white hover:bg-white/10 transition-colors"
-                          >
-                            {subItem.label}
-                          </Link>
-                        ))}
+                        {item.submenu.map((subItem, subIndex) => {
+                          const isBrandOnlyRow =
+                            typeof subItem.href === 'string' &&
+                            subItem.href.startsWith('/brand/');
+                          const hasChildMenu =
+                            Array.isArray(subItem.children) && subItem.children.length > 0;
+                          return (
+                          <div key={subIndex} className="border-b border-white/5 last:border-b-0">
+                            <Link
+                              href={subItem.href}
+                              onClick={() => {
+                                setMobileActiveDropdown(null);
+                                setMobileMenuOpen(false);
+                              }}
+                              className={`flex items-center justify-between gap-2 py-2 px-6 text-sm font-medium text-gray-100 hover:text-white hover:bg-white/10 transition-colors`}
+                            >
+                              <span className="min-w-0 truncate">{subItem.label}</span>
+                              {hasChildMenu && !isBrandOnlyRow ? (
+                                <span
+                                  className="inline-flex shrink-0 rounded p-0.5 text-gray-400 hover:bg-white/10"
+                                  aria-hidden
+                                >
+                                  <svg
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                  >
+                                    <path
+                                      strokeLinecap="round"
+                                      strokeLinejoin="round"
+                                      strokeWidth={2}
+                                      d="M9 5l7 7-7 7"
+                                    />
+                                  </svg>
+                                </span>
+                              ) : null}
+                            </Link>
+                            {hasChildMenu &&
+                              subItem.children.map((child, ci) => (
+                                <Link
+                                  key={ci}
+                                  href={child.href}
+                                  onClick={() => {
+                                    setMobileActiveDropdown(null);
+                                    setMobileMenuOpen(false);
+                                  }}
+                                  className="block py-1.5 pl-10 pr-6 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/10 transition-colors"
+                                >
+                                  {child.label}
+                                </Link>
+                              ))}
+                          </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
