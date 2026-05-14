@@ -1024,7 +1024,7 @@ export default function ProductPageClient({ params }) {
       {/* DESCRIPTION */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 mt-6 sm:mt-8">
       
-        <div className="z-30 flex flex-wrap items-center gap-2 sm:gap-4 md:gap-6 sticky top-[50px] bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <div className="z-30 flex flex-wrap items-center gap-2 sm:gap-4 md:gap-6 sticky top-[50px] md:top-[70px] bg-white shadow-md px-2 sm:px-3 overflow-x-auto scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <button
               onClick={() => scrollToSection("editor-note")}
               className={`py-2 px-1 sm:px-2 whitespace-nowrap font-semibold text-xs sm:text-sm md:text-base lg:text-lg transition-colors flex-shrink-0 ${

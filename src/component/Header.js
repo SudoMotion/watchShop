@@ -810,10 +810,7 @@ export default function Header() {
             {String(searchQuery || "").trim().length > 0 && (
               <div className="mt-2 max-h-72 overflow-y-auto rounded border border-gray-100">
                 {relatedKeywords.length > 0 && (
-                  <div className="border-b border-gray-100 px-3 py-2">
-                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-600 mb-2">
-                      Related keywords
-                    </p>
+                  <div className="border-b border-gray-100 px-3 py-2 max-w-full overflow-x-auto">
                     <div className="flex flex-wrap gap-2">
                       {relatedKeywords.map((keyword, keywordIndex) => (
                         <button
