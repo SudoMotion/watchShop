@@ -75,6 +75,17 @@ export const getSubcategoryByCategoryId = async (categoryId) => {
     return null;
   }
 };
+export const getOutlets = async (categoryId) => {
+  try {
+    const id = encodeURIComponent();
+    const response = await apiRequest(`/api/branches`);
+    const payload = response?.data?.data ?? response?.data ?? null;
+    return response;
+  } catch (error) {
+    console.error('Error fetching subcategories by category id:', error);
+    return null;
+  }
+};
 
 export default {
   getHome,
@@ -83,4 +94,5 @@ export default {
   getBannerContent,
   getHomeMetaContents,
   getSubcategoryByCategoryId,
+  getOutlets,
 };
