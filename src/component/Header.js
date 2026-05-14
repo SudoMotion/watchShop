@@ -6,6 +6,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { isLoggedIn } from '@/lib/auth';
 import { getWishlist } from '@/lib/wishlistStorage';
 import { getCart } from '@/lib/cartStorage';
+import { getSubcategoryByCategoryId } from '@/stores/HomeAPI';
 import { getCategories, postSearchProducts } from '@/stores/ProductAPI';
 import { Backend_Base_Url } from '@/config';
 import { formatBdt } from '@/lib/formatPriceView';
@@ -217,6 +218,20 @@ export default function Header() {
             { label: 'Best Deal', href: '/best-deal', submenu: [] },
             { label: 'Outlets', href: '/outlets', submenu: [] },
           ]);
+
+          const categoryIds = [
+            ...new Set(
+              data
+                .filter((cat) => cat && cat.id != null && cat.id !== '')
+                .map((cat) => String(cat.id)),
+            ),
+          ];
+          await Promise.all(
+            categoryIds.map(async (categoryId) => {
+              const subcategoryResponse = await getSubcategoryByCategoryId(categoryId);
+              console.log('getSubcategoryByCategoryId', { categoryId, response: subcategoryResponse });
+            }),
+          );
         }
       } catch (error) {
         console.error('Error loading categories in Header:', error);
