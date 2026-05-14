@@ -99,26 +99,35 @@ export default function ProductFilter({
 
   const brandLabel = (b) => b?.name ?? brandSlug(b);
 
+  const expandIcon = (sectionKey) => (
+    <span
+      className="flex h-8 w-8 shrink-0 items-center justify-center text-3xl font-light leading-none text-gray-500 sm:h-9 sm:w-9 sm:text-[2rem]"
+      aria-hidden
+    >
+      {open === sectionKey ? "-" : "+"}
+    </span>
+  );
+
   return (
     <div
-      className="border border-gray-200 p-5 rounded-xl shadow-md flex flex-col gap-y-4 max-h-screen overflow-y-auto md:sticky top-0"
+      className="border border-gray-200 p-3 rounded-xl shadow-md flex flex-col gap-y-2 max-h-screen overflow-y-auto md:sticky top-0"
       data-brand-id={brandId ?? undefined}
     >
-      <h2 className="text-lg font-semibold text-gray-800">Filters</h2>
+      <h2 className="text-base font-semibold text-gray-800">Filters</h2>
 
-      <div className="border border-gray-200 p-3 rounded-md">
+      <div className="border border-gray-200 p-2 rounded-md">
         <button
           type="button"
-          className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "quantity" ? "border-b border-gray-300" : ""
+          className={`flex w-full items-center justify-between gap-2 text-left text-base font-medium text-gray-900 ${
+            open === "quantity" ? "border-b border-gray-300 pb-1.5" : ""
           }`}
           onClick={() => toggle("quantity")}
         >
           <span>Available quantity</span>
-          <span className="text-gray-500">{open === "quantity" ? "-" : "+"}</span>
+          {expandIcon("quantity")}
         </button>
         {open === "quantity" && (
-          <div className="mt-3 ml-1 space-y-2">
+          <div className="mt-2 ml-0.5 space-y-1.5">
             <label className="flex items-center gap-x-2 text-sm text-gray-700">
               <input
                 type="checkbox"
@@ -164,19 +173,19 @@ export default function ProductFilter({
       </div>
 
       {Array.isArray(subcategoryOptions) && subcategoryOptions.length > 0 ? (
-        <div className="border border-gray-200 p-3 rounded-md">
+        <div className="border border-gray-200 p-2 rounded-md">
           <button
             type="button"
-            className={`text-xl flex items-center justify-between w-full text-left ${
-              open === "subcategory" ? "border-b border-gray-300" : ""
+            className={`flex w-full items-center justify-between gap-2 text-left text-base font-medium text-gray-900 ${
+              open === "subcategory" ? "border-b border-gray-300 pb-1.5" : ""
             }`}
             onClick={() => toggle("subcategory")}
           >
             <span>Subcategory</span>
-            <span className="text-gray-500">{open === "subcategory" ? "-" : "+"}</span>
+            {expandIcon("subcategory")}
           </button>
           {open === "subcategory" && (
-            <div className="mt-2 ml-1 max-h-56 overflow-y-auto flex flex-col gap-y-2">
+            <div className="mt-2 ml-0.5 max-h-56 overflow-y-auto flex flex-col gap-y-1.5">
               {subcategoryOptions.map((sub) => {
                 const slug =
                   sub?.slug ?? sub?.subcategory_slug ?? String(sub?.id ?? "");
@@ -208,19 +217,19 @@ export default function ProductFilter({
         </div>
       ) : null}
 
-      <div className="border border-gray-200 p-3 rounded-md">
+      <div className="border border-gray-200 p-2 rounded-md">
         <button
           type="button"
-          className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "movement" ? "border-b border-gray-300" : ""
+          className={`flex w-full items-center justify-between gap-2 text-left text-base font-medium text-gray-900 ${
+            open === "movement" ? "border-b border-gray-300 pb-1.5" : ""
           }`}
           onClick={() => toggle("movement")}
         >
           <span>Movement</span>
-          <span className="text-gray-500">{open === "movement" ? "-" : "+"}</span>
+          {expandIcon("movement")}
         </button>
         {open === "movement" && (
-          <div className="mt-2 ml-4 flex flex-col gap-y-2">
+          <div className="mt-2 ml-2 flex flex-col gap-y-1.5">
             {movementOptions.length === 0 ? (
               <p className="text-sm text-gray-500">No movement available</p>
             ) : (
@@ -248,19 +257,19 @@ export default function ProductFilter({
         )}
       </div>
 
-      <div className="border border-gray-200 p-3 rounded-md">
+      <div className="border border-gray-200 p-2 rounded-md">
         <button
           type="button"
-          className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "band_type" ? "border-b border-gray-300" : ""
+          className={`flex w-full items-center justify-between gap-2 text-left text-base font-medium text-gray-900 ${
+            open === "band_type" ? "border-b border-gray-300 pb-1.5" : ""
           }`}
           onClick={() => toggle("band_type")}
         >
           <span>Band type</span>
-          <span className="text-gray-500">{open === "band_type" ? "-" : "+"}</span>
+          {expandIcon("band_type")}
         </button>
         {open === "band_type" && (
-          <div className="mt-2 ml-4 flex flex-col gap-y-2">
+          <div className="mt-2 ml-2 flex flex-col gap-y-1.5">
             {BAND_TYPE_OPTIONS.map(([value, label]) => (
               <label key={value} className="flex items-center gap-x-2">
                 <input
@@ -284,19 +293,19 @@ export default function ProductFilter({
         )}
       </div>
 
-      <div className="border border-gray-200 p-3 rounded-md">
+      <div className="border border-gray-200 p-2 rounded-md">
         <button
           type="button"
-          className={`text-xl flex items-center justify-between w-full text-left ${
-            open === "brands" ? "border-b border-gray-300" : ""
+          className={`flex w-full items-center justify-between gap-2 text-left text-base font-medium text-gray-900 ${
+            open === "brands" ? "border-b border-gray-300 pb-1.5" : ""
           }`}
           onClick={() => toggle("brands")}
         >
           <span>Brands</span>
-          <span className="text-gray-500">{open === "brands" ? "-" : "+"}</span>
+          {expandIcon("brands")}
         </button>
         {open === "brands" && (
-          <div className="mt-2 ml-1 max-h-56 overflow-y-auto flex flex-col gap-y-2">
+          <div className="mt-2 ml-0.5 max-h-56 overflow-y-auto flex flex-col gap-y-1.5">
             {brandList.length === 0 ? (
               <p className="text-sm text-gray-500">No brands available</p>
             ) : (
