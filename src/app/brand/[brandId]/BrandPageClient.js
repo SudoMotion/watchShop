@@ -19,7 +19,7 @@ const SORT_OPTIONS = [
 ];
 const FALLBACK_BANNER_URL = '/images/brand-banner.webp';
 
-export default function BrandPageClient({ brandId, initialBrand = null }) {
+export default function BrandPageClient({ brandId, initialBrand = null, description = null }) {
   const [filters, setFilters] = useState({});
   const [sortBy, setSortBy] = useState('');
   const [bannerLoaded, setBannerLoaded] = useState(false);
@@ -180,6 +180,9 @@ export default function BrandPageClient({ brandId, initialBrand = null }) {
             </div>
           )}
         </div>
+      </div>
+      <div className="max-w-7xl mx-auto px-2 md:px-0 py-6 md:py-10 border-t mt-2">
+        <p>{description}</p>
       </div>
     </div>
   );

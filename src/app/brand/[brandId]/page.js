@@ -15,9 +15,10 @@ export async function generateMetadata({ params }) {
 export default async function BrandPage({ params }) {
   const { brandId } = await params;
   const listingPayload = brandId ? await getBrandListingPayload(brandId) : null;
+  const description = listingPayload?.brand?.meta_description;
   const initialBrand = extractBrandFromListingPayload(listingPayload);
 
   return (
-    <BrandPageClient brandId={brandId} initialBrand={initialBrand} />
+    <BrandPageClient brandId={brandId} initialBrand={initialBrand} description={description} />
   );
 }
