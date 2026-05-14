@@ -800,7 +800,7 @@ export default function ProductPageClient({ params }) {
           <div className="mt-2 sm:mt-3 flex flex-wrap items-baseline gap-2 sm:gap-3">
             {sellingPriceNum > 0 && (
               <span className="text-red-600 font-bold text-lg sm:text-xl md:text-2xl">
-                {formatBdt(sellingPriceNum)}
+                {formatBdt(originalPriceNum - sellingPriceNum)}
               </span>
             )}
             {discountPercent > 0 && (
