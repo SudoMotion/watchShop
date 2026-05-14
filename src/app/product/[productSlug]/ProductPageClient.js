@@ -13,6 +13,7 @@ import Link from "next/link";
 import { useRef, useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Loading from "@/component/Loading";
+import LoginModal from "@/component/LoginModal";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { formatBdt, formatNumberGrouped, formatTaka } from "@/lib/formatPriceView";
@@ -1462,54 +1463,15 @@ export default function ProductPageClient({ params }) {
         </div>
       )}
 
-      {reviewLoginPromptOpen && (
-        <div
-          className="fixed inset-0 z-[60] flex items-center justify-center p-4 sm:p-6"
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="review-login-modal-title"
-        >
-          <button
-            type="button"
-            className="absolute inset-0 bg-black/50 backdrop-blur-[2px]"
-            onClick={() => setReviewLoginPromptOpen(false)}
-            aria-label="Close login prompt"
-          />
-          <div
-            className="relative z-10 w-full max-w-md rounded-2xl border border-gray-200 bg-white p-5 shadow-xl sm:p-6"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h4
-              id="review-login-modal-title"
-              className="text-lg font-semibold text-gray-900 sm:text-xl"
-            >
-              Login required
-            </h4>
-            <p className="mt-2 text-sm text-gray-600">
-              Login to place review.
-            </p>
-            <div className="mt-5 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-              <button
-                type="button"
-                onClick={() => setReviewLoginPromptOpen(false)}
-                className="rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 hover:bg-gray-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setReviewLoginPromptOpen(false);
-                  router.push("/login");
-                }}
-                className="rounded-lg bg-black px-4 py-2.5 text-sm font-semibold text-white hover:bg-gray-800"
-              >
-                Login
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LoginModal
+        open={reviewLoginPromptOpen}
+        onClose={() => setReviewLoginPromptOpen(false)}
+        onSuccess={() => {
+          setReviewModalOpen(true);
+        }}
+        title="Sign in to review"
+        description="Enter your mobile number to receive a code. After you sign in, you can submit your review."
+      />
 
       <ToastContainer position="top-right" autoClose={2500} newestOnTop />
     </div>
