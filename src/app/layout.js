@@ -4,6 +4,7 @@ import Header from "@/component/Header";
 import Footer from "@/component/Footer";
 import Popup from "@/component/Popup";
 import FixedFloatingActions from "@/component/FixedFloatingActions";
+import ConditionalLayoutSocial from "@/component/ConditionalLayoutSocial";
 
 const jost = Jost({
   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({ children }) {
           <div className="flex-1 w-full">
             {children}
           </div>
+          <ConditionalLayoutSocial />
           <Footer/>
           <FixedFloatingActions />
         </div>
