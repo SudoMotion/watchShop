@@ -127,7 +127,7 @@ export default function BrandPageClient({ brandId, initialBrand = null }) {
           <span className="capitalize">{displayName}</span>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 md:mt-4 px-2 mt-2">
+      <div className="grid grid-cols-1 md:grid-cols-6 gap-2 md:mt-4 px-2 mt-2">
         <ProductFilter
           brandId={brandId}
           brand_id={apiBrandId}
@@ -135,7 +135,7 @@ export default function BrandPageClient({ brandId, initialBrand = null }) {
           setFilters={setFilters}
           stockCounts={stockCounts}
         />
-        <div className="md:col-span-2 lg:col-span-3 xl:col-span-4">
+        <div className="md:col-span-5">
           <div
             className={`mb-4 flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4 ${
               activeFilterCount > 0 ? 'sm:justify-between' : 'sm:justify-end'
