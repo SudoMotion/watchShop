@@ -321,12 +321,17 @@ export const getbrandLabels = async (params = {}) => {
     return null;
   }
 };
-export const getBestDeals = async (body = {}) => {
+export const getBestDeals = async (params = {}) => {
   try {
-    const response = await apiRequest('/api/page-product-lists/best-deal',);
+    const response = await apiRequest(
+      '/api/page-product-lists/best-deal',
+      'GET',
+      null,
+      params,
+    );
     return response.data;
   } catch (error) {
-    console.error('Error fetching search products:', error);
+    console.error('Error fetching best deal products:', error);
     return null;
   }
 };
