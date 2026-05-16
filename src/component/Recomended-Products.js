@@ -7,7 +7,6 @@ import ProductCard2 from './ProductCard2';
 export default async function RecomendedProducts({ sectionTitle = 'Recommended' }) {
     // const result = await getDiscountProducts();
     const {page_name, products} = await getRecommendedProducts();
-    console.log('Hello world',  await getRecommendedProducts())
     // const {products, brands, categories    } = result || {};
     const items = (products ?? (Array.isArray(products) ? products : [])).slice(0, 6);
   return (
