@@ -10,6 +10,7 @@ export default async function DynamicSection() {
   const {sections : newDynamicSection} = await getNewDynamicSection();
   const hasDynamicSection =
     Array.isArray(newDynamicSection) && newDynamicSection.length > 0;
+  console.log('newDynamicSection', newDynamicSection)
 
   return (
     <div>
@@ -47,20 +48,35 @@ export default async function DynamicSection() {
                   </div>
                 </div>
 
-                {/* Back */}
+                {/* Back — hover image + text */}
                 <div
-                  className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl border border-neutral-700 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-950 px-6 py-8 text-center shadow-inner [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translate3d(0,0,1px)]"
+                  className={`absolute inset-0 flex flex-col items-center justify-center overflow-hidden rounded-2xl border px-6 py-8 text-center shadow-inner [backface-visibility:hidden] [-webkit-backface-visibility:hidden] [transform:rotateY(180deg)_translate3d(0,0,1px)] ${
+                    item.hover_image
+                      ? 'border-gray-100 bg-white'
+                      : 'border-neutral-700 bg-gradient-to-br from-neutral-900 via-neutral-800 to-neutral-950'
+                  }`}
                 >
-                  <h3 className="text-xs font-semibold leading-tight tracking-tight text-white md:text-base">
-                    {item.name}
-                  </h3>
-                  <p className="mt-1.5 text-[10px] text-neutral-300 md:mt-2 md:text-xs">
-                    {item.description}
-                  </p>
-                  <div
-                    className="mt-3 h-px w-8 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent md:mt-4 md:w-10"
-                    aria-hidden
-                  />
+                  {item.hover_image && (
+                    <Image
+                      src={Backend_Base_Url + '/' + item.hover_image}
+                      alt={`${item.name} hover`}
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    />
+                  )}
+                  <div className="relative z-10 flex flex-col items-center justify-center">
+                    <h3 className="text-xs font-semibold leading-tight tracking-tight text-white md:text-base">
+                      {item.name}
+                    </h3>
+                    <p className="mt-1.5 text-[10px] text-neutral-300 md:mt-2 md:text-xs">
+                      {item.description}
+                    </p>
+                    <div
+                      className="mt-3 h-px w-8 bg-gradient-to-r from-transparent via-amber-400/60 to-transparent md:mt-4 md:w-10"
+                      aria-hidden
+                    />
+                  </div>
                 </div>
               </div>
             </article>
