@@ -10,7 +10,6 @@ export default async function DynamicSection() {
   const {sections : newDynamicSection} = await getNewDynamicSection();
   const hasDynamicSection =
     Array.isArray(newDynamicSection) && newDynamicSection.length > 0;
-  console.log('newDynamicSection', newDynamicSection)
 
   return (
     <div>
