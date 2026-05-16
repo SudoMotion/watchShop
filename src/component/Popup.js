@@ -211,14 +211,21 @@ export default function Popup() {
             </p>
           ) : null}
 
-          <div className="mt-8 flex items-center justify-center gap-2.5 sm:mt-9 sm:flex-row sm:items-stretch sm:gap-3">
+          <div className="mt-8 flex flex-col items-center gap-3 sm:mt-9">
             <Link
               href={href}
               onClick={dismiss}
-              className="inline-flex min-h-[2.75rem] max-w-56 whitespace-nowrap flex-1 items-center justify-center rounded-xl bg-neutral-900 px-5 text-center text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 active:scale-[0.99]"
+              className="inline-flex min-h-[2.75rem] max-w-56 whitespace-nowrap items-center justify-center rounded-xl bg-neutral-900 px-5 text-center text-[0.6875rem] font-semibold uppercase tracking-[0.2em] text-white shadow-sm transition hover:bg-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-900 active:scale-[0.99]"
             >
               {btnText}
             </Link>
+            <button
+              type="button"
+              onClick={dismiss}
+              className="text-center cursor-pointer text-[0.6875rem] font-medium uppercase tracking-[0.15em] text-neutral-500 transition hover:text-neutral-800 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-neutral-400"
+            >
+              Skip Now
+            </button>
           </div>
         </div>
       </div>
